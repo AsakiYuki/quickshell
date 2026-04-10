@@ -1,0 +1,339 @@
+import QtQuick
+import Quickshell
+
+import "../../components"
+import "../../core"
+import "../../base"
+
+import "./commands" as Cmd
+
+Loader {
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    anchors.topMargin: 10
+
+    sourceComponent: RadiusRectangle {
+        id: _root
+
+        width: _list_container.width
+        height: _list_container.height
+        clip: true
+
+        Behavior on height {
+            NumberAnimation {
+                duration: 350
+                easing.type: Easing.OutExpo
+            }
+        }
+
+        property int viewIndex: 0
+        property int selectorIndex: 0
+
+        readonly property var _e: _textField.commandMode ? _cmd_list : _list
+
+        property int count: _e.model.length
+        property int maxSelector: Math.min(_e.maxView, count)
+
+        NumberAnimation {
+            running: true
+            target: _root
+            properties: "y"
+            from: -20 - _root.height
+            to: 0
+            easing.type: Easing.OutExpo
+            duration: 350
+        }
+
+        NumberAnimation {
+            running: !SharedState.isLauncherOpened
+            target: _root
+            properties: "y"
+            from: _root.y
+            to: -20 - _root.height
+            easing.type: Easing.OutExpo
+            duration: 350
+        }
+
+        onSelectorIndexChanged: {
+            selectorIndex = Math.max(0, Math.min(selectorIndex, maxSelector - 1));
+        }
+
+        onViewIndexChanged: {
+            _e.viewIndex = viewIndex = Math.max(0, Math.min(count - maxSelector, viewIndex));
+        }
+
+        function goUp() {
+            if (selectorIndex < 1) {
+                if (viewIndex === 0) {
+                    selectorIndex = maxSelector - 1;
+                    viewIndex = count;
+                } else
+                    viewIndex--;
+            } else
+                selectorIndex--;
+        }
+
+        function goDown() {
+            if (selectorIndex > maxSelector - 2) {
+                if (viewIndex + maxSelector === count) {
+                    selectorIndex = 0;
+                    viewIndex = 0;
+                } else
+                    viewIndex++;
+            } else
+                selectorIndex++;
+        }
+
+        function mouseClick(index) {
+            if (selectorIndex === index) {
+                execute(viewIndex + selectorIndex);
+                SharedState.isLauncherOpened = false;
+            } else
+                selectorIndex = index;
+        }
+
+        function execute(index) {
+            if (!_textField.searchText.trim().startsWith("/")) {
+                _e.model[index].entry.execute();
+                SharedState.isLauncherOpened = false;
+                return;
+            }
+
+            const entry = _e.model[index].entry;
+            _textField.customPlaceHolder = entry.textfieldPlaceHolder;
+            _command_panel.commandId = entry.commandId;
+            _command_panel.isActive = true;
+        }
+
+        function reset() {
+            _root.viewIndex = 0;
+            selectorIndex = 0;
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: _command_panel.isActive ? Qt.ArrowCursor : Qt.PointingHandCursor
+            enabled: !_command_panel.isActive
+
+            onClicked: ({
+                    x,
+                    y
+                }) => {
+                if (y <= 50)
+                    return;
+                _root.mouseClick((y / 55 >> 0) - 1);
+            }
+
+            onWheel: ({
+                    angleDelta
+                }) => {
+                const isScrollUp = angleDelta.y > 0;
+                if (isScrollUp)
+                    _root.goUp();
+                else
+                    _root.goDown();
+            }
+        }
+
+        Keys.onPressed: ev => {
+            if (ev.modifiers === Qt.AltModifier && ev.key === Qt.Key_Left) {
+                _command_panel.isActive = false;
+                _textField.customPlaceHolder = "";
+                _textField.text = _textField.searchText;
+            }
+            
+            if (ev.key === Qt.Key_Escape) {
+                SharedState.isLauncherOpened = false;
+            }
+
+            if (_command_panel.isActive || (ev.modifiers > Qt.NoModifier))
+                return;
+
+            if (ev.key === Qt.Key_Down)
+                _root.goDown();
+            else if (ev.key === Qt.Key_Up)
+                _root.goUp();
+            else if (ev.key === Qt.Key_Enter || ev.key === Qt.Key_Return) {
+                _root.execute(viewIndex + selectorIndex);
+            }
+        }
+
+        RadiusRectangle {
+            id: selector_panel
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width - 20
+            height: 55
+            color: Catppuccin.crust
+            y: 45 + _root.selectorIndex * 55
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+            }
+        }
+
+        Column {
+            id: _list_container
+
+            spacing: 5
+            topPadding: 10
+            bottomPadding: 10
+            width: _command_panel.isActive ? (_command_panel.width + 20) : 650
+            Behavior on width {
+                NumberAnimation {
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+            }
+
+            StyledTextField {
+                id: _textField
+
+                width: parent.width - 20
+
+                property string searchText: ""
+                onTextChanged: {
+                    if (!_command_panel.isActive) {
+                        searchText = text.trim();
+                    }
+                }
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                readonly property bool commandMode: searchText[0] === "/"
+
+                property string customPlaceHolder: ""
+                placeholderText: customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder
+
+                onCommandModeChanged: {
+                    if (commandMode)
+                        openCommandAnim.running = true;
+                    else
+                        closeCommandAnim.running = true;
+                }
+                Component.onCompleted: _textField.forceActiveFocus()
+            }
+
+            ParallelAnimation {
+                id: openCommandAnim
+
+                OpacityAnimator {
+                    from: 1
+                    to: 0
+                    target: _list
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+
+                OpacityAnimator {
+                    from: 0
+                    to: 1
+                    target: _cmd_list
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+            }
+
+            ParallelAnimation {
+                id: closeCommandAnim
+
+                OpacityAnimator {
+                    from: 0
+                    to: 1
+                    target: _list
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+
+                OpacityAnimator {
+                    from: 1
+                    to: 0
+                    target: _cmd_list
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+            }
+
+            ParallelAnimation {
+                running: _command_panel.isActive
+
+                OpacityAnimator {
+                    from: 1
+                    to: 0
+                    target: _cmd_list
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+
+                OpacityAnimator {
+                    from: 1
+                    to: 0
+                    target: selector_panel
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+
+                OpacityAnimator {
+                    from: 0
+                    to: 1
+                    target: _command_panel
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+            }
+
+            ParallelAnimation {
+                running: !_command_panel.isActive
+
+                OpacityAnimator {
+                    from: 0
+                    to: 1
+                    target: _cmd_list
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+
+                OpacityAnimator {
+                    from: 0
+                    to: 1
+                    target: selector_panel
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+
+                OpacityAnimator {
+                    from: 1
+                    to: 0
+                    target: _command_panel
+                    duration: 350
+                    easing.type: Easing.OutExpo
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height)
+
+                Cmd.CommandPanel {
+                    id: _command_panel
+                    opacity: 0
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onIsActiveChanged: {
+                        if (isActive)
+                            _textField.text = "";
+                    }
+                }
+
+                Commands {
+                    id: _cmd_list
+                    opacity: 0
+                }
+
+                Applications {
+                    id: _list
+                }
+            }
+        }
+    }
+}

@@ -1,12 +1,28 @@
 import Quickshell
+import QtQuick
 
 import "../components"
 import "../modules"
 import "../core"
 
 Scope {
+    Timer {
+        id: launcherTimer
+        property bool isBlocked: false
+        running: false
+        interval: 350
+        onTriggered: {
+            isBlocked = false;
+        }
+    }
+
     CustomShortcut {
         name: "launcher"
-        onPressed: SharedState.isLauncherOpened = !SharedState.isLauncherOpened
+        onPressed: {
+            if (!launcherTimer.isBlocked) {
+                launcherTimer.isBlocked = launcherTimer.running = true;
+                SharedState.isLauncherOpened = !SharedState.isLauncherOpened;
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@ import Quickshell
 import QtQuick
 
 import "./modules" as Modules
-import "./core" as Core
+import "./core"
 
 ShellRoot {
     id: root
@@ -23,8 +23,4 @@ ShellRoot {
 
     Modules.Overlay {}
     Modules.Wallpaper {}
-
-    Component.onCompleted: {
-        console.log(Core.Paths.);
-    }
 }

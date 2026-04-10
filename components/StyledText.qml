@@ -6,5 +6,5 @@ import "../base"
 Text {
     color: Catppuccin.text
     renderType: Text.NativeRendering
-    font.pixelSize: 12
+    font.pixelSize: 13
 }

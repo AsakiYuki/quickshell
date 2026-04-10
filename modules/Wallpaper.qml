@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 
 import "../components"
+import "../core"
 
 Variants {
     model: Quickshell.screens
@@ -29,7 +30,7 @@ Variants {
                 first.source = second.source;
 
                 second.opacity = 0;
-                second.source = `../assets/wallpapers/${wallpaper}`;
+                second.source = `${Paths.wallpapers}/${wallpaper}`;
 
                 anim.running = true;
             }

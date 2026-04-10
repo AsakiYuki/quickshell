@@ -8,7 +8,7 @@ import Quickshell.Wayland
 import "../components"
 import "../modules"
 import "../core"
-import "../layouts" as Layouts
+import "../elements/Launcher"
 
 Variants {
     id: _root
@@ -41,7 +41,27 @@ Variants {
                 item: null
             }
 
-            Layouts.Launcher {}
+            Launcher {
+                id: launcher
+
+                Timer {
+                    running: !SharedState.isLauncherOpened
+                    interval: 150
+                    onTriggered: {
+                        launcher.active = false;
+                    }
+                }
+
+                Timer {
+                    running: SharedState.isLauncherOpened
+                    interval: 0
+                    onTriggered: {
+                        launcher.active = true;
+                    }
+                }
+
+                active: false
+            }
         }
     }
 }

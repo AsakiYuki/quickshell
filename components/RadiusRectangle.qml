@@ -9,5 +9,5 @@ Rectangle {
 
     color: Catppuccin.base
     border.color: Catppuccin.surface2
-    radius: 20
+    radius: 25
 }

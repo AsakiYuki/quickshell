@@ -1,6 +1,8 @@
 import Quickshell
 import QtQuick
 
+import "../core"
+
 Scope {
     id: _configuration
 
@@ -9,18 +11,16 @@ Scope {
     onWallpaperChanged: save()
 
     function save() {
-        fs.writefile("/home/asakiyuki/.config/quickshell/settings.json", JSON.stringify({
+        fs.writefile(Paths.settings, JSON.stringify({
             wallpaper
         }));
     }
 
     Component.onCompleted: {
-        fs.readfile("/home/asakiyuki/.config/quickshell/settings.json").then(v => {
+        fs.readfile(Paths.settings).then(v => {
             const data = JSON.parse(v);
-
             wallpaper = data.wallpaper || "wallpaper-0.jpg";
-        }).catch(() => {
-            console.log("cac");
+        }).catch(err => {
             wallpaper = "wallpaper-0.jpg";
         });
     }
