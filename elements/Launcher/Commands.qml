@@ -2,19 +2,12 @@ import QtQuick
 
 import "../../core"
 import "../../utils/FuzzySort.js" as FuzzySort
+import "../../commands" as Cmd
 
 LauncherListView {
     id: _list
 
-    property list<var> entries: [
-        {
-            name: "Wallpaper",
-            comment: "Change your current wallpaper",
-            icon: "../../assets/icons/images.png",
-            textfieldPlaceHolder: "Choose your wallpaper",
-            commandId: 0
-        },
-    ].map(a => ({
+    property list<var> entries: Cmd.List.commands.map(a => ({
                 name: FuzzySort.prepare(a.name),
                 comment: FuzzySort.prepare(a.comment),
                 entry: a
@@ -34,7 +27,7 @@ LauncherListView {
                         text: v.entry.name,
                         subtext: v.entry.comment,
                         entry: {
-                            commandId: v.entry.commandId,
+                            target: v.entry.target,
                             textfieldPlaceHolder: v.entry.textfieldPlaceHolder
                         }
                     }));

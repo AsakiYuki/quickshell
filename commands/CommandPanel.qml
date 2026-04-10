@@ -4,7 +4,7 @@ Item {
     id: _root
 
     property bool isActive: false
-    property int commandId: -1
+    property string command: "Wallpapers"
 
     width: _loader.width
     height: _loader.height
@@ -12,6 +12,6 @@ Item {
     Loader {
         id: _loader
         active: _root.isActive
-        source: ["Wallpapers.qml"][_root.commandId] || ""
+        source: `${_root.command}.qml`
     }
 }

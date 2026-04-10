@@ -5,7 +5,7 @@ import "../../components"
 import "../../core"
 import "../../base"
 
-import "./commands" as Cmd
+import "../../commands" as Cmd
 
 Loader {
     anchors.horizontalCenter: parent.horizontalCenter
@@ -52,6 +52,14 @@ Loader {
             to: -20 - _root.height
             easing.type: Easing.OutExpo
             duration: 350
+        }
+
+        onVisibleChanged: {
+            if (SharedState.isLauncherOpened) {
+                openAnim.start();
+            } else {
+                closeAnim.start();
+            }
         }
 
         onSelectorIndexChanged: {
@@ -101,7 +109,7 @@ Loader {
 
             const entry = _e.model[index].entry;
             _textField.customPlaceHolder = entry.textfieldPlaceHolder;
-            _command_panel.commandId = entry.commandId;
+            _command_panel.command = entry.target;
             _command_panel.isActive = true;
         }
 
@@ -141,7 +149,7 @@ Loader {
                 _textField.customPlaceHolder = "";
                 _textField.text = _textField.searchText;
             }
-            
+
             if (ev.key === Qt.Key_Escape) {
                 SharedState.isLauncherOpened = false;
             }
@@ -165,6 +173,13 @@ Loader {
             height: 55
             color: Catppuccin.crust
             y: 45 + _root.selectorIndex * 55
+
+            opacity: _command_panel.isActive ? 0 : 1
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 120
+                }
+            }
 
             Behavior on y {
                 NumberAnimation {
@@ -215,110 +230,14 @@ Loader {
                 Component.onCompleted: _textField.forceActiveFocus()
             }
 
-            ParallelAnimation {
-                id: openCommandAnim
-
-                OpacityAnimator {
-                    from: 1
-                    to: 0
-                    target: _list
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-
-                OpacityAnimator {
-                    from: 0
-                    to: 1
-                    target: _cmd_list
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-            }
-
-            ParallelAnimation {
-                id: closeCommandAnim
-
-                OpacityAnimator {
-                    from: 0
-                    to: 1
-                    target: _list
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-
-                OpacityAnimator {
-                    from: 1
-                    to: 0
-                    target: _cmd_list
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-            }
-
-            ParallelAnimation {
-                running: _command_panel.isActive
-
-                OpacityAnimator {
-                    from: 1
-                    to: 0
-                    target: _cmd_list
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-
-                OpacityAnimator {
-                    from: 1
-                    to: 0
-                    target: selector_panel
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-
-                OpacityAnimator {
-                    from: 0
-                    to: 1
-                    target: _command_panel
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-            }
-
-            ParallelAnimation {
-                running: !_command_panel.isActive
-
-                OpacityAnimator {
-                    from: 0
-                    to: 1
-                    target: _cmd_list
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-
-                OpacityAnimator {
-                    from: 0
-                    to: 1
-                    target: selector_panel
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-
-                OpacityAnimator {
-                    from: 1
-                    to: 0
-                    target: _command_panel
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-            }
-
             Item {
                 width: parent.width
                 height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height)
 
                 Cmd.CommandPanel {
                     id: _command_panel
-                    opacity: 0
                     anchors.horizontalCenter: parent.horizontalCenter
+                    visible: isActive
                     onIsActiveChanged: {
                         if (isActive)
                             _textField.text = "";
@@ -327,11 +246,22 @@ Loader {
 
                 Commands {
                     id: _cmd_list
-                    opacity: 0
+                    opacity: (_textField.commandMode && !_command_panel.isActive) ? 1 : 0
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 120
+                        }
+                    }
                 }
 
                 Applications {
                     id: _list
+                    opacity: (!_textField.commandMode && !_command_panel.isActive) ? 1 : 0
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 120
+                        }
+                    }
                 }
             }
         }
