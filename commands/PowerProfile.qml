@@ -6,10 +6,7 @@ import Quickshell.Services.UPower
 import "../components"
 
 Item {
-    width: 100
-    height: 100
-
     StyledText {
-        text: UPower.displayDevice.percentage
+        text: `Baterry: ${(UPower.displayDevice.percentage * 100) >> 0}%`
     }
 }

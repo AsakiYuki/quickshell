@@ -2,6 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 
+import Qt5Compat.GraphicalEffects
+
 import "../components"
 import "../core"
 
@@ -28,36 +30,32 @@ Variants {
 
             onWallpaperChanged: {
                 first.source = second.source;
-
-                second.opacity = 0;
+                second.opacity = 0
                 second.source = `${Paths.wallpapers}/${wallpaper}`;
-
                 anim.running = true;
             }
 
             OpacityAnimator {
                 id: anim
+                duration: 150
                 target: second
                 from: 0
                 to: 1
-                duration: 100
                 onFinished: {
-                    first.source = "";
+                    first.source = ""
                 }
             }
 
             Image {
                 id: first
-                width: parent.width
-                height: parent.height
+                anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
                 source: ""
             }
 
             Image {
                 id: second
-                width: parent.width
-                height: parent.height
+                anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
                 source: ""
             }

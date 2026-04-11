@@ -150,14 +150,18 @@ Loader {
                 _textField.customPlaceHolder = "";
                 _textField.allowTyping = true;
                 _textField.text = _textField.searchText;
-            }
-
-            if (ev.key === Qt.Key_Escape) {
+            } else if (ev.key === Qt.Key_Escape) {
                 SharedState.isLauncherOpened = false;
             }
 
-            if (_command_panel.isActive || (ev.modifiers > Qt.NoModifier))
+            if (_command_panel.isActive) {
+                _command_panel.onKeyPressed(ev);
                 return;
+            }
+
+            if (ev.modifiers > Qt.NoModifier) {
+                return;
+            }
 
             if (ev.key === Qt.Key_Down)
                 _root.goDown();
@@ -194,7 +198,7 @@ Loader {
         Column {
             id: _list_container
 
-            spacing: 5
+            spacing: 10
             topPadding: 10
             bottomPadding: 10
             width: _command_panel.isActive ? (_command_panel.width + 20) : 650
@@ -222,25 +226,19 @@ Loader {
 
                 property string customPlaceHolder: ""
                 placeholderText: customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder
-
-                onCommandModeChanged: {
-                    if (commandMode)
-                        openCommandAnim.running = true;
-                    else
-                        closeCommandAnim.running = true;
-                }
                 Component.onCompleted: _textField.forceActiveFocus()
             }
 
             Item {
                 width: parent.width
-                height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height)
+                height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height) - 5
 
                 Cmd.CommandPanel {
                     id: _command_panel
                     anchors.horizontalCenter: parent.horizontalCenter
                     opacity: Number(isActive)
                     visible: opacity > 0
+
                     Behavior on opacity {
                         NumberAnimation {
                             duration: 120
@@ -254,6 +252,7 @@ Loader {
 
                 Commands {
                     id: _cmd_list
+                    y: -5
                     opacity: (_textField.commandMode && !_command_panel.isActive) ? 1 : 0
                     Behavior on opacity {
                         NumberAnimation {
@@ -264,6 +263,7 @@ Loader {
 
                 Applications {
                     id: _list
+                    y: -5
                     opacity: (!_textField.commandMode && !_command_panel.isActive) ? 1 : 0
                     Behavior on opacity {
                         NumberAnimation {

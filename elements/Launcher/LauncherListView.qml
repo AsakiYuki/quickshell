@@ -58,6 +58,7 @@ Item {
                         width: height
                         source: _root.model[_item.index].icon
                         visible: (_root.model[_item.index].icon !== undefined)
+                        asynchronous: true
 
                         fillMode: Image.PreserveAspectCrop
                     }
