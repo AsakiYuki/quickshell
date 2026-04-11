@@ -5,6 +5,7 @@ Item {
 
     property bool isActive: false
     property string command: "Wallpapers"
+    clip: true
 
     width: _loader.width
     height: _loader.height

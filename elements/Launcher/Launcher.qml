@@ -109,7 +109,7 @@ Loader {
 
             const entry = _e.model[index].entry;
             _textField.customPlaceHolder = entry.textfieldPlaceHolder;
-            _textField.allowTyping = entry.allowTyping; 
+            _textField.allowTyping = entry.allowTyping;
             _command_panel.command = entry.target;
             _command_panel.isActive = true;
         }
@@ -239,7 +239,13 @@ Loader {
                 Cmd.CommandPanel {
                     id: _command_panel
                     anchors.horizontalCenter: parent.horizontalCenter
-                    visible: isActive
+                    opacity: Number(isActive)
+                    visible: opacity > 0
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 120
+                        }
+                    }
                     onIsActiveChanged: {
                         if (isActive)
                             _textField.text = "";
