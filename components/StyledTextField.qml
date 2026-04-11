@@ -30,14 +30,14 @@ TextField {
     }
 
     cursorDelegate: Rectangle {
+        id: _blink
         property bool disableBlink
 
         implicitWidth: 2
         opacity: 1
-        visible: root.allowTyping
 
         onXChanged: {
-            opacity = 1;
+            opacity = root.allowTyping * 1;
             disableBlink = false;
             disableBlink = true;
         }
@@ -51,10 +51,10 @@ TextField {
 
         Timer {
             interval: 750
-            running: root.allowTyping && disableBlink
+            running: _blink.disableBlink && root.allowTyping
             repeat: true
             onTriggered: {
-                opacity = opacity ? 0 : 1;
+                _blink.opacity = _blink.opacity ? 0 : 1;
             }
         }
     }
