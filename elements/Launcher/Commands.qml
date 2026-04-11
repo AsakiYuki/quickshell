@@ -28,7 +28,8 @@ LauncherListView {
                         subtext: v.entry.comment,
                         entry: {
                             target: v.entry.target,
-                            textfieldPlaceHolder: v.entry.textfieldPlaceHolder
+                            textfieldPlaceHolder: v.entry.textfieldPlaceHolder,
+                            allowTyping: v.entry.allowTyping
                         }
                     }));
         } else {

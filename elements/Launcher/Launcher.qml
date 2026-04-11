@@ -109,6 +109,7 @@ Loader {
 
             const entry = _e.model[index].entry;
             _textField.customPlaceHolder = entry.textfieldPlaceHolder;
+            _textField.allowTyping = entry.allowTyping; 
             _command_panel.command = entry.target;
             _command_panel.isActive = true;
         }
@@ -147,6 +148,7 @@ Loader {
             if (ev.modifiers === Qt.AltModifier && ev.key === Qt.Key_Left) {
                 _command_panel.isActive = false;
                 _textField.customPlaceHolder = "";
+                _textField.allowTyping = true;
                 _textField.text = _textField.searchText;
             }
 

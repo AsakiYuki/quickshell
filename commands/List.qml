@@ -9,6 +9,7 @@ Singleton {
             comment: "Change your current wallpaper",
             icon: "../../assets/icons/images.png",
             textfieldPlaceHolder: "Choose your wallpaper",
+            allowTyping: false,
             target: "Wallpapers"
         },
         {
@@ -16,6 +17,7 @@ Singleton {
             comment: "Test",
             icon: "../../assets/icons/images.png",
             textfieldPlaceHolder: "Test, btw",
+            allowTyping: true,
             target: "PowerProfile"
         },
     ]

@@ -7,6 +7,8 @@ import QtQuick.Controls
 TextField {
     id: root
 
+    property bool allowTyping: true
+
     height: 30
     color: Catppuccin.text
     placeholderTextColor: Catppuccin.subtext0
@@ -21,11 +23,18 @@ TextField {
         color: Catppuccin.crust
     }
 
+    onTextChanged: {
+        if (root.allowTyping)
+            return;
+        text = "";
+    }
+
     cursorDelegate: Rectangle {
         property bool disableBlink
 
         implicitWidth: 2
         opacity: 1
+        visible: root.allowTyping
 
         onXChanged: {
             opacity = 1;
@@ -42,7 +51,7 @@ TextField {
 
         Timer {
             interval: 750
-            running: disableBlink
+            running: root.allowTyping && disableBlink
             repeat: true
             onTriggered: {
                 opacity = opacity ? 0 : 1;
