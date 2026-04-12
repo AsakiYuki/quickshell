@@ -17,7 +17,8 @@ Scope {
         `, _root);
 
         obj.callback = text => {
-            callback(text);
+            if (callback)
+                callback(text);
             obj.destroy();
         };
         obj.command = cmd;

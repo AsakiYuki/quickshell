@@ -146,22 +146,21 @@ Loader {
 
         Keys.onPressed: ev => {
             if (ev.modifiers === Qt.AltModifier && ev.key === Qt.Key_Left) {
-                _command_panel.isActive = false;
-                _textField.customPlaceHolder = "";
-                _textField.allowTyping = true;
-                _textField.text = _textField.searchText;
-            } else if (ev.key === Qt.Key_Escape) {
-                SharedState.isLauncherOpened = false;
-            }
+                if (_command_panel.isActive) {
+                    _command_panel.isActive = false;
+                    _textField.customPlaceHolder = "";
+                    _textField.allowTyping = true;
+                    _textField.text = _textField.searchText;
+                } else if (_textField.text === "") SharedState.isLauncherOpened = false; 
+                else _textField.text = ""
+            } else if (ev.key === Qt.Key_Escape) SharedState.isLauncherOpened = false;
 
             if (_command_panel.isActive) {
                 _command_panel.onKeyPressed(ev);
                 return;
             }
 
-            if (ev.modifiers > Qt.NoModifier) {
-                return;
-            }
+            if (ev.modifiers > Qt.NoModifier) return;
 
             if (ev.key === Qt.Key_Down)
                 _root.goDown();
@@ -177,8 +176,9 @@ Loader {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width - 20
             height: 55
-            color: Catppuccin.crust
+            color: Catppuccin.surface0
             y: 45 + _root.selectorIndex * 55
+            border.width: 0
 
             opacity: _command_panel.isActive ? 0 : 1
             Behavior on opacity {

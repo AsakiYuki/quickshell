@@ -25,4 +25,18 @@ Scope {
             }
         }
     }
+
+    CustomShortcut {
+        name: "touchpadtoggle"
+        onPressed: {
+            configuration.touchpad = !configuration.touchpad;
+        }
+    }
+
+    CustomShortcut {
+        name: "capslock"
+        onPressed: {
+            configuration.capsLock = !configuration.capsLock;
+        }
+    }
 }

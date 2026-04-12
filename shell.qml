@@ -19,8 +19,10 @@ ShellRoot {
         id: configuration
     }
 
-    Modules.Shortcuts {}
+    Modules.Overlay {
+        id: overlay
+    }
 
-    Modules.Overlay {}
+    Modules.Shortcuts {}
     Modules.Wallpaper {}
 }

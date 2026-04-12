@@ -11,14 +11,16 @@ Item {
     height: imageHeight + 20
 
     property list<string> wallpapers: []
-    
+
     property int currentWallpaperIndex: wallpapersMap[configuration.wallpaper] ?? 0
     onCurrentWallpaperIndexChanged: {
-        if (currentWallpaperIndex > wallpapers.length - 1) currentWallpaperIndex = 0
-        else if (currentWallpaperIndex < 0) currentWallpaperIndex = wallpapers.length - 1
-        
-        _changeWallpaperDelay.running = false
-        _changeWallpaperDelay.running = true
+        if (currentWallpaperIndex > wallpapers.length - 1)
+            currentWallpaperIndex = 0;
+        else if (currentWallpaperIndex < 0)
+            currentWallpaperIndex = wallpapers.length - 1;
+
+        _changeWallpaperDelay.running = false;
+        _changeWallpaperDelay.running = true;
     }
 
     Timer {
@@ -26,7 +28,7 @@ Item {
         running: false
         interval: 250
         onTriggered: {
-            configuration.wallpaper = _root.wallpapers[_root.currentWallpaperIndex]
+            configuration.wallpaper = _root.wallpapers[_root.currentWallpaperIndex];
         }
     }
 
@@ -40,8 +42,10 @@ Item {
     readonly property int imageHeight: imageWidth / 16 * 9
 
     function onKeyPressed(ev) {
-        if (ev.key === Qt.Key_Left) currentWallpaperIndex--;
-        else if (ev.key === Qt.Key_Right) currentWallpaperIndex++;
+        if (ev.key === Qt.Key_Left)
+            currentWallpaperIndex--;
+        else if (ev.key === Qt.Key_Right)
+            currentWallpaperIndex++;
     }
 
     Loader {
@@ -66,7 +70,7 @@ Item {
                 model: _root.wallpapers.length
 
                 Image {
-                    required property int index 
+                    required property int index
 
                     scale: _root.currentWallpaperIndex === index ? 1 : 0.8
                     Behavior on scale {
@@ -80,6 +84,9 @@ Item {
                     mipmap: true
                     fillMode: Image.PreserveAspectCrop
                     source: `${Paths.wallpapers}/${_root.wallpapers[index]}`
+
+                    sourceSize.width: _root.imageWidth
+                    sourceSize.height: _root.imageHeight
 
                     width: _root.imageWidth
                     height: _root.imageHeight

@@ -36,4 +36,6 @@ Singleton {
             };
         });
     }
+
+    property bool capsLock: false
 }
