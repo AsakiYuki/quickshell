@@ -28,7 +28,7 @@ Loader {
 
         Row {
             id: _notification_panel
-            spacing: 10
+            spacing: 20
             anchors.centerIn: parent
 
             Item {

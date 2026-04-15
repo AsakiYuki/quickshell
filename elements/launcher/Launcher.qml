@@ -95,7 +95,6 @@ Loader {
         function mouseClick(index) {
             if (selectorIndex === index) {
                 execute(viewIndex + selectorIndex);
-                SharedState.isLauncherOpened = false;
             } else
                 selectorIndex = index;
         }
