@@ -97,6 +97,50 @@ Variants {
                     Container {}
                 }
             }
+
+            Shape {
+                anchors.fill: parent
+                antialiasing: true
+
+                ShapePath {
+                    strokeWidth: 2
+                    strokeColor: Catppuccin.surface0
+                    fillColor: "transparent"
+
+                    capStyle: ShapePath.RoundCap
+                    joinStyle: ShapePath.RoundJoin
+
+                    startX: _shape.width
+                    startY: _shape.height
+
+                    PathCubic {
+                        x: _shape.width - 15
+                        y: _shape.height - 15
+
+                        control1X: _shape.width
+                        control1Y: _shape.height - 5
+
+                        control2X: _shape.width - 5
+                        control2Y: _shape.height - 15
+                    }
+
+                    PathLine {
+                        x: 15
+                        y: _shape.height - 15
+                    }
+
+                    PathCubic {
+                        x: 0
+                        y: _shape.height
+
+                        control1X: 5
+                        control1Y: _shape.height - 15
+
+                        control2X: 0
+                        control2Y: _shape.height - 5
+                    }
+                }
+            }
         }
     }
 }

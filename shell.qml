@@ -19,12 +19,12 @@ ShellRoot {
         id: configuration
     }
 
-    Modules.Topbar {
-        id: topbar
-    }
-
     Modules.Overlay {
         id: overlay
+    }
+
+    Modules.Topbar {
+        id: topbar
     }
 
     Modules.Shortcuts {}

@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Qt5Compat.GraphicalEffects
 
@@ -12,6 +14,7 @@ Item {
 
     property list<string> wallpapers: []
 
+    property bool isLoaded: false
     property int currentWallpaperIndex: wallpapersMap[configuration.wallpaper] ?? 0
     onCurrentWallpaperIndexChanged: {
         if (currentWallpaperIndex > wallpapers.length - 1)
@@ -54,11 +57,13 @@ Item {
 
         width: _row.widdth
         height: _row.height
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: _img.verticalCenter
         x: 10 + Math.max(Math.min(_root.currentWallpaperIndex - 2, _root.wallpapers.length - 5), 0) * (-_root.imageWidth - 5)
+
         Behavior on x {
             NumberAnimation {
-                duration: 500
+                id: _xAnim
+                duration: 0
                 easing.type: Easing.OutQuint
             }
         }
@@ -70,14 +75,22 @@ Item {
                 model: _root.wallpapers.length
 
                 Image {
+                    id: _img
                     required property int index
 
-                    scale: _root.currentWallpaperIndex === index ? 1 : 0.8
+                    scale: _root.isLoaded && _root.currentWallpaperIndex === index ? 1 : 0.8
                     Behavior on scale {
                         NumberAnimation {
-                            duration: 500
-                            easing.type: Easing.OutQuint
+                            duration: 350
+                            easing.type: Easing.OutBack
                         }
+                    }
+
+                    NumberAnimation on opacity {
+                        running: _img.status === Image.Ready
+                        duration: 250
+                        from: 0
+                        to: 1
                     }
 
                     asynchronous: true
@@ -105,6 +118,10 @@ Item {
     }
 
     Component.onCompleted: {
-        fs.readdir(Paths.wallpapers).then(v => _root.wallpapers = v);
+        fs.readdir(Paths.wallpapers).then(v => {
+            _root.wallpapers = v;
+            _root.isLoaded = true;
+            _xAnim.duration = 500;
+        });
     }
 }

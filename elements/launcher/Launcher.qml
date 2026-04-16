@@ -10,7 +10,7 @@ import "../../commands" as Cmd
 Loader {
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: parent.top
-    anchors.topMargin: 10
+    anchors.topMargin: 7
 
     sourceComponent: RadiusRectangle {
         id: _root

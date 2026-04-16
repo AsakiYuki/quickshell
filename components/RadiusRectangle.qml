@@ -8,6 +8,8 @@ Rectangle {
     height: 100
 
     color: Catppuccin.base
-    border.color: Catppuccin.surface2
+    border.color: Catppuccin.surface0
+    border.width: 2
+
     radius: 25
 }
