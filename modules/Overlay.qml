@@ -71,7 +71,7 @@ Variants {
                 readonly property bool touchpad: configuration.touchpad
                 onTouchpadChanged: {
                     if (touchpad)
-                        setPopup("touchpad_mouse_on.png", "Touchpad enabled");
+                        setPopup("touchpad_mouse.png", "Touchpad enabled");
                     else
                         setPopup("touchpad_mouse_off.png", "Touchpad disabled");
                 }

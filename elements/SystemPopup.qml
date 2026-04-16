@@ -1,4 +1,5 @@
 import QtQuick
+
 import "../components"
 
 Loader {
@@ -78,13 +79,13 @@ Loader {
                     }
                 }
 
-                Image {
+                ImageIcon {
                     id: _firsticon
                     anchors.fill: parent
                     source: ""
                 }
 
-                Image {
+                ImageIcon {
                     id: _secondicon
                     anchors.fill: parent
                     source: ""
