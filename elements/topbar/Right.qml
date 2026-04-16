@@ -4,5 +4,5 @@ Row {
     height: parent.height
 
     anchors.right: parent.right
-    anchors.rightMargin: 10
+    anchors.rightMargin: 5
 }

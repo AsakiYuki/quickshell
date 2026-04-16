@@ -48,8 +48,8 @@ Rectangle {
 
         Behavior on x {
             NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutQuint
+                duration: 250
+                easing.type: Easing.OutBack
             }
         }
     }
@@ -80,7 +80,7 @@ Rectangle {
 
                 StyledText {
                     anchors.centerIn: parent
-                    text: _workspace.modelData.id
+                    text: _workspace.modelData.id % 10
                 }
             }
         }
