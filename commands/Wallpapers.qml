@@ -55,7 +55,7 @@ Item {
         id: _loader
         active: _root.wallpapers.length > 0
 
-        width: _row.widdth
+        width: _row.width
         height: _row.height
         anchors.verticalCenter: _img.verticalCenter
         x: 10 + Math.max(Math.min(_root.currentWallpaperIndex - 2, _root.wallpapers.length - 5), 0) * (-_root.imageWidth - 5)
@@ -82,7 +82,7 @@ Item {
                     Behavior on scale {
                         NumberAnimation {
                             duration: 350
-                            easing.type: Easing.OutBack
+                            easing.type: Easing.OutQuint
                         }
                     }
 
@@ -121,7 +121,7 @@ Item {
         fs.readdir(Paths.wallpapers).then(v => {
             _root.wallpapers = v;
             _root.isLoaded = true;
-            _xAnim.duration = 500;
+            _xAnim.duration = 350;
         });
     }
 }

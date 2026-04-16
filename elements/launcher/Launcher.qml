@@ -40,7 +40,7 @@ Loader {
             properties: "y"
             from: -20 - _root.height
             to: 0
-            easing.type: Easing.OutExpo
+            easing.type: Easing.OutQuint
             duration: 350
         }
 
@@ -50,7 +50,7 @@ Loader {
             properties: "y"
             from: _root.y
             to: -20 - _root.height
-            easing.type: Easing.OutExpo
+            easing.type: Easing.OutQuint
             duration: 350
         }
 
@@ -150,16 +150,20 @@ Loader {
                     _textField.customPlaceHolder = "";
                     _textField.allowTyping = true;
                     _textField.text = _textField.searchText;
-                } else if (_textField.text === "") SharedState.isLauncherOpened = false; 
-                else _textField.text = ""
-            } else if (ev.key === Qt.Key_Escape) SharedState.isLauncherOpened = false;
+                } else if (_textField.text === "")
+                    SharedState.isLauncherOpened = false;
+                else
+                    _textField.text = "";
+            } else if (ev.key === Qt.Key_Escape)
+                SharedState.isLauncherOpened = false;
 
             if (_command_panel.isActive) {
                 _command_panel.onKeyPressed(ev);
                 return;
             }
 
-            if (ev.modifiers > Qt.NoModifier) return;
+            if (ev.modifiers > Qt.NoModifier)
+                return;
 
             if (ev.key === Qt.Key_Down)
                 _root.goDown();

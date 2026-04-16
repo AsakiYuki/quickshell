@@ -1,0 +1,88 @@
+import QtQuick
+
+import Quickshell.Hyprland
+
+import "../../components"
+import "../../base"
+import "../../core"
+
+Rectangle {
+    width: _workspaces.width + 10
+    height: _workspaces.height + 10
+    clip: true
+
+    Behavior on width {
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.OutQuint
+        }
+    }
+
+    color: Catppuccin.surface0
+    radius: height / 2
+    anchors.verticalCenter: parent.verticalCenter
+
+    MouseArea {
+        cursorShape: Qt.PointingHandCursor
+        anchors.fill: parent
+        onWheel: event => {
+            if (event.angleDelta.y < 0)
+                Workspaces.next();
+            else
+                Workspaces.prev();
+        }
+        onClicked: event => {
+            const x = event.x - 5; // 5 is the left margin
+            const index = Math.min(Math.max(0, Math.floor(x / 25)), Hyprland.workspaces.values.length - 1); // 25 is the workspace size
+            Workspaces.set(Hyprland.workspaces.values[index].id);
+        }
+    }
+
+    Rectangle {
+        width: 25
+        height: 25
+        anchors.verticalCenter: parent.verticalCenter
+        color: Catppuccin.surface1
+        radius: width / 2
+        x: 5.5 + Hyprland.workspaces.values.findIndex(w => w.active) * 25
+
+        Behavior on x {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutQuint
+            }
+        }
+    }
+
+    Row {
+        id: _workspaces
+        anchors.left: parent.left
+        anchors.leftMargin: 5
+        anchors.verticalCenter: parent.verticalCenter
+
+        Repeater {
+            model: Hyprland.workspaces.values
+
+            Item {
+                id: _workspace
+
+                required property HyprlandWorkspace modelData
+
+                width: 25
+                height: 25
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutQuint
+                    }
+                }
+
+                StyledText {
+                    anchors.centerIn: parent
+                    text: _workspace.modelData.id
+                }
+            }
+        }
+    }
+}

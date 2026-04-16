@@ -29,7 +29,7 @@ Variants {
 
             margins.bottom: -15
 
-            height: 60
+            implicitHeight: 60
             focusable: true
 
             Shape {

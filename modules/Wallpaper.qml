@@ -30,7 +30,7 @@ Variants {
 
             onWallpaperChanged: {
                 first.source = second.source;
-                second.opacity = 0
+                second.opacity = 0;
                 second.source = `${Paths.wallpapers}/${wallpaper}`;
                 anim.running = true;
             }
@@ -42,7 +42,7 @@ Variants {
                 from: 0
                 to: 1
                 onFinished: {
-                    first.source = ""
+                    first.source = "";
                 }
             }
 

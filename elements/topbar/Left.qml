@@ -2,6 +2,9 @@ import QtQuick
 
 Row {
     height: parent.height
-    width: _clock.width
+
     anchors.left: parent.left
+    anchors.leftMargin: 10
+
+    Workspaces {}
 }
