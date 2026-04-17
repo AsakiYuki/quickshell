@@ -93,7 +93,7 @@ Rectangle {
     }
 
     onPressed: ev => {
-      isFirstClick = _root.isPressed = true;
+      if (ev.button === Qt.LeftButton) isFirstClick = _root.isPressed = true;
       getMouseDelta(ev)
       _root.pressed(ev);
     }
