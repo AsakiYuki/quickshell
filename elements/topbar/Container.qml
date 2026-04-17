@@ -11,7 +11,6 @@ Item {
         target: Hyprland
 
         function onRawEvent(event) {
-            console.log("Event:", JSON.stringify(event));
         }
     }
 

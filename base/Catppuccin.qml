@@ -40,7 +40,7 @@ Singleton {
                 _root.surface2 = "#acb0be";
                 _root.surface1 = "#bcc0cc";
                 _root.surface0 = "#ccd0da";
-                _root.base = "#eff1f5";
+                _root.base = "#eff1f5"; 
                 _root.mantle = "#e6e9ef";
                 _root.crust = "#dce0e8";
             }

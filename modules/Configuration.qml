@@ -9,6 +9,16 @@ Scope {
     property string wallpaper: ""
     property bool touchpad: false
     property bool capsLock: false
+    property var trayIndex: ({})
+    property list<string> hideTrayID: []
+
+    onTrayIndexChanged: save()
+    onHideTrayIDChanged: {
+        save()
+        if (SystemTray.hideTrayID !== hideTrayID) {
+            SystemTray.hideTrayID = hideTrayID;
+        }
+    }
 
     onWallpaperChanged: save()
     onTouchpadChanged: {
@@ -17,8 +27,7 @@ Scope {
     }
 
     function save() {
-        _save.running = false;
-        _save.running = true;
+        _save.restart()
     }
 
     Timer {
@@ -26,10 +35,7 @@ Scope {
         running: false
         interval: 1000
         onTriggered: {
-            fs.writefile(Paths.settings, JSON.stringify({
-                wallpaper,
-                touchpad
-            }));
+            fs.writefile(Paths.settings, JSON.stringify(_configuration));
         }
     }
 
@@ -38,9 +44,13 @@ Scope {
             const data = JSON.parse(v);
             wallpaper = data.wallpaper ?? "wallpaper-0.jpg";
             touchpad = data.touchpad ?? true;
+            trayIndex = data.trayIndex ?? {};
+            hideTrayID = data.hideTrayID ?? [];
         }).catch(err => {
             wallpaper = "wallpaper-0.jpg";
             touchpad = true;
+            trayIndex = {};
+            hideTrayID = [];
         });
 
         chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => capsLock = v.trim() === "yes");

@@ -7,6 +7,8 @@ import "../../base"
 import "../../core"
 
 Rectangle {
+    id: _root
+
     width: _workspaces.width + 10
     height: _workspaces.height + 10
     clip: true

@@ -6,7 +6,6 @@ import Quickshell
 import Quickshell.Wayland
 
 import "../components"
-import "../modules"
 import "../core"
 import "../elements" as Elements
 import "../elements/launcher" as Launcher
@@ -15,6 +14,22 @@ Variants {
     id: _root
 
     model: Quickshell.screens
+
+    property int width: 0
+    property int height: 0
+
+    property int trayDragPosX: 0
+    property int trayDragPosY: 0
+    property string trayIcon: ""
+
+    function setDragIcon(icon) {
+        trayIcon = icon;
+    }
+
+    function setOverlayPosition(x, y) {
+        trayDragPosX = x;
+        trayDragPosY = y;
+    }
 
     Scope {
         id: _scope
@@ -32,6 +47,19 @@ Variants {
             anchors.bottom: true
             anchors.left: true
             anchors.right: true
+
+            Image {
+                width: 20
+                height: 20
+                x: _root.trayDragPosX
+                y: _root.trayDragPosY
+                source: _root.trayIcon
+            }
+
+            Component.onCompleted: {
+                _root.width = modelData.width;
+                _root.height = modelData.height;
+            }
 
             MouseArea {
                 anchors.fill: parent

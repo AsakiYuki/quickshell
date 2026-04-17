@@ -5,4 +5,8 @@ Row {
 
     anchors.right: parent.right
     anchors.rightMargin: 5
+
+    SystemTray {
+        id: systemTray
+    }
 }

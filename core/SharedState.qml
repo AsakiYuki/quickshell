@@ -7,10 +7,19 @@ Singleton {
     id: _root
 
     property bool isLauncherOpened: false
+    property bool isMoreTrayOpened: false
 
-    readonly property bool isOverlay: isLauncherOpened
+    readonly property bool isOverlay: isLauncherOpened || isMoreTrayOpened
+
+    onIsLauncherOpenedChanged: {
+        if (isLauncherOpened) {
+            isMoreTrayOpened = false;
+        }
+    }
+    
     function onOverlayClicked() {
         isLauncherOpened = false;
+        isMoreTrayOpened = false;
     }
 
     function parseIconPath(icon) {
