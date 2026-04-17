@@ -14,6 +14,7 @@ Rectangle{
   width: _tray.width + 15
   height: _tray.height + 10
   radius: height / 2
+  clip: true
   
   anchors.verticalCenter: parent.verticalCenter
   

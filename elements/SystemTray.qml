@@ -29,6 +29,7 @@ Loader {
   sourceComponent: RadiusRectangle {
     radius: 15
     id: _system_tray
+    clip: true
 
     NumberAnimation {
       target: _system_tray
