@@ -107,7 +107,7 @@ Loader {
             pressedColor: "transparent"
 
             onDrag: (ev, delta) => {
-              if (Math.abs(delta.x) > 5 || Math.abs(delta.y) > 5) {
+              if (Math.abs(delta.x) > 1.5 || Math.abs(delta.y) > 1.5) {
                 setDragIcon(modelData.icon)
                 trayDrag = true;
               }
