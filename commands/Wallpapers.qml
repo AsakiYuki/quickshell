@@ -94,7 +94,7 @@ Item {
                     NumberAnimation on scale {
                         running: _img.status === Image.Ready
                         from: 0
-                        to: 0.8
+                        to: _root.isLoaded && _root.currentWallpaperIndex === _img.index ? 1 : 0.8
                         duration: 350
                         easing.type: Easing.OutQuint
                     }

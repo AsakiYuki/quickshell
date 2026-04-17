@@ -122,6 +122,14 @@ Variants {
                             setPopup("shift_lock_off.png", "Caps Lock is off");
                     }
 
+                    readonly property bool hdr: configuration.hdr
+                    onHdrChanged: {
+                        if (hdr)
+                            setPopup("hdr_on.png", "HDR is on");
+                        else
+                            setPopup("hdr_off.png", "HDR is off");
+                    }
+
                     function setPopup(_icon, _message) {
                         if (isFirstLoad) {
                             isFirstLoad = false;

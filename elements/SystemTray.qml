@@ -89,6 +89,7 @@ Loader {
               anchor.item: _trayitem
               anchor.margins.top: 35
               anchor.edges: Edges.Right
+              onClosed: SharedState.isMoreTrayOpened = false
           }
 
           StyledButton {

@@ -33,6 +33,14 @@ Scope {
         }
     }
 
+
+    CustomShortcut {
+        name: "hdrtoggle"
+        onPressed: {
+            configuration.hdr = !configuration.hdr;
+        }
+    }
+
     CustomShortcut {
         name: "capslock"
         onPressed: {
