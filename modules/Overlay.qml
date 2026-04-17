@@ -39,6 +39,10 @@ Variants {
             id: _overlay
             name: "overlay"
 
+            function setDragIcon(icon) {
+                _root.trayIcon = icon;
+            }
+
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: SharedState.isOverlay ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -47,14 +51,6 @@ Variants {
             anchors.bottom: true
             anchors.left: true
             anchors.right: true
-
-            Image {
-                width: 20
-                height: 20
-                x: _root.trayDragPosX
-                y: _root.trayDragPosY
-                source: _root.trayIcon
-            }
 
             Component.onCompleted: {
                 _root.width = modelData.width;
@@ -89,6 +85,16 @@ Variants {
                         launcher.active = true;
                     }
                 }
+            }
+
+            Elements.SystemTray {}
+
+            Image {
+                width: 20
+                height: 20
+                x: _root.trayDragPosX
+                y: _root.trayDragPosY
+                source: _root.trayIcon
             }
 
             Elements.SystemPopup {

@@ -8,6 +8,9 @@ Rectangle {
   property color hoverColor: Catppuccin.sapphire
   property color pressedColor: Catppuccin.sky
 
+  property bool isDrag: false
+  property bool isPressed: false
+
   height: 100
   width: 100
   radius: 15
@@ -22,6 +25,7 @@ Rectangle {
   signal middleDoubleClicked()
 
   signal mouseMoved(MouseEvent ev)
+  signal drag(MouseEvent ev, var delta)
   signal pressed(MouseEvent ev)
   signal released(MouseEvent ev)
   
@@ -35,14 +39,24 @@ Rectangle {
   }
 
   MouseArea {
+    property bool isFirstClick: false
+    property int lastMouseX: 0
+    property int lastMouseY: 0
+    
+    function getMouseDelta(ev) {
+      const deltaX = ev.x - lastMouseX
+      const deltaY = ev.y - lastMouseY
+
+      lastMouseX = ev.x
+      lastMouseY = ev.x
+
+      return {x: deltaX, y: deltaY}
+    }
+    
     anchors.fill: parent
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-
-    onMouseXChanged: ev => {
-      _root.mouseMoved(ev);
-    }
 
     onClicked: ev => {
       if (ev.button === Qt.LeftButton) {
@@ -64,11 +78,23 @@ Rectangle {
       }
     }
 
+    onMouseXChanged: ev => {
+      if (_root.isPressed) {
+        if (isFirstClick) isFirstClick = false;
+        else _root.drag(ev, getMouseDelta(ev))
+      }
+
+      _root.mouseMoved(ev);
+    }
+
     onReleased: ev => {
       _root.released(ev);
+      _root.isDrag = _root.isPressed = false;
     }
 
     onPressed: ev => {
+      isFirstClick = _root.isPressed = true;
+      getMouseDelta(ev)
       _root.pressed(ev);
     }
 

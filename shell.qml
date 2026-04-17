@@ -27,6 +27,8 @@ ShellRoot {
 
     Modules.Topbar {
         id: topbar
+
+        property var systemTrayElement;
     }
 
     Modules.Shortcuts {}

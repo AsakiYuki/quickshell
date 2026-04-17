@@ -2,6 +2,8 @@ import QtQuick
 
 import Quickshell
 
+import "../../utils/Utils.js" as Utils
+
 import "../../base"
 import "../../core"
 import "../../components"
@@ -16,25 +18,34 @@ Rectangle{
   anchors.verticalCenter: parent.verticalCenter
   
   property int offsetX: 0
-  property int offsetY: 0 
+  property int offsetY: 0
+
+  property bool isTrayDragging: false
+
+  visible: SystemTray.systemTray.length
+
+  Behavior on width {
+    NumberAnimation {
+      duration: 200
+      easing.type: Easing.OutQuint
+    }
+  }
 
   Row {
     id: _tray
-    anchors.centerIn: parent
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    anchors.rightMargin: 7
     
     Repeater {
       id: _repeater
       model: SystemTray.showTray.length
-      
-      readonly property int hideTrayBtnPos: overlay.width - 25 - 19.5
 
       Item {
         id: _trayitem
         
         required property int index
         property var modelData: SystemTray.showTray[index]
-        
-        readonly property int rightOffsetPosition: overlay.width - (_repeater.model - index) * 25 - 32.5
 
         width: 25
         height: 25
@@ -50,13 +61,6 @@ Rectangle{
         StyledButton {
           id: _btn
           anchors.fill: parent
-          property bool isHold: false
-          property int lastX: 0
-          property int lastY: 0
-
-          function getCurrentMousePosition(ev) {
-            return [_trayitem.rightOffsetPosition + ev.x - _root.offsetX, ev.y + 12.5 - _root.offsetY]
-          }
 
           normalColor: Catppuccin.surface0
           hoverColor: Catppuccin.surface1
@@ -69,22 +73,14 @@ Rectangle{
             height: 20
           }
 
-          onMouseMoved: ev => {
-            if (isHold) {
-              const deltaX = lastX - ev.x
-              const deltaY = lastY - ev.y
-
-              if (Math.abs(deltaX) > 1.5 || Math.abs(deltaY) > 1.5) {
-                _clickDelay.running = false;
-                overlay.setDragIcon(modelData.icon)       
-              }
-
-
-              lastX = ev.x
-              lastY = ev.y
-
-              overlay.setOverlayPosition(...getCurrentMousePosition(ev))
+          onDrag: (ev, delta) => {
+            if (Math.abs(delta.x) > 5 || Math.abs(delta.y) > 5) {
+              _root.isTrayDragging = true;
+              overlay.setDragIcon(modelData.icon)
             }
+
+            const {x, y} = this.mapToGlobal(ev.x, ev.y)
+            overlay.setOverlayPosition(x - _root.offsetX, y - _root.offsetY)
           }
 
           onRightClicked: {
@@ -93,37 +89,27 @@ Rectangle{
 
           onPressed: ev => {
             if (ev.button === Qt.LeftButton) {
-              lastX = _root.offsetX = ev.x
-              lastY = _root.offsetY = ev.y
-              _btn.isHold = true
-              _clickDelay.start()
+              _root.offsetX = ev.x
+              _root.offsetY = ev.y
             }
           }
 
           onReleased: ev => {
             if (ev.button === Qt.LeftButton) {
-              _btn.isHold = false
               overlay.setDragIcon("")
-              if (_clickDelay.running) {
-                _clickDelay.stop()
-                modelData.activate()
-              } else {
-                const [x, y] = getCurrentMousePosition(ev)
-
-                if ((_repeater.hideTrayBtnPos < x &&  (_repeater.hideTrayBtnPos + 25) > x) && (32.5 > y)) {
+              if (_root.isTrayDragging) {
+                _root.isTrayDragging = false;
+                const {x, y} = this.mapToGlobal(ev.x, ev.y)
+                if (Utils.isMouseInsideTargetElement(x, y, 0, 0, _moreTrayButton)) {
                   configuration.hideTrayID.push([modelData.id, modelData.tooltipTitle, modelData.title].join("&"))
                 }
+              } else {
+                modelData.activate()
               }
             }
           }
 
           onMiddleClicked: modelData.secondaryActivate();
-
-          Timer {
-            id: _clickDelay
-            running: false
-            interval: 250
-          }
         }
       }
     }
@@ -131,11 +117,16 @@ Rectangle{
     StyledButton {
       id: _moreTrayButton
 
+      property int readX: mapToGlobal(x, y).x; 
+      property int readY: mapToGlobal(x, y).y; 
+
       width: 25
       height: 25
       normalColor: Catppuccin.surface0
       hoverColor: Catppuccin.surface1
       pressedColor: "transparent"
+
+      visible: SystemTray.hideTray.length || _root.isTrayDragging
 
       ImageIcon {
         anchors.fill: parent
@@ -153,8 +144,13 @@ Rectangle{
       onClicked: {
         SharedState.isMoreTrayOpened = !SharedState.isMoreTrayOpened;
       }
+
     }
   }
 
   color: Catppuccin.surface0
+
+  Component.onCompleted: {
+    topbar.systemTrayElement = this;
+  }
 }
