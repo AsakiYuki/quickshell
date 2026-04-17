@@ -29,7 +29,7 @@ Scope {
             "keyword",
             "$CURRENT_STATE_SCREEN",
             hdr
-                ? "eDP-1, 1920x1200@60, 0x0, 1, sdrbrightness, 1.2, sdrsaturation, 1.5, bitdepth, 10, cm, hdr"
+                ? "eDP-1, 1920x1200@60, 0x0, 1, sdrbrightness, 1.1, sdrsaturation, 1.25, bitdepth, 10, cm, hdr"
                 : "eDP-1, 1920x1200@60, 0x0, 1",
             "-r"
         ]);
