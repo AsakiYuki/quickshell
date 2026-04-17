@@ -39,7 +39,7 @@ Rectangle {
   }
 
   MouseArea {
-    property bool isFirstClick: false
+    property bool isFirstClick: true
     property int lastMouseX: 0
     property int lastMouseY: 0
     
@@ -88,12 +88,13 @@ Rectangle {
     }
 
     onReleased: ev => {
+      isFirstClick = true;
       _root.released(ev);
       _root.isDrag = _root.isPressed = false;
     }
 
     onPressed: ev => {
-      if (ev.button === Qt.LeftButton) isFirstClick = _root.isPressed = true;
+      if (ev.button === Qt.LeftButton) _root.isPressed = true;
       getMouseDelta(ev)
       _root.pressed(ev);
     }
