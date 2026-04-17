@@ -66,28 +66,82 @@ Variants {
                 item: null
             }
 
-            Launcher.Launcher {
-                id: launcher
-                active: false
+            Item {
+                anchors.fill: parent
+                anchors.topMargin: Workspaces.hasFullscreen ? 0 : 45
+                clip: true
 
-                Timer {
-                    running: !SharedState.isLauncherOpened
-                    interval: 150
-                    onTriggered: {
-                        launcher.active = false;
+                Behavior on anchors.topMargin {
+                    NumberAnimation {
+                        duration: 350
+                        easing.type: Easing.OutQuint
                     }
                 }
 
-                Timer {
-                    running: SharedState.isLauncherOpened
-                    interval: 0
-                    onTriggered: {
-                        launcher.active = true;
+                Launcher.Launcher {
+                    id: launcher
+                    active: false
+
+                    Timer {
+                        running: !SharedState.isLauncherOpened
+                        interval: 150
+                        onTriggered: {
+                            launcher.active = false;
+                        }
+                    }
+
+                    Timer {
+                        running: SharedState.isLauncherOpened
+                        interval: 0
+                        onTriggered: {
+                            launcher.active = true;
+                        }
+                    }
+                }
+
+                Elements.SystemTray {}
+
+                Elements.SystemPopup {
+                    id: _system_popup
+
+                    property bool isFirstLoad: true
+
+                    readonly property bool touchpad: configuration.touchpad
+                    onTouchpadChanged: {
+                        if (touchpad)
+                            setPopup("touchpad_mouse.png", "Touchpad enabled");
+                        else
+                            setPopup("touchpad_mouse_off.png", "Touchpad disabled");
+                    }
+
+                    readonly property bool capslock: configuration.capsLock
+                    onCapslockChanged: {
+                        if (capslock)
+                            setPopup("shift_lock.png", "Caps Lock is on");
+                        else
+                            setPopup("shift_lock_off.png", "Caps Lock is off");
+                    }
+
+                    function setPopup(_icon, _message) {
+                        if (isFirstLoad) {
+                            isFirstLoad = false;
+                            return;
+                        }
+
+                        icon = _icon;
+                        notifyText = _message;
+                        active = true;
+                    }
+
+                    Timer {
+                        running: true
+                        interval: 50
+                        onTriggered: {
+                            _system_popup.isFirstLoad = false;
+                        }
                     }
                 }
             }
-
-            Elements.SystemTray {}
 
             Image {
                 width: 20
@@ -95,47 +149,6 @@ Variants {
                 x: _root.trayDragPosX
                 y: _root.trayDragPosY
                 source: _root.trayIcon
-            }
-
-            Elements.SystemPopup {
-                id: _system_popup
-
-                property bool isFirstLoad: true
-
-                readonly property bool touchpad: configuration.touchpad
-                onTouchpadChanged: {
-                    if (touchpad)
-                        setPopup("touchpad_mouse.png", "Touchpad enabled");
-                    else
-                        setPopup("touchpad_mouse_off.png", "Touchpad disabled");
-                }
-
-                readonly property bool capslock: configuration.capsLock
-                onCapslockChanged: {
-                    if (capslock)
-                        setPopup("shift_lock.png", "Caps Lock is on");
-                    else
-                        setPopup("shift_lock_off.png", "Caps Lock is off");
-                }
-
-                function setPopup(_icon, _message) {
-                    if (isFirstLoad) {
-                        isFirstLoad = false;
-                        return;
-                    }
-
-                    icon = _icon;
-                    notifyText = _message;
-                    active = true;
-                }
-
-                Timer {
-                    running: true
-                    interval: 50
-                    onTriggered: {
-                        _system_popup.isFirstLoad = false;
-                    }
-                }
             }
         }
     }

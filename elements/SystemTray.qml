@@ -13,7 +13,7 @@ Loader {
 
   anchors.right: parent.right
   anchors.top: parent.top
-  anchors.topMargin: 50
+  anchors.topMargin: 5
   anchors.rightMargin: 5
 
   Timer {
@@ -35,7 +35,7 @@ Loader {
       target: _system_tray
       running: SharedState.isMoreTrayOpened
       properties: "y"
-      from: -_system_tray.height - 50
+      from: -_system_tray.height - 10
       to: 0
       duration: 350
       easing.type: Easing.OutQuint
@@ -46,7 +46,7 @@ Loader {
       running: !SharedState.isMoreTrayOpened || !SystemTray.hideTray.length
       properties: "y"
       from: 0
-      to: -_system_tray.height - 50
+      to: -_system_tray.height - 10
       duration: 350
       easing.type: Easing.OutQuint
 
