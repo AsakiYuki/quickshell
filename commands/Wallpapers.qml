@@ -57,8 +57,11 @@ Item {
 
         width: _row.width
         height: _row.height
-        anchors.verticalCenter: _img.verticalCenter
-        x: 10 + Math.max(Math.min(_root.currentWallpaperIndex - 2, _root.wallpapers.length - 5), 0) * (-_root.imageWidth - 5)
+
+        readonly property int currentViewPos: Math.max(Math.min(_root.currentWallpaperIndex - 2, _root.wallpapers.length - 5), 0)
+        readonly property int endViewPos: Math.min(currentViewPos + 4, _root.wallpapers.length - 1)
+
+        x: 10 + currentViewPos * (-_root.imageWidth - 5)
 
         Behavior on x {
             NumberAnimation {
@@ -77,13 +80,23 @@ Item {
                 Image {
                     id: _img
                     required property int index
+                    readonly property int shouldLoad: _loader.currentViewPos <= index && index <= _loader.endViewPos
 
                     scale: _root.isLoaded && _root.currentWallpaperIndex === index ? 1 : 0.8
+
                     Behavior on scale {
                         NumberAnimation {
                             duration: 350
                             easing.type: Easing.OutQuint
                         }
+                    }
+
+                    NumberAnimation on scale {
+                        running: _img.status === Image.Ready
+                        from: 0
+                        to: 0.8
+                        duration: 350
+                        easing.type: Easing.OutQuint
                     }
 
                     NumberAnimation on opacity {
@@ -96,7 +109,23 @@ Item {
                     asynchronous: true
                     mipmap: true
                     fillMode: Image.PreserveAspectCrop
-                    source: `${Paths.wallpapers}/${_root.wallpapers[index]}`
+                    source: "" 
+
+                    Timer {
+                        running: _img.shouldLoad
+                        interval: 0
+                        onTriggered: {
+                            _img.source = `${Paths.wallpapers}/${_root.wallpapers[index]}`
+                        } 
+                    }
+
+                    Timer {
+                        running: !_img.shouldLoad
+                        interval: 350
+                        onTriggered: {
+                            _img.source =  ""
+                        } 
+                    }
 
                     sourceSize.width: _root.imageWidth
                     sourceSize.height: _root.imageHeight
