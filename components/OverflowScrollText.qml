@@ -8,6 +8,8 @@ Item {
     
     property bool scrollToRight: false
     property bool moveFirst: false
+    property bool paused: false
+
     property int spacing: 50
     property int maxWidth: 200
     property int delayRepeat: 2500
@@ -46,6 +48,7 @@ Item {
     SequentialAnimation {
         id: scrollAnimation
         running: root.shouldScroll
+        paused: root.paused
         loops: Animation.Infinite
 
         PropertyAction {
