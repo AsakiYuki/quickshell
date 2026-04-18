@@ -122,7 +122,7 @@ Item {
 
                     Timer {
                         running: !_img.shouldLoad
-                        interval: 350
+                        interval: 150
                         onTriggered: {
                             _img.source =  ""
                         } 
