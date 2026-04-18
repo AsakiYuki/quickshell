@@ -78,77 +78,9 @@ Variants {
                     }
                 }
 
-                Launcher.Launcher {
-                    id: launcher
-                    active: false
-
-                    Timer {
-                        running: !SharedState.isLauncherOpened
-                        interval: 150
-                        onTriggered: {
-                            launcher.active = false;
-                        }
-                    }
-
-                    Timer {
-                        running: SharedState.isLauncherOpened
-                        interval: 0
-                        onTriggered: {
-                            launcher.active = true;
-                        }
-                    }
-                }
-
+                Launcher.Launcher {}
                 Elements.SystemTray {}
-
-                Elements.SystemPopup {
-                    id: _system_popup
-
-                    property bool isFirstLoad: true
-
-                    readonly property bool touchpad: configuration.touchpad
-                    onTouchpadChanged: {
-                        if (touchpad)
-                            setPopup("touchpad_mouse.png", "Touchpad enabled");
-                        else
-                            setPopup("touchpad_mouse_off.png", "Touchpad disabled");
-                    }
-
-                    readonly property bool capslock: configuration.capsLock
-                    onCapslockChanged: {
-                        if (capslock)
-                            setPopup("shift_lock.png", "Caps Lock is on");
-                        else
-                            setPopup("shift_lock_off.png", "Caps Lock is off");
-                    }
-
-                    readonly property bool hdr: configuration.hdr
-                    onHdrChanged: {
-                        if (hdr)
-                            setPopup("hdr_on.png", "HDR is on");
-                        else
-                            setPopup("hdr_off.png", "HDR is off");
-                    }
-
-                    function setPopup(_icon, _message) {
-                        if (isFirstLoad) {
-                            isFirstLoad = false;
-                            return;
-                        }
-
-                        icon = _icon;
-                        notifyText = _message;
-                        active = true;
-                    }
-
-                    Timer {
-                        running: true
-                        interval: 50
-                        onTriggered: {
-                            _system_popup.isFirstLoad = false;
-                        }
-                    }
-                }
+                Elements.SystemPopup {}
             }
 
             Image {

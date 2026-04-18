@@ -12,6 +12,25 @@ Loader {
     anchors.top: parent.top
     anchors.topMargin: 7
 
+    id: launcher
+    active: false
+
+    Timer {
+        running: !SharedState.isLauncherOpened
+        interval: 150
+        onTriggered: {
+            launcher.active = false;
+        }
+    }
+
+    Timer {
+        running: SharedState.isLauncherOpened
+        interval: 0
+        onTriggered: {
+            launcher.active = true;
+        }
+    }
+
     sourceComponent: RadiusRectangle {
         id: _root
 
@@ -165,7 +184,7 @@ Loader {
             if (ev.modifiers > Qt.NoModifier)
                 return;
 
-            if (ev.key === Qt.Key_Down)
+            if (ev.key === Qt.Key_Down) 
                 _root.goDown();
             else if (ev.key === Qt.Key_Up)
                 _root.goUp();
@@ -228,8 +247,10 @@ Loader {
                 readonly property bool commandMode: searchText[0] === "/"
 
                 property string customPlaceHolder: ""
-                placeholderText: customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder
+                placeholderText: qsTr(customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder)
                 Component.onCompleted: _textField.forceActiveFocus()
+
+
             }
 
             Item {
