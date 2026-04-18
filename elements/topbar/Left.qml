@@ -14,10 +14,10 @@ Row {
     OverflowScrollText {
         id: _text
         text: "Bảo sao Đức VIP vãi lồn, cả box chỉ biết ước"
-        moveFirst: true
-        scrollToRight: false
-        delayRepeat: 0
-        easingType: Easing.Linear
+        // moveFirst: true
+        // scrollToRight: false
+        // delayRepeat: 0
+        // easingType: Easing.Linear
         anchors.verticalCenter: parent.verticalCenter
 
         textComponent: StyledText {

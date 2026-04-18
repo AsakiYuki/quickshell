@@ -41,6 +41,7 @@ Item {
         Loader {
             id: loaderRight
             sourceComponent: root.textComponent
+            active: scrollAnimation.running
             Binding { target: loaderRight.item; property: "text"; value: root.text; restoreMode: Binding.RestoreBinding }
         }
     }
