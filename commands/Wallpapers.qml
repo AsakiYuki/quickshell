@@ -29,7 +29,7 @@ Item {
     Timer {
         id: _changeWallpaperDelay
         running: false
-        interval: 250
+        interval: 500
         onTriggered: {
             configuration.wallpaper = _root.wallpapers[_root.currentWallpaperIndex];
         }
