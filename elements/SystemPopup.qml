@@ -53,7 +53,7 @@ Loader {
         running: true
         interval: 50
         onTriggered: {
-            _system_popup.isFirstLoad = false;
+            _loader.isFirstLoad = false;
         }
     }
 
