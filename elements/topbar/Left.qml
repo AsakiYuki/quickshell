@@ -13,7 +13,7 @@ Row {
 
     OverflowScrollText {
         id: _text
-        text: "Bảo sao Đức VIP vãi lồn, cả box chỉ biết ước"
+        text: "Ước Ước Ước Ước Ước Ước Ước Ước Ước"
         anchors.verticalCenter: parent.verticalCenter
 
         textComponent: StyledText {

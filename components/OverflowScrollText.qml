@@ -35,14 +35,14 @@ Item {
         Loader {
             id: loaderLeft
             sourceComponent: root.textComponent
-            Binding { target: loaderLeft.item; property: "text"; value: root.text; restoreMode: Binding.RestoreBinding }
+            Binding { target: loaderLeft.item; property: "text"; value: root.text.trim(); restoreMode: Binding.RestoreBinding }
         }
 
         Loader {
             id: loaderRight
             sourceComponent: root.textComponent
             active: scrollAnimation.running
-            Binding { target: loaderRight.item; property: "text"; value: root.text; restoreMode: Binding.RestoreBinding }
+            Binding { target: loaderRight.item; property: "text"; value: root.text.trim(); restoreMode: Binding.RestoreBinding }
         }
     }
 
