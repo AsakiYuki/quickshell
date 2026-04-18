@@ -18,6 +18,8 @@ Variants {
             id: _root
             name: "wallpaper"
 
+            property int loadedState: 0
+
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Bottom
 
@@ -30,9 +32,6 @@ Variants {
 
             onWallpaperChanged: {
                 first.source = second.source;
-                second.opacity = 0;
-                second.source = `${Paths.wallpapers}/${wallpaper}`;
-                anim.running = true;
             }
 
             OpacityAnimator {
@@ -50,14 +49,32 @@ Variants {
                 id: first
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
-                source: ""
+                asynchronous: true
+                source: " "
+                onSourceChanged: {
+                    if (`${source}` === "") {
+                        second.source = `${Paths.wallpapers}/${_root.wallpaper}`;
+                    }
+                }
+                onStatusChanged: {
+                    if (status === Image.Ready) {
+                        second.source = `${Paths.wallpapers}/${_root.wallpaper}`;
+                        second.opacity = 0
+                    }
+                }
             }
 
             Image {
                 id: second
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
+                asynchronous: true
                 source: ""
+                onStatusChanged: {
+                    if (status === Image.Ready) {
+                        anim.restart()
+                    }
+                }
             }
         }
     }

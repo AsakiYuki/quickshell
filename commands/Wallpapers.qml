@@ -29,7 +29,7 @@ Item {
     Timer {
         id: _changeWallpaperDelay
         running: false
-        interval: 500
+        interval: 300
         onTriggered: {
             configuration.wallpaper = _root.wallpapers[_root.currentWallpaperIndex];
         }
@@ -108,6 +108,7 @@ Item {
 
                     asynchronous: true
                     mipmap: true
+                    cache: true
                     fillMode: Image.PreserveAspectCrop
                     source: "" 
 
