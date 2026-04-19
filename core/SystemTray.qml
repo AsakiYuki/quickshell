@@ -22,8 +22,6 @@ Singleton {
     showTray = [];
     hideTray = [];
 
-    console.log(hideTrayID)
-
     for (const trayItem of allTray) {
       const fullId = [trayItem.id, trayItem.tooltipTitle, trayItem.title].join("&")
       const isHide = hideTrayID.includes(fullId)

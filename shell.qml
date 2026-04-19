@@ -25,8 +25,6 @@ ShellRoot {
         id: overlay
     }
 
-    Modules.Services {}
-
     Modules.Topbar {
         id: topbar
         property var systemTrayElement;
