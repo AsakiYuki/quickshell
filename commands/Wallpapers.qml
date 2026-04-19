@@ -148,7 +148,7 @@ Item {
     }
 
     ScaleText {
-        text: _root.wallpapers[_root.currentWallpaperIndex].replace(/\.\w*/, "")
+        text: _root.wallpapers[_root.currentWallpaperIndex]?.replace(/\.\w*/, "")
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         resizeSpeed: 0
