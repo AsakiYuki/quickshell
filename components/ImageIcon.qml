@@ -8,7 +8,7 @@ Item {
     width: 48
     height: 48
 
-    property string source: "image.png"
+    property string source: ""
     property color color: Catppuccin.text
 
     Image {

@@ -47,15 +47,19 @@ Item {
     }
   }
 
-  Column {
+  Item {
     id: textStack
 
-    readonly property int displayHeight: root.viewHeight || Math.max(loaderTop.item?.height || 0, loaderBottom.item?.height || 0)
+    width: Math.max(loaderTop.item?.height || 0, loaderBottom.item?.height || 0)
+    height: displayHeight * 2
+
+    readonly property int displayHeight: root.viewHeight || width
     readonly property int displayWidth: root.viewWidth || loaderBottom.item?.width || 0
 
     Item {
       width: loaderTop.item?.width || 0
       height: textStack.displayHeight
+      anchors.top: parent.top
       clip: true
 
       Loader {
@@ -63,13 +67,14 @@ Item {
         anchors.centerIn: parent
         property string text: ""
         sourceComponent: root.textComponent
-        Binding { target: loaderTop.item; property: "text"; value: loaderTop.text || " "; restoreMode: Binding.RestoreBinding }
+        Binding { target: loaderTop.item; property: "text"; value: loaderTop.text; restoreMode: Binding.RestoreBinding }
       }
     }
 
     Item {
       width: loaderBottom.item?.width || 0
       height: textStack.displayHeight
+      anchors.bottom: parent.bottom
       clip: true
 
       Loader {
@@ -77,7 +82,7 @@ Item {
         anchors.centerIn: parent
         property string text: ""
         sourceComponent: root.textComponent
-        Binding { target: loaderBottom.item; property: "text"; value: loaderBottom.text || " "; restoreMode: Binding.RestoreBinding }
+        Binding { target: loaderBottom.item; property: "text"; value: loaderBottom.text; restoreMode: Binding.RestoreBinding }
       }
     }
   }

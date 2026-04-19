@@ -90,13 +90,15 @@ Loader {
             Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: _text.width
-                height: _text.height
+                height: 30
                 clip: true
 
                 ScrollText {
                     id: _text
                     text: _loader.notifyText
                     onTextChanged: _popup_timeout.restart()
+                    viewHeight: parent.height
+                    anchors.centerIn: parent
 
                     textComponent: StyledText {
                         font.pixelSize: 16

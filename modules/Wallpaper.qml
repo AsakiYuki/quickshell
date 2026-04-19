@@ -18,7 +18,7 @@ Variants {
             id: _root
             name: "wallpaper"
 
-            property int loadedState: 0
+            property int loadedState: -1
 
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Bottom
@@ -32,6 +32,7 @@ Variants {
 
             onWallpaperChanged: {
                 first.source = second.source;
+                if (loadedState === -1) second.source = `${Paths.wallpapers}/${_root.wallpaper}`
             }
 
             OpacityAnimator {
@@ -50,12 +51,7 @@ Variants {
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
-                source: " "
-                onSourceChanged: {
-                    if (`${source}` === "") {
-                        second.source = `${Paths.wallpapers}/${_root.wallpaper}`;
-                    }
-                }
+                source: ""
                 onStatusChanged: {
                     if (status === Image.Ready) {
                         second.source = `${Paths.wallpapers}/${_root.wallpaper}`;
