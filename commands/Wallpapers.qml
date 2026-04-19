@@ -147,7 +147,7 @@ Item {
         }
     }
 
-    ScrollText {
+    ScaleText {
         text: _root.wallpapers[_root.currentWallpaperIndex].replace(/\.\w*/, "")
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter

@@ -6,8 +6,6 @@ Item {
     property Component textComponent: StyledText {}
     property string text: ""
 
-    property string textAlign: "left"
-
     property int viewWidth: 0
     property int viewHeight: 0
     property int moveSpeed: 500
@@ -21,17 +19,6 @@ Item {
     height: textStack.displayHeight
     clip: true
 
-    function mapAlign(value) {
-        switch (value) {
-        case "center":
-            return Text.AlignHCenter;
-        case "right":
-            return Text.AlignRight;
-        default:
-            return Text.AlignLeft;
-        }
-    }
-
     onTextChanged: {
         loaderTop.text = loaderBottom.text;
         loaderBottom.text = text.trim();
@@ -40,8 +27,8 @@ Item {
 
     Behavior on width {
         NumberAnimation {
-            duration: root.resizeSpeed
             easing.type: root.resizeEasingType
+            duration: root.resizeSpeed
         }
     }
 
@@ -63,73 +50,48 @@ Item {
     Item {
         id: textStack
 
-        width: Math.max(loaderTop.item?.implicitWidth || 0, loaderBottom.item?.implicitWidth || 0)
-
+        width: Math.max(loaderTop.item?.height || 0, loaderBottom.item?.height || 0)
         height: displayHeight * 2
 
-        readonly property int displayHeight: root.viewHeight || (loaderBottom.item?.implicitHeight || 0)
-        readonly property int displayWidth: root.viewWidth || width
+        readonly property int displayHeight: root.viewHeight || width
+        readonly property int displayWidth: root.viewWidth || loaderBottom.item?.width || 0
 
         Item {
-            anchors.top: parent.top
-            width: parent.width
+            width: loaderTop.item?.width || 0
             height: textStack.displayHeight
+            anchors.top: parent.top
             clip: true
 
             Loader {
                 id: loaderTop
-                anchors.fill: parent
+                anchors.centerIn: parent
                 property string text: ""
                 sourceComponent: root.textComponent
-
                 Binding {
                     target: loaderTop.item
                     property: "text"
                     value: loaderTop.text
-                }
-
-                Binding {
-                    target: loaderTop.item
-                    property: "horizontalAlignment"
-                    value: root.mapAlign(root.textAlign)
-                }
-
-                Binding {
-                    target: loaderTop.item
-                    property: "width"
-                    value: loaderTop.width
+                    restoreMode: Binding.RestoreBinding
                 }
             }
         }
 
         Item {
-            anchors.bottom: parent.bottom
-            width: parent.width
+            width: loaderBottom.item?.width || 0
             height: textStack.displayHeight
+            anchors.bottom: parent.bottom
             clip: true
 
             Loader {
                 id: loaderBottom
-                anchors.fill: parent
+                anchors.centerIn: parent
                 property string text: ""
                 sourceComponent: root.textComponent
-
                 Binding {
                     target: loaderBottom.item
                     property: "text"
                     value: loaderBottom.text
-                }
-
-                Binding {
-                    target: loaderBottom.item
-                    property: "horizontalAlignment"
-                    value: root.mapAlign(root.textAlign)
-                }
-
-                Binding {
-                    target: loaderBottom.item
-                    property: "width"
-                    value: loaderBottom.width
+                    restoreMode: Binding.RestoreBinding
                 }
             }
         }
