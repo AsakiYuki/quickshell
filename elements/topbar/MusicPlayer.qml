@@ -13,6 +13,10 @@ Rectangle {
   readonly property var metadata: Mpris.current.metadata
   readonly property string ciderToken: "rqwqpw7m99wazqxzg05z2em3"
   property list<var> lyrics: []
+
+  property double realLength: 0
+  property double timeOffset: 0
+
   property double lyricsDelay: 0.25
   property int currentLyricLine: 0
   property int fetchId: 0
@@ -33,14 +37,18 @@ Rectangle {
   clip: true
   onMetadataChanged: {
     root.lyrics = [];
-    currentLyricLine = 0;
     if (Mpris.current.identity === "Cider") {
       const currentId = ++root.fetchId;
+      console.log(currentId)
       HttpRequest.fetchJson("http://localhost:10767/api/v1/playback/now-playing", {
         headers: { apptoken: root.ciderToken },
       }).then(({ info }) => {
-        if (!info.hasLyrics) return;
         if (currentId !== root.fetchId) return
+        
+        root.timeOffset = Mpris.current.position - info.currentPlaybackTime
+        root.realLength = info.durationInMillis / 1000
+
+        if (!info.hasLyrics) return;
         
         const id = info.playParams.catalogId || info.playParams.id;
         const name = info.name;
@@ -61,18 +69,18 @@ Rectangle {
           ]
         })
       })
-    }
+    } else root.timeOffset = root.realLength = currentLyricLine = 0;
     
     root.updatePositionView();
   }
 
   function updatePositionView() {
-    progressCircle.arcEnd = ((Mpris.current.position / Mpris.current.length) * 360) >> 0;
+    progressCircle.arcEnd = (((Mpris.current.position - root.timeOffset) / (root.realLength || Mpris.current.length)) * 360) >> 0;
   }
   
   function updateLyrics() {
-    const timeCurr = Math.max(0, Mpris.current.position + root.lyricsDelay)
-    const { text, time } = root.lyrics[root.currentLyricLine] || {}
+    const timeCurr = Math.max(0, Mpris.current.position + root.lyricsDelay - root.timeOffset)
+    const { time } = root.lyrics[root.currentLyricLine] || {}
 
     if (time?.start > timeCurr) {
       for (let index = root.currentLyricLine; index > -1; index--) {
@@ -119,7 +127,7 @@ Rectangle {
       anchors.verticalCenter: parent.verticalCenter
       width: 25
       height: 25
-      lineWidth: 2
+      lineWidth: 3
       showBackground: true
       arcEnd: 0
 
@@ -127,7 +135,6 @@ Rectangle {
         width: (Mpris.current.playbackState !== 1) * 4 + 15
         height: width
         anchors.centerIn: parent
-        anchors.horizontalCenterOffset: (Mpris.current.playbackState !== 1) * -1
         source: Mpris.current.playbackState === 1 ? "../assets/icons/pause.png" : "../assets/icons/play.png"
       }
     }

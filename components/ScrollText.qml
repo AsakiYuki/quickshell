@@ -40,6 +40,11 @@ Item {
     to: -root.height
     target: textStack
     properties: "y"
+
+    onFinished: {
+      loaderTop.text = loaderBottom.text
+      textStack.y = 0
+    }
   }
 
   Column {

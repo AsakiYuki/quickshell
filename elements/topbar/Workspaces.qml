@@ -82,6 +82,7 @@ Rectangle {
 
                 StyledText {
                     anchors.centerIn: parent
+                    font.pixelSize: 14
                     text: _workspace.modelData.id % 10
                 }
             }
