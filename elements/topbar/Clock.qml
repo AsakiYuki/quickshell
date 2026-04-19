@@ -14,7 +14,7 @@ Rectangle {
     StyledText {
         id: _text
         anchors.centerIn: parent
-        property string format: "HH:mm:ss • dddd, dd/MM/yy"
+        property string format: "HH:mm:ss • dddd, dd/MM/yyyy"
         property var date: new Date()
         text: Qt.formatDateTime(date, format)
 

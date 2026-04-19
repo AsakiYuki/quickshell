@@ -33,3 +33,11 @@ function fetch(input, init = {}) {
 		xhr.send(init.body || null)
 	})
 }
+
+function fetchJson(input, init = {}) {
+	return fetch(input, init).then(v => v.json())
+}
+
+function fetchText(input, init = {}) {
+	return fetch(input, init).then(v => v.text())
+}

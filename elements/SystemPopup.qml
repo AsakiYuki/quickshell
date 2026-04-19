@@ -161,9 +161,9 @@ Loader {
                     id: _textScrollAnim
                     target: _textStack
                     from: 0
-                    to: -41
+                    to: -46
                     duration: 400
-                    easing.type: Easing.OutBack
+                    easing.type: Easing.OutQuint
                 }
 
                 Column {

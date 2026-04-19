@@ -11,9 +11,9 @@ Item {
     property bool paused: false
 
     property int spacing: 50
-    property int maxWidth: 250
-    property int delayRepeat: 2500
-    property int moveSpeed: 1000
+    property int maxWidth: 200
+    property int delayRepeat: 1500
+    property int moveSpeed: 2500
     property int easingType: Easing.InOutSine 
 
     property Item leftText: loaderLeft.item
