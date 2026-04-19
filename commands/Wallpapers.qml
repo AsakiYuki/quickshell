@@ -10,7 +10,7 @@ Item {
     id: _root
 
     width: imageWidth * Math.min(wallpapers.length, 5) + Math.min(wallpapers.length, 5) * 4 + 20
-    height: imageHeight + 20
+    height: imageHeight + 28
 
     property list<string> wallpapers: []
 
@@ -110,22 +110,22 @@ Item {
                     mipmap: true
                     cache: true
                     fillMode: Image.PreserveAspectCrop
-                    source: "" 
+                    source: ""
 
                     Timer {
                         running: _img.shouldLoad
                         interval: 0
                         onTriggered: {
-                            _img.source = `${Paths.wallpapers}/${_root.wallpapers[index]}`
-                        } 
+                            _img.source = `${Paths.wallpapers}/${_root.wallpapers[index]}`;
+                        }
                     }
 
                     Timer {
                         running: !_img.shouldLoad
                         interval: 150
                         onTriggered: {
-                            _img.source =  ""
-                        } 
+                            _img.source = "";
+                        }
                     }
 
                     sourceSize.width: _root.imageWidth
@@ -144,6 +144,18 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    ScrollText {
+        text: _root.wallpapers[_root.currentWallpaperIndex].replace(/\.\w*/, "")
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        resizeSpeed: 0
+        textAlign: "center"
+
+        textComponent: StyledText {
+            font.pixelSize: 15
         }
     }
 
