@@ -16,6 +16,12 @@ Item {
     property int moveSpeed: 2500
     property int easingType: Easing.InOutSine 
 
+    onPausedChanged: {
+        if (!shouldScroll) return
+        if (paused) scrollAnimation.pause()
+        else scrollAnimation.resume() 
+    }
+
     property Item leftText: loaderLeft.item
     property Item rightText: loaderRight.item
 
@@ -49,7 +55,6 @@ Item {
     SequentialAnimation {
         id: scrollAnimation
         running: root.shouldScroll
-        paused: root.paused
         loops: Animation.Infinite
 
         PropertyAction {

@@ -14,17 +14,16 @@ Rectangle {
   readonly property string ciderToken: "rqwqpw7m99wazqxzg05z2em3"
   property list<var> lyrics: []
 
+  property int currentLyricLine: 0
   property double realLength: 0
   property double timeOffset: 0
 
   property double lyricsDelay: 0.3
-  property int currentLyricLine: 0
   property int fetchId: 0
 
   onCurrentLyricLineChanged: {
     const lyrics = root.lyrics[currentLyricLine] || { text: "", time: {} };
     lyricText.text = (currentLyricLine & 1 ? "‎" : "") + lyrics.text
-    console.log(`[${lyrics.time.start} - ${lyrics.time.end}]`, lyrics.text)
   }
 
   height: 35
@@ -37,14 +36,16 @@ Rectangle {
   clip: true
   onMetadataChanged: {
     root.lyrics = [];
+    root.realLength = currentLyricLine = 0;
     if (Mpris.current.identity === "Cider") {
       const currentId = ++root.fetchId;
+      root.timeOffset = Mpris.current.position
       HttpRequest.fetchJson("http://localhost:10767/api/v1/playback/now-playing", {
         headers: { apptoken: root.ciderToken },
       }).then(({ info }) => {
         if (currentId !== root.fetchId) return
         
-        root.timeOffset = Mpris.current.position - info.currentPlaybackTime
+        root.timeOffset -= info.currentPlaybackTime
         root.realLength = info.durationInMillis / 1000
 
         if (!info.hasLyrics) return;
@@ -68,7 +69,7 @@ Rectangle {
           ]
         })
       })
-    } else root.timeOffset = root.realLength = currentLyricLine = 0;
+    } else root.timeOffset = 0;
     
     root.updatePositionView();
   }
@@ -81,6 +82,7 @@ Rectangle {
     const timeCurr = Math.max(0, Mpris.current.position + root.lyricsDelay - root.timeOffset)
     const { time } = root.lyrics[root.currentLyricLine] || {}
 
+    if (time?.start <= timeCurr && timeCurr <= time?.end) return
     if (time?.start > timeCurr) {
       for (let index = root.currentLyricLine; index > -1; index--) {
         const { text, time } = root.lyrics[index];
@@ -102,10 +104,10 @@ Rectangle {
   }
 
   FrameAnimation {
-    running: Mpris.current && Mpris.current.playbackState === 1
+    running: (Mpris.current && Mpris.current.playbackState === 1) && !Workspaces.current.hasFullscreen
     onTriggered: {
       root.updatePositionView()
-      root.updateLyrics()
+      if (root.lyrics.length) root.updateLyrics()
     }
   }
 

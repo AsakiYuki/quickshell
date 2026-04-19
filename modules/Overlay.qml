@@ -78,6 +78,14 @@ Variants {
                     }
                 }
 
+                DropPanel {
+                    x: 10
+                    y: 10
+                    content: StyledText {
+                        text: "Hello, World!"
+                    }
+                }
+
                 Launcher.Launcher {}
                 Elements.SystemTray {}
                 Elements.SystemPopup {}
