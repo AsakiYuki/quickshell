@@ -1,6 +1,7 @@
 import QtQuick
 
 import "../../components"
+import "../../core"
 import "../../base"
 
 Rectangle {
@@ -18,7 +19,7 @@ Rectangle {
         text: Qt.formatDateTime(date, format)
 
         FrameAnimation {
-            running: true
+            running: !Workspaces.current.hasFullscreen
             onTriggered: _text.date = new Date()
         }
     }
