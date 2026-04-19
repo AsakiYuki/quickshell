@@ -29,6 +29,8 @@ Singleton {
       if (isHide) hideTray.push(trayItem)
       else showTray.push(trayItem)
     }
+
+    if (!hideTray.length) SharedState.isMoreTrayOpened = false;
   }
 
   property list<string> hideTrayID: []

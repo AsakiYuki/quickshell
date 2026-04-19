@@ -3,17 +3,28 @@ import QtQuick
 Item {
   id: root
 
-  property Component backgroundComponent: RadiusRectangle {}
+  property Component backgroundComponent: RadiusRectangle {
+    radius: 15
+  }
   required property Component content;
   
   property bool active: false
-  property int verticalPadding: 50
-  property int horizontalPadding: 50
+  property int verticalPadding: 0
+  property int horizontalPadding: 0
+
+  property int viewX: 0
+  property int viewY: 0
+
+  height: bgLoader.height
+  width: bgLoader.width
+
+  x: viewX
+  y: viewY
 
   Loader {
     id: bgLoader
     sourceComponent: root.backgroundComponent
-    active: root.active
+    active: false
 
     Binding {
       target: bgLoader.item
@@ -37,4 +48,34 @@ Item {
       value: (bgLoader.item?.children[0].height || 0) + root.verticalPadding
     }
   }
+
+  onActiveChanged: {
+    if (active) {
+      bgLoader.active = true;
+      openAnim.start();
+    } else closeAnim.start();
+  }
+
+  NumberAnimation {
+    id: openAnim
+    target: root
+    properties: "y"
+    duration: 350
+    easing.type: Easing.OutQuint
+    from: -root.height - 10
+    to: root.viewY
+  }
+
+  NumberAnimation {
+    id: closeAnim
+    target: root
+    properties: "y"
+    duration: 350
+    easing.type: Easing.OutQuint
+    from: root.viewY
+    to: -root.height - 10
+    onFinished: bgLoader.active = false
+  }
+
+  Component.onCompleted: bgLoader.active = root.active
 }

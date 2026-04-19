@@ -8,150 +8,99 @@ import "../components"
 import "../base"
 import "../core"
 
-Loader {
-  id: _loader
+DropPanel {
+  active: SharedState.isMoreTrayOpened
 
   anchors.right: parent.right
-  anchors.top: parent.top
-  anchors.topMargin: 5
   anchors.rightMargin: 5
+  viewY: 5
 
-  Timer {
-    interval: 0
-    running: SharedState.isMoreTrayOpened
-    onTriggered: {
-      _loader.active = true
-    }
-  }
+  content: Grid {
+    id: _grid
+    columns: 5
+    padding: 10
+    
+    Repeater {
+      id: _repeater
+      model: SystemTray.hideTray.length
 
-  active: false
+      Item {
+        id: _trayitem
+        required property int index;
+        readonly property var modelData: SystemTray.hideTray[index];
 
-  sourceComponent: RadiusRectangle {
-    radius: 15
-    id: _system_tray
-    clip: true
+        width: 30
+        height: 30
 
-    NumberAnimation {
-      target: _system_tray
-      running: SharedState.isMoreTrayOpened
-      properties: "y"
-      from: -_system_tray.height - 10
-      to: 0
-      duration: 350
-      easing.type: Easing.OutQuint
-    }
+        QsMenuAnchor {
+            id: menu
+            menu: _trayitem.modelData.menu
+            anchor.item: _trayitem
+            anchor.margins.top: 35
+            anchor.edges: Edges.Right
+            onClosed: SharedState.isMoreTrayOpened = false
+        }
 
-    NumberAnimation {
-      target: _system_tray
-      running: !SharedState.isMoreTrayOpened || !SystemTray.hideTray.length
-      properties: "y"
-      from: 0
-      to: -_system_tray.height - 10
-      duration: 350
-      easing.type: Easing.OutQuint
+        StyledButton {
+          anchors.fill: parent
 
-      onFinished: {
-        _loader.active = false;
-        SharedState.isMoreTrayOpened = false;
-      }
-    }
+          property int offsetX;
+          property int offsetY;
+          property bool trayDrag: false;
 
-    width: _repeater.model ? _grid.width : _text.width + 35
-    height: _repeater.model ? _grid.height : _text.height + 25
-
-    StyledText {
-      id: _text
-      visible: !_repeater.model
-      anchors.centerIn: parent
-      text: "Nothing here."
-    }
-
-    Grid {
-      id: _grid
-      columns: 5
-      padding: 10
-      
-      Repeater {
-        id: _repeater
-        model: SystemTray.hideTray.length
-
-        Item {
-          id: _trayitem
-          required property int index;
-          readonly property var modelData: SystemTray.hideTray[index];
-
-          width: 30
-          height: 30
-
-          QsMenuAnchor {
-              id: menu
-              menu: _trayitem.modelData.menu
-              anchor.item: _trayitem
-              anchor.margins.top: 35
-              anchor.edges: Edges.Right
-              onClosed: SharedState.isMoreTrayOpened = false
+          function setDragIcon(icon) {
+            overlay.setDragIcon(icon)
           }
 
-          StyledButton {
-            anchors.fill: parent
+          normalColor: Catppuccin.base
+          hoverColor: Catppuccin.surface1
+          pressedColor: "transparent"
 
-            property int offsetX;
-            property int offsetY;
-            property bool trayDrag: false;
-
-            function setDragIcon(icon) {
-              overlay.setDragIcon(icon)
+          onDrag: (ev, delta) => {
+            if (Math.abs(delta.x) > 1.5 || Math.abs(delta.y) > 1.5) {
+              setDragIcon(modelData.icon)
+              trayDrag = true;
             }
 
-            normalColor: Catppuccin.base
-            hoverColor: Catppuccin.surface1
-            pressedColor: "transparent"
+            const {x, y} = this.mapToGlobal(ev.x, ev.y)
+            overlay.setOverlayPosition(x - offsetX, y - offsetY)
+          }
 
-            onDrag: (ev, delta) => {
-              if (Math.abs(delta.x) > 1.5 || Math.abs(delta.y) > 1.5) {
-                setDragIcon(modelData.icon)
-                trayDrag = true;
-              }
+          onRightClicked: {
+            menu.open()
+          }
 
-              const {x, y} = this.mapToGlobal(ev.x, ev.y)
-              overlay.setOverlayPosition(x - offsetX, y - offsetY)
-            }
+          onPressed: ev => {
+            offsetX = ev.x
+            offsetY = ev.y
+          }
 
-            onRightClicked: {
-              menu.open()
-            }
-
-            onPressed: ev => {
-              offsetX = ev.x
-              offsetY = ev.y
-            }
-
-            onReleased: ev => {
-              if (ev.button === Qt.LeftButton) {
-                overlay.setDragIcon("");
-                
-                if (trayDrag) {
-                  trayDrag = false;
-                  const {x, y} = this.mapToGlobal(ev.x, ev.y)
-                  if (Utils.isMouseInsideTargetElement(x, y, 0, 0, topbar.systemTrayElement)) {
-                    configuration.hideTrayID = configuration.hideTrayID.filter(v => v !== [modelData.id, modelData.tooltipTitle, modelData.title].join("&"))
-                  }
-                } else {
-                  modelData.activate()
-                  SharedState.isMoreTrayOpened = false
+          onReleased: ev => {
+            if (ev.button === Qt.LeftButton) {
+              overlay.setDragIcon("");
+              
+              if (trayDrag) {
+                trayDrag = false;
+                const {x, y} = this.mapToGlobal(ev.x, ev.y)
+                if (Utils.isMouseInsideTargetElement(x, y, 0, 0, topbar.systemTrayElement)) {
+                  const hideTrayItems = configuration.hideTrayID.filter(v => v !== [modelData.id, modelData.tooltipTitle, modelData.title].join("&"))
+                  configuration.hideTrayID = hideTrayItems
                 }
+              } else {
+                modelData.activate()
+                SharedState.isMoreTrayOpened = false
               }
             }
+          }
 
-            Image {
-              anchors.centerIn: parent
-              source: modelData.icon
-              width: 20
-              height: 20
-            }
+          Image {
+            anchors.centerIn: parent
+            source: modelData.icon
+            width: 20
+            height: 20
           }
         }
       }
     }
   }
-} 
+}
