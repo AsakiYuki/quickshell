@@ -96,6 +96,7 @@ Loader {
                 ScrollText {
                     id: _text
                     text: _loader.notifyText
+                    onTextChanged: _popup_timeout.restart()
 
                     textComponent: StyledText {
                         font.pixelSize: 16
