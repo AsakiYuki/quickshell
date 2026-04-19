@@ -34,6 +34,7 @@ Rectangle {
   color: Catppuccin.surface0
   visible: Mpris.players.length
   clip: true
+  
   onMetadataChanged: {
     root.lyrics = [];
     root.realLength = currentLyricLine = 0;

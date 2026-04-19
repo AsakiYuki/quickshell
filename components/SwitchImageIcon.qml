@@ -11,6 +11,8 @@ Item {
   property bool toggle: false
   property string source: "image.png"
   property color color: Catppuccin.text
+  property int duration: 350
+  property int easingType: Easing.OutQuint
 
   onSourceChanged: {
     toggle = !toggle
@@ -35,7 +37,7 @@ Item {
 
       PropertyChanges {
         target: secondImage
-        scale: 0.2
+        scale: 0
         opacity: 0
       }
     },
@@ -46,7 +48,7 @@ Item {
 
       PropertyChanges {
         target: firstImage
-        scale: 0.2
+        scale: 0
         opacity: 0
       }
 
@@ -62,8 +64,8 @@ Item {
     Transition {
       NumberAnimation {
         properties: "scale,opacity"
-        duration: 300
-        easing.type: Easing.OutQuint
+        duration: root.duration
+        easing.type: root.easingType
       }
     }
   ]
@@ -84,7 +86,7 @@ Item {
     height: root.height
     color: root.color
     anchors.centerIn: parent
-    scale: 0.2
+    scale: 0
     opacity: 0
   }
 

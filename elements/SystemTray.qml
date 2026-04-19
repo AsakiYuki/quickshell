@@ -96,6 +96,7 @@ DropPanel {
           Image {
             anchors.centerIn: parent
             source: modelData.icon
+            mipmap: true
             width: 20
             height: 20
           }

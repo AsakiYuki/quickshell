@@ -21,7 +21,7 @@ Item {
 
   onTextChanged: {
     loaderTop.text = loaderBottom.text
-    loaderBottom.text = text
+    loaderBottom.text = text.trim()
     moveAnim.restart()
   }
 

@@ -89,6 +89,7 @@ Variants {
                 x: _root.trayDragPosX
                 y: _root.trayDragPosY
                 source: _root.trayIcon
+                mipmap: true
             }
         }
     }
