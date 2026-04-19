@@ -3,7 +3,7 @@ import QtQuick
 Item {
     id: root
 
-    property Component textComponent: Component { StyledText {} }
+    property Component textComponent: StyledText { } 
     property string text: "Hello Overflow Scrolltext"
     
     property bool scrollToRight: false

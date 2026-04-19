@@ -3,7 +3,7 @@ import QtQuick
 Item {
   id: root
   
-  property Component textComponent: Component { StyledText { } }
+  property Component textComponent: StyledText { }
   property string text: ""
 
   property int viewWidth: 0
@@ -58,7 +58,7 @@ Item {
         anchors.centerIn: parent
         property string text: ""
         sourceComponent: root.textComponent
-        Binding { target: loaderTop.item; property: "text"; value: loaderTop.text.length ? loaderTop.text : " " ; restoreMode: Binding.RestoreBinding }
+        Binding { target: loaderTop.item; property: "text"; value: loaderTop.text; restoreMode: Binding.RestoreBinding }
       }
     }
 
@@ -72,7 +72,7 @@ Item {
         anchors.centerIn: parent
         property string text: ""
         sourceComponent: root.textComponent
-        Binding { target: loaderBottom.item; property: "text"; value: loaderBottom.text.length ? loaderBottom.text : " " ; restoreMode: Binding.RestoreBinding }
+        Binding { target: loaderBottom.item; property: "text"; value: loaderBottom.text; restoreMode: Binding.RestoreBinding }
       }
     }
   }

@@ -17,11 +17,9 @@ Rectangle {
         property var date: new Date()
         text: Qt.formatDateTime(date, format)
 
-        Timer {
-            interval: 1000
-            repeat: true
+        FrameAnimation {
             running: true
-            onTriggered: parent.date = new Date()
+            onTriggered: _text.date = new Date()
         }
     }
 }
