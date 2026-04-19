@@ -10,14 +10,14 @@ import "../../utils/Lyrics.js" as Lyrics
 Rectangle {
   id: root
 
-  readonly property var metadata: Mpris.current.metadata
+  readonly property var metadata: `${Mpris.current.identity}|${Mpris.current.trackArtists}|${Mpris.current.trackAlbum}`
   readonly property string ciderToken: "rqwqpw7m99wazqxzg05z2em3"
   property list<var> lyrics: []
 
   property double realLength: 0
   property double timeOffset: 0
 
-  property double lyricsDelay: 0.25
+  property double lyricsDelay: 0.3
   property int currentLyricLine: 0
   property int fetchId: 0
 
@@ -39,7 +39,6 @@ Rectangle {
     root.lyrics = [];
     if (Mpris.current.identity === "Cider") {
       const currentId = ++root.fetchId;
-      console.log(currentId)
       HttpRequest.fetchJson("http://localhost:10767/api/v1/playback/now-playing", {
         headers: { apptoken: root.ciderToken },
       }).then(({ info }) => {
