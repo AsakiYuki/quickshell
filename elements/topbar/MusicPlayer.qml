@@ -13,7 +13,7 @@ Rectangle {
   readonly property var metadata: Mpris.current.metadata
   readonly property string ciderToken: "rqwqpw7m99wazqxzg05z2em3"
   property list<var> lyrics: []
-  property double lyricsDelay: 0.5
+  property double lyricsDelay: 0.25
   property int currentLyricLine: 0
   property int fetchId: 0
 
@@ -156,8 +156,8 @@ Rectangle {
         id: nameText
         y: -1
         spacing: -2
-
         opacity: ((`${lyricText.text}` === "") || (`${lyricText.text}` === "‎") || (Mpris.current.playbackState === 2))
+        
         Behavior on opacity {
           NumberAnimation {
             duration: 150
@@ -166,6 +166,7 @@ Rectangle {
 
         OverflowScrollText {
           text: Mpris.current.trackTitle || "Unknown Track"
+          paused: !nameText.opacity
           textComponent: StyledText {
             font.pixelSize: 12
           }
@@ -173,6 +174,7 @@ Rectangle {
 
         OverflowScrollText {
           text: `${Mpris.current.trackArtists}${Mpris.current.trackAlbum ? ` - ${Mpris.current.trackAlbum}` : ""}`
+          paused: !nameText.opacity
           textComponent: StyledText {
             font.pixelSize: 12
             color: Catppuccin.subtext0
