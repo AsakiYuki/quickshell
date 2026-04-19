@@ -132,9 +132,16 @@ Rectangle {
       showBackground: true
       arcEnd: 0
 
-      ImageIcon {
+      SwitchImageIcon {
         width: (Mpris.current.playbackState !== 1) * 4 + 15
         height: width
+
+        Behavior on width {
+          NumberAnimation {
+            duration: 150
+          }
+        }
+
         anchors.centerIn: parent
         source: Mpris.current.playbackState === 1 ? "../assets/icons/pause.png" : "../assets/icons/play.png"
       }
