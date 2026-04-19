@@ -74,122 +74,32 @@ Loader {
 
         Row {
             id: _notification_panel
-            spacing: 20
+            spacing: 15
             anchors.centerIn: parent
 
             Item {
                 width: 30
                 height: 30
 
-                property string icon: _loader.icon
-                onIconChanged: {
-                    _firsticon.source = _secondicon.source;
-                    _firsticon.opacity = 1;
-                    _secondicon.opacity = 0;
-                    _secondicon.source = `../assets/icons/${icon}`;
-                    iconAnim.restart();
-                }
-
-                ParallelAnimation {
-                    id: iconAnim
-
-                    ScaleAnimator {
-                        target: _firsticon
-                        from: 1
-                        to: 0.5
-                        duration: 250
-                        easing.type: Easing.OutQuart
-                    }
-
-                    OpacityAnimator {
-                        target: _firsticon
-                        from: 1
-                        to: 0
-                        duration: 200
-                    }
-
-                    ScaleAnimator {
-                        target: _secondicon
-                        from: 0.5
-                        to: 1
-                        duration: 350
-                        easing.type: Easing.OutBack
-                    }
-
-                    OpacityAnimator {
-                        target: _secondicon
-                        from: 0
-                        to: 1
-                        duration: 250
-                    }
-                }
-
-                ImageIcon {
-                    id: _firsticon
+                SwitchImageIcon {
                     anchors.fill: parent
-                    source: ""
-                }
-
-                ImageIcon {
-                    id: _secondicon
-                    anchors.fill: parent
-                    source: ""
+                    source: `../assets/icons/${_loader.icon}`;
                 }
             }
 
             Item {
                 anchors.verticalCenter: parent.verticalCenter
-                width: _textStack.width
+                width: _text.width
                 height: _text.height
                 clip: true
 
-                property string notifyText: _loader.notifyText
-                onNotifyTextChanged: {
-                    _text.text = _text2.text;
-                    _text2.text = notifyText;
+                ScrollText {
+                    id: _text
+                    text: _loader.notifyText
 
-                    _textStack.y = 0;
-                    _textScrollAnim.restart();
-                    _popup_timeout.restart();
-                    if (exitAnim.running) {
-                        exitAnim.running = false;
-                        enterAnim.running = true;
-                    }
-                }
-
-                YAnimator {
-                    id: _textScrollAnim
-                    target: _textStack
-                    from: 0
-                    to: -46
-                    duration: 400
-                    easing.type: Easing.OutQuint
-                }
-
-                Column {
-                    id: _textStack
-                    width: _text2.width
-                    spacing: 25
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: 300
-                            easing.type: Easing.OutExpo
-                        }
-                    }
-
-                    StyledText {
-                        id: _text
-                        font.pixelSize: 15
-                        font.weight: 1000
-                        text: " "
-                    }
-
-                    StyledText {
-                        id: _text2
-                        font.pixelSize: 15
-                        font.weight: 1000
-                        text: " "
+                    textComponent: StyledText {
+                        font.pixelSize: 16
+                        font.weight: 500
                     }
                 }
             }
