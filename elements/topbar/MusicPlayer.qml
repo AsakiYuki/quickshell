@@ -87,7 +87,7 @@ Rectangle {
   function updatePositionView() {
     root.position = Mpris.current.position - root.timeOffset
     root.arcEnd = ((root.position / root.length) * 360) >> 0;
-    if (SharedState.isMusicPlayerOpened) {
+    if (!Workspaces.current.hasFullscreen) {
       progressCircle.arcEnd = root.arcEnd
     }
   }
@@ -121,7 +121,7 @@ Rectangle {
     running: (Mpris.current && Mpris.current.playbackState === 1) && !Workspaces.current.hasFullscreen || SharedState.isMusicPlayerOpened
     onTriggered: {
       root.updatePositionView()
-      if (root.lyrics.length && !SharedState.isMusicPlayerOpened) root.updateLyrics()
+      if (root.lyrics.length && !Workspaces.current.hasFullscreen) root.updateLyrics()
     }
   }
 
