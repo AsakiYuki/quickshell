@@ -82,7 +82,7 @@ DropPanel {
               if (trayDrag) {
                 trayDrag = false;
                 const {x, y} = this.mapToGlobal(ev.x, ev.y)
-                if (Utils.isMouseInsideTargetElement(x, y, 0, 0, topbar.systemTrayElement)) {
+                if (!Workspaces.current.hasFullscreen && Utils.isMouseInsideTargetElement(x, y, 0, 0, topbar.systemTrayElement)) {
                   const hideTrayItems = configuration.hideTrayID.filter(v => v !== [modelData.id, modelData.tooltipTitle, modelData.title].join("&"))
                   configuration.hideTrayID = hideTrayItems
                 }
