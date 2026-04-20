@@ -8,18 +8,17 @@ Singleton {
 
     property bool isLauncherOpened: false
     property bool isMoreTrayOpened: false
+    property bool isMusicPlayerOpened: false
 
-    readonly property bool isOverlay: isLauncherOpened || isMoreTrayOpened
+    readonly property bool isOverlay: isLauncherOpened || isMoreTrayOpened || isMusicPlayerOpened
 
     onIsLauncherOpenedChanged: {
-        if (isLauncherOpened) {
-            isMoreTrayOpened = false;
-        }
+        if (isLauncherOpened)
+            isMusicPlayerOpened = isMoreTrayOpened = false;
     }
     
     function onOverlayClicked() {
-        isLauncherOpened = false;
-        isMoreTrayOpened = false;
+        isMusicPlayerOpened = isLauncherOpened = isMoreTrayOpened = false;
     }
 
     function parseIconPath(icon) {

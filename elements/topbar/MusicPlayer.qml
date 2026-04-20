@@ -18,8 +18,13 @@ Rectangle {
   property double realLength: 0
   property double timeOffset: 0
 
+  property double position: 0
+  property double length: realLength || Mpris.current.length
+
   property double lyricsDelay: 0.3
   property int fetchId: 0
+
+  property int arcEnd: 0
 
   onCurrentLyricLineChanged: {
     const lyrics = root.lyrics[currentLyricLine] || { text: "", time: {} };
@@ -76,7 +81,8 @@ Rectangle {
   }
 
   function updatePositionView() {
-    progressCircle.arcEnd = (((Mpris.current.position - root.timeOffset) / (root.realLength || Mpris.current.length)) * 360) >> 0;
+    root.position = Mpris.current.position - root.timeOffset
+    root.arcEnd = progressCircle.arcEnd = ((root.position / root.length) * 360) >> 0;
   }
   
   function updateLyrics() {
@@ -115,7 +121,7 @@ Rectangle {
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: Mpris.current.togglePlaying()
+    onClicked: SharedState.isMusicPlayerOpened = true
   }
 
   Row {
@@ -129,7 +135,7 @@ Rectangle {
       anchors.verticalCenter: parent.verticalCenter
       width: 25
       height: 25
-      lineWidth: 3
+      lineWidth: 2
       showBackground: true
       arcEnd: 0
 
@@ -198,5 +204,9 @@ Rectangle {
         }
       }
     }
+  }
+
+  Component.onCompleted: {
+    topbar.musicPlayer = this;
   }
 }

@@ -59,7 +59,13 @@ Variants {
 
             MouseArea {
                 anchors.fill: parent
+                focus: SharedState.isOverlay
                 onPressed: SharedState.onOverlayClicked()
+
+                Keys.onPressed: ev => {
+                    if (ev.key === Qt.Key_Escape) 
+                        SharedState.onOverlayClicked()
+                }
             }
 
             mask: Region {
@@ -80,6 +86,7 @@ Variants {
 
                 Launcher.Launcher {}
                 Elements.SystemTray {}
+                Elements.MusicPlayer {}
                 Elements.SystemPopup {}
             }
 

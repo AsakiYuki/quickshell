@@ -155,7 +155,7 @@ Item {
         textAlign: "center"
 
         textComponent: StyledText {
-            font.pixelSize: 15
+            font.pixelSize: 13
         }
     }
 

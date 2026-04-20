@@ -28,6 +28,7 @@ ShellRoot {
     Modules.Topbar {
         id: topbar
         property var systemTrayElement;
+        property var musicPlayer;
     }
 
     Modules.Shortcuts {}
