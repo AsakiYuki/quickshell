@@ -21,6 +21,10 @@ Item {
   x: viewX
   y: viewY
 
+  MouseArea {
+    anchors.fill: parent
+  }
+
   Loader {
     id: bgLoader
     sourceComponent: root.backgroundComponent

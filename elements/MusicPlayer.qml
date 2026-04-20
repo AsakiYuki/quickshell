@@ -19,9 +19,6 @@ DropPanel {
   verticalPadding: 40
   horizontalPadding: verticalPadding
 
-  backgroundComponent: RadiusRectangle {
-    radius: 25
-  }
   content: Item {
     width: contents.width 
     height: contents.height
@@ -32,8 +29,8 @@ DropPanel {
       spacing: 15
 
       RadiusImage {
-        radius: 12
-        source: Mpris.current.trackArtUrl
+        radius: 5
+        source: Mpris.current.trackArtUrl || "../assets/fallback.jpg"
         width: 100
         height: 100
       }
