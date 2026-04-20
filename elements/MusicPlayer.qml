@@ -9,11 +9,14 @@ import "../utils/Utils.js" as Utils
 DropPanel {
   id: root
 
-  active: SharedState.isMusicPlayerOpened
+  active: SharedState.overlayDropPanelType === 3
   viewY: 5
 
   onActiveChanged: {
-    if (active) viewX =  topbar.musicPlayer.mapToGlobal(0, 0).x
+    if (root.active) {
+      const topbarMusicPlayerPosition = topbar.musicPlayer.mapToGlobal(0, 0).x
+      root.viewX = topbarMusicPlayerPosition
+    }
   }
 
   verticalPadding: 40
@@ -116,8 +119,8 @@ DropPanel {
 
             StyledButton {
               anchors.centerIn: parent
-              height: 32
-              width: 32
+              height: 34
+              width: 34
               radius: 20
            
               normalColor: Catppuccin.base

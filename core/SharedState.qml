@@ -6,19 +6,19 @@ import "../utils/FuzzySort.js" as FuzzySort
 Singleton {
     id: _root
 
-    property bool isLauncherOpened: false
-    property bool isMoreTrayOpened: false
-    property bool isMusicPlayerOpened: false
+    property int overlayDropPanelType: 0
+    readonly property bool isOverlay: overlayDropPanelType > 0
 
-    readonly property bool isOverlay: isLauncherOpened || isMoreTrayOpened || isMusicPlayerOpened
+    onOverlayDropPanelTypeChanged: {
+        console.log(overlayDropPanelType)
+    }
 
-    onIsLauncherOpenedChanged: {
-        if (isLauncherOpened)
-            isMusicPlayerOpened = isMoreTrayOpened = false;
+    function toggleOverlay(type) {
+        overlayDropPanelType = (overlayDropPanelType === type) ? 0 : type;
     }
     
     function onOverlayClicked() {
-        isMusicPlayerOpened = isLauncherOpened = isMoreTrayOpened = false;
+        overlayDropPanelType = 0;
     }
 
     function parseIconPath(icon) {

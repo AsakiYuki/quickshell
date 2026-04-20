@@ -6,24 +6,9 @@ import "../modules"
 import "../core"
 
 Scope {
-    Timer {
-        id: launcherTimer
-        property bool isBlocked: false
-        running: false
-        interval: 350
-        onTriggered: {
-            isBlocked = false;
-        }
-    }
-
     CustomShortcut {
         name: "launcher"
-        onPressed: {
-            if (!launcherTimer.isBlocked) {
-                launcherTimer.isBlocked = launcherTimer.running = true;
-                SharedState.isLauncherOpened = !SharedState.isLauncherOpened;
-            }
-        }
+        onPressed: SharedState.toggleOverlay(1)
     }
 
     CustomShortcut {

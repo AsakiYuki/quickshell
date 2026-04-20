@@ -9,7 +9,8 @@ import "../base"
 import "../core"
 
 DropPanel {
-  active: SharedState.isMoreTrayOpened
+  id: root
+  active: SharedState.overlayDropPanelType === 2
 
   anchors.right: parent.right
   anchors.rightMargin: 5
@@ -38,7 +39,7 @@ DropPanel {
             anchor.item: _trayitem
             anchor.margins.top: 35
             anchor.edges: Edges.Right
-            onClosed: SharedState.isMoreTrayOpened = false
+            onClosed: SharedState.overlayDropPanelType = 0
         }
 
         StyledButton {
@@ -88,7 +89,7 @@ DropPanel {
                 }
               } else {
                 modelData.activate()
-                SharedState.isMoreTrayOpened = false
+                SharedState.overlayDropPanelType = 0
               }
             }
           }

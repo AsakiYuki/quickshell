@@ -41,7 +41,7 @@ Rectangle {
   clip: true
 
   onVisibleChanged: {
-    if (!visible) SharedState.isMusicPlayerOpened = false;
+    if (!visible) SharedState.overlayDropPanelType = 0;
   }
   
   onMetadataChanged: {
@@ -87,7 +87,7 @@ Rectangle {
   function updatePositionView() {
     root.position = Mpris.current.position - root.timeOffset
     root.arcEnd = ((root.position / root.length) * 360) >> 0;
-    if (!Workspaces.current.hasFullscreen) {
+    if (!Workspaces.current?.hasFullscreen) {
       progressCircle.arcEnd = root.arcEnd
     }
   }
@@ -118,17 +118,17 @@ Rectangle {
   }
 
   FrameAnimation {
-    running: (Mpris.current && Mpris.current.playbackState === 1) && !Workspaces.current.hasFullscreen || SharedState.isMusicPlayerOpened
+    running: (Mpris.current && Mpris.current.playbackState === 1) && !Workspaces.current?.hasFullscreen || (SharedState.overlayDropPanelType === 3)
     onTriggered: {
       root.updatePositionView()
-      if (root.lyrics.length && !Workspaces.current.hasFullscreen) root.updateLyrics()
+      if (root.lyrics.length && !Workspaces.current?.hasFullscreen) root.updateLyrics()
     }
   }
 
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
-    onClicked: SharedState.isMusicPlayerOpened = true
+    onClicked: SharedState.toggleOverlay(3)
   }
 
   Row {
@@ -147,7 +147,7 @@ Rectangle {
       arcEnd: 0
 
       SwitchImageIcon {
-        width: (Mpris.current.playbackState !== 1) * 4 + 15
+        width: 15
         height: width
 
         Behavior on width {

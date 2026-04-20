@@ -8,6 +8,7 @@ import Quickshell.Wayland
 
 import "../components"
 import "../base"
+import "../core"
 import "../elements/topbar"
 
 Variants {
@@ -22,6 +23,8 @@ Variants {
         StyledWindow {
             id: _topbar
             name: "topbar"
+            
+            property bool isFocus: false
 
             anchors.top: true
             anchors.left: true
@@ -30,7 +33,6 @@ Variants {
             margins.bottom: -15
 
             implicitHeight: 60
-            focusable: true
 
             Shape {
                 id: _shape

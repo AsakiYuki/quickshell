@@ -57,7 +57,11 @@ Item {
     if (active) {
       bgLoader.active = true;
       openAnim.start();
-    } else closeAnim.start();
+      closeAnim.stop();
+    } else {
+      openAnim.stop();
+      closeAnim.start();
+    }
   }
 
   NumberAnimation {

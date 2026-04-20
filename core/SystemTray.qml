@@ -30,7 +30,8 @@ Singleton {
       else showTray.push(trayItem)
     }
 
-    if (!hideTray.length) SharedState.isMoreTrayOpened = false;
+    if ((SharedState.overlayDropPanelType === 2) && !hideTray.length)
+      SharedState.overlayDropPanelType = 0;
   }
 
   property list<string> hideTrayID: []

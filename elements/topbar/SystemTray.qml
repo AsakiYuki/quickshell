@@ -132,7 +132,7 @@ Rectangle{
 
       ImageIcon {
         anchors.fill: parent
-        rotation: SharedState.isMoreTrayOpened ? -90 : 90
+        rotation: (SharedState.overlayDropPanelType === 2) ? -90 : 90
         source: "../assets/icons/chevron_right.png"
 
         Behavior on rotation {
@@ -143,10 +143,7 @@ Rectangle{
         }
       }
 
-      onClicked: {
-        SharedState.isMoreTrayOpened = !SharedState.isMoreTrayOpened;
-      }
-
+      onClicked: SharedState.toggleOverlay(2);
     }
   }
 

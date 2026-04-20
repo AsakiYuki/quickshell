@@ -14,9 +14,15 @@ Loader {
 
     id: launcher
     active: false
+    
+    property bool launcherOpened: SharedState.overlayDropPanelType === 1
+
+    onLauncherOpenedChanged: {
+        console.log("Is launcher opened:", launcherOpened)
+    }
 
     Timer {
-        running: !SharedState.isLauncherOpened
+        running: !launcher.launcherOpened
         interval: 150
         onTriggered: {
             launcher.active = false;
@@ -24,7 +30,7 @@ Loader {
     }
 
     Timer {
-        running: SharedState.isLauncherOpened
+        running: launcher.launcherOpened
         interval: 0
         onTriggered: {
             launcher.active = true;
@@ -64,7 +70,7 @@ Loader {
         }
 
         NumberAnimation {
-            running: !SharedState.isLauncherOpened
+            running: !launcher.launcherOpened
             target: _root
             properties: "y"
             from: _root.y
@@ -74,11 +80,8 @@ Loader {
         }
 
         onVisibleChanged: {
-            if (SharedState.isLauncherOpened) {
-                openAnim.start();
-            } else {
-                closeAnim.start();
-            }
+            if (launcher.launcherOpened) openAnim.start();
+            else closeAnim.start();
         }
 
         onSelectorIndexChanged: {
@@ -121,7 +124,7 @@ Loader {
         function execute(index) {
             if (!_textField.searchText.trim().startsWith("/")) {
                 _e.model[index].entry.execute();
-                SharedState.isLauncherOpened = false;
+                SharedState.overlayDropPanelType = 0;
                 return;
             }
 
@@ -170,11 +173,11 @@ Loader {
                     _textField.allowTyping = true;
                     _textField.text = _textField.searchText;
                 } else if (_textField.text === "")
-                    SharedState.isLauncherOpened = false;
+                    SharedState.overlayDropPanelType = 0;
                 else
                     _textField.text = "";
             } else if (ev.key === Qt.Key_Escape)
-                SharedState.isLauncherOpened = false;
+                SharedState.overlayDropPanelType = 0;
 
             if (_command_panel.isActive) {
                 _command_panel.onKeyPressed(ev);
@@ -233,10 +236,11 @@ Loader {
 
             StyledTextField {
                 id: _textField
-
                 width: parent.width - 20
-
                 property string searchText: ""
+                
+                property bool isLauncherMode: SharedState.overlayDropPanelType
+
                 onTextChanged: {
                     if (!_command_panel.isActive) {
                         searchText = text.trim();
@@ -249,8 +253,6 @@ Loader {
                 property string customPlaceHolder: ""
                 placeholderText: qsTr(customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder)
                 Component.onCompleted: _textField.forceActiveFocus()
-
-
             }
 
             Item {
