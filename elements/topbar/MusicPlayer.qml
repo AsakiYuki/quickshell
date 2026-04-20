@@ -39,6 +39,10 @@ Rectangle {
   color: Catppuccin.surface0
   visible: Mpris.players.length
   clip: true
+
+  onVisibleChanged: {
+    if (!visible) SharedState.isMusicPlayerOpened = false;
+  }
   
   onMetadataChanged: {
     root.lyrics = [];
@@ -82,7 +86,10 @@ Rectangle {
 
   function updatePositionView() {
     root.position = Mpris.current.position - root.timeOffset
-    root.arcEnd = progressCircle.arcEnd = ((root.position / root.length) * 360) >> 0;
+    root.arcEnd = ((root.position / root.length) * 360) >> 0;
+    if (SharedState.isMusicPlayerOpened) {
+      progressCircle.arcEnd = root.arcEnd
+    }
   }
   
   function updateLyrics() {
@@ -111,10 +118,10 @@ Rectangle {
   }
 
   FrameAnimation {
-    running: (Mpris.current && Mpris.current.playbackState === 1) && !Workspaces.current.hasFullscreen
+    running: (Mpris.current && Mpris.current.playbackState === 1) && !Workspaces.current.hasFullscreen || SharedState.isMusicPlayerOpened
     onTriggered: {
       root.updatePositionView()
-      if (root.lyrics.length) root.updateLyrics()
+      if (root.lyrics.length && !SharedState.isMusicPlayerOpened) root.updateLyrics()
     }
   }
 
