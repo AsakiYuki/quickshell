@@ -17,10 +17,6 @@ Loader {
     
     property bool launcherOpened: SharedState.overlayDropPanelType === 1
 
-    onLauncherOpenedChanged: {
-        console.log("Is launcher opened:", launcherOpened)
-    }
-
     Timer {
         running: !launcher.launcherOpened
         interval: 150

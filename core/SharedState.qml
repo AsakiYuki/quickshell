@@ -9,10 +9,6 @@ Singleton {
     property int overlayDropPanelType: 0
     readonly property bool isOverlay: overlayDropPanelType > 0
 
-    onOverlayDropPanelTypeChanged: {
-        console.log(overlayDropPanelType)
-    }
-
     function toggleOverlay(type) {
         overlayDropPanelType = (overlayDropPanelType === type) ? 0 : type;
     }
