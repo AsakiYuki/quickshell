@@ -12,7 +12,7 @@ Item {
 
     StyledText {
         y: 15
-        text: `Profile: ${PowerProfiles.profile = PowerProfile.Balanced}`
+        text: `Profile: ${PowerProfiles.profile = 1}`
     }
 
     Component.onCompleted: {}

@@ -15,7 +15,7 @@ DropPanel {
   onActiveChanged: {
     if (root.active) {
       const topbarMusicPlayerPosition = topbar.musicPlayer.mapToGlobal(0, 0).x
-      root.viewX = topbarMusicPlayerPosition
+      root.viewX = Math.max(5, topbarMusicPlayerPosition - 100)
     }
   }
 

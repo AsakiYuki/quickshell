@@ -6,6 +6,7 @@ import "../../core"
 
 import "../../utils/HttpRequest.js" as HttpRequest
 import "../../utils/Lyrics.js" as Lyrics
+import "../../utils/Utils.js" as Utils
 
 Rectangle {
   id: root
@@ -26,9 +27,35 @@ Rectangle {
 
   property int arcEnd: 0
 
+  function fetchAppleMxmLyrics(data) {
+    return HttpRequest.fetchJson("https://rise.cider.sh/api/v1/lyrics/mxm", {
+      method: "POST",
+      body: JSON.stringify(data)
+    }).then(data => {
+      const lyrics = Lyrics.parseMxm(data.body)
+      if (lyrics[0].time.start === 0) return lyrics
+      else return [
+        {text: "", time: { start: 0, end: lyrics[0].time.start }},
+        ...lyrics
+      ]
+    })
+  }
+
+  function fetchLrclibLyrics(data) {
+    return HttpRequest.fetchJson(`https://lrclib.net/api/get${Utils.buildSearchQuery(data)}`).then(v => {
+      const lyrics = Lyrics.parseLrclib(v.syncedLyrics)
+      if (lyrics[0].time.start === 0) return lyrics
+      else return [
+        {text: "", time: { start: 0, end: lyrics[0].time.start }},
+        ...lyrics
+      ]
+    })
+  }
+
   onCurrentLyricLineChanged: {
     const lyrics = root.lyrics[currentLyricLine] || { text: "", time: {} };
     lyricText.text = (currentLyricLine & 1 ? "‎" : "") + lyrics.text
+    console.info(`Lyrics ${currentLyricLine} ${lyrics.time.start.toFixed(2)}-${lyrics.time.end.toFixed(2)}: ${lyricText.text}`)
   }
 
   height: 35
@@ -66,17 +93,35 @@ Rectangle {
         const album = info.albumName;
         const duration = info.durationInMillis;
 
-        HttpRequest.fetchJson("https://rise.cider.sh/api/v1/lyrics/mxm", {
-          method: "POST",
-          body: JSON.stringify({ id, name, artist, album, duration })
+        console.info(`Fetching lyrics for ${name} - ${artist}`)
+        const callback = () => fetchAppleMxmLyrics({ id, name, artist, album, duration }).then(v => { if (currentId === root.fetchId) root.lyrics = v })
+        callback().then(() => {
+          if (currentId !== root.fetchId) return;
+          console.info(`Found lyrics for ${name} - ${artist}`)
+        }).catch(() => {
+          if (currentId !== root.fetchId) return;
+          console.info(`Fetch lyrics for ${name} - ${artist} failed, retry!`)
+          return callback()
+            .then(() => {
+              if (currentId !== root.fetchId) return;
+              console.info(`Found lyrics for ${name} - ${artist}`)
+            }).catch(() => {
+              if (currentId !== root.fetchId) return;
+              console.info(`Lyrics for ${name} - ${artist} not found!`)
+              console.info(`Try to fetch the lyrics from lrclib!`)
+
+              return fetchLrclibLyrics({ artist_name: artist, track_name: name, duration: duration / 1000 >> 0 }).then(v => {
+                if (currentId !== root.fetchId) return
+                console.info(`Found lyrics for ${name} - ${artist}`)
+                root.lyrcs = v;
+              }).catch(() => {
+                console.info(`Lyrics for ${name} - ${artist} not found!`)
+              })
+            })
         }).then(v => {
           if (currentId !== root.fetchId) return
-          const lyrics = Lyrics.parse(v.body)
-          if (lyrics[0].time.start === 0) root.lyrics = lyrics
-          else root.lyrics = [
-            {text: "", time: { start: 0, end: lyrics[0].time.start }},
-            ...lyrics
-          ]
+          if (currentId === root.fetchId) console.info(`DONE!`)
+          else console.info("CANCELED!")
         })
       })
     } else root.timeOffset = 0;
@@ -187,14 +232,14 @@ Rectangle {
           property bool isBottomText;
           property int duration: (((root.lyrics[currentLyricLine]?.time.end || 0) - (root.lyrics[currentLyricLine]?.time.start || 0)) * 1000)
 
-          width: ((lyricsText.width - 250) > 25) ? 250 : lyricsText.width
+          width: ((lyricsText.width - 225) > 25) ? 225 : lyricsText.width
           height: lyricsText.height
           clip: true
 
           NumberAnimation {
             id: moveLyricsAnim
             target: lyricsText
-            running: !lyricsContainer.isBottomText && lyricsContainer.isOverflow
+            running: false
             properties: "x"
             from: 0
             to: 0
@@ -218,7 +263,7 @@ Rectangle {
               if (lyricsContainer.isBottomText) return;
               moveLyricsAnim.stop();
               if (lyricsText.width > lyricsContainer.width) {
-                moveLyricsAnim.to = -(lyricsText.width - lyricsContainer.width) - 2;
+                moveLyricsAnim.to = -(lyricsText.width - lyricsContainer.width);
                 moveLyricsAnim.restart();
               } else lyricsText.x = 0;
             }

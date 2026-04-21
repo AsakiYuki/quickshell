@@ -19,7 +19,7 @@ Rectangle {
         text: Qt.formatDateTime(date, format)
 
         FrameAnimation {
-            running: !Workspaces.current.hasFullscreen
+            running: !Workspaces.current?.hasFullscreen
             onTriggered: _text.date = new Date()
         }
     }

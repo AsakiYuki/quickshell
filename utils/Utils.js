@@ -1,3 +1,5 @@
+.pragma library
+
 function isMouseInsideTargetElement(mouseX, mouseY, offsetX, offsetY, target) {
   const {x, y} = target.mapToGlobal(offsetX, offsetY)
   const [toX, toY] = [x + target.width, y + target.height]
@@ -19,4 +21,14 @@ function secondsToTime(seconds) {
   }
   
   return hours + minutes + ":" + seconds
+}
+
+function buildSearchQuery(data) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(data)) {
+    if (value === null || value === undefined) continue;
+    params.append(key, String(value));
+  }
+  const query = params.toString();
+  return query ? `?${query}` : "";
 }

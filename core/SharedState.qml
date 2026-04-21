@@ -8,6 +8,14 @@ Singleton {
 
     property int overlayDropPanelType: 0
     readonly property bool isOverlay: overlayDropPanelType > 0
+    
+    onIsOverlayChanged: {
+        console.info("Is overlay focus", isOverlay)
+    }
+
+    onOverlayDropPanelTypeChanged: {
+        console.info("Overlay Drop Panel:", overlayDropPanelType)
+    }
 
     function toggleOverlay(type) {
         overlayDropPanelType = (overlayDropPanelType === type) ? 0 : type;

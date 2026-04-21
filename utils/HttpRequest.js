@@ -11,7 +11,6 @@ function fetch(input, init = {}) {
 				xhr.setRequestHeader(key, value)
 			}
 		}
-
 		xhr.onload = function () {
 			const response = {
 				status: xhr.status,
@@ -35,7 +34,7 @@ function fetch(input, init = {}) {
 }
 
 function fetchJson(input, init = {}) {
-	return fetch(input, init).then(v => v.json())
+	return fetch(input, init).then(v => v.json()).catch(v => console.error(v))
 }
 
 function fetchText(input, init = {}) {
