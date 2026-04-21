@@ -8,7 +8,7 @@ Item {
 
     property int viewWidth: 0
     property int viewHeight: 0
-    property int moveSpeed: 500
+    property int moveSpeed: 350
     property int resizeSpeed: 350
     property int moveEasingType: Easing.OutQuint
     property int resizeEasingType: Easing.OutQuint
@@ -64,14 +64,20 @@ Item {
 
             Loader {
                 id: loaderTop
-                anchors.centerIn: parent
                 property string text: ""
+                anchors.centerIn: parent
                 sourceComponent: root.textComponent
+
                 Binding {
                     target: loaderTop.item
                     property: "text"
                     value: loaderTop.text
-                    restoreMode: Binding.RestoreBinding
+                }
+
+                Binding {
+                    target: loaderTop.item
+                    property: "isBottomText"
+                    value: false
                 }
             }
         }
@@ -84,14 +90,20 @@ Item {
 
             Loader {
                 id: loaderBottom
-                anchors.centerIn: parent
                 property string text: ""
+                anchors.centerIn: parent
                 sourceComponent: root.textComponent
+                
                 Binding {
                     target: loaderBottom.item
                     property: "text"
                     value: loaderBottom.text
-                    restoreMode: Binding.RestoreBinding
+                }
+
+                Binding {
+                    target: loaderBottom.item
+                    property: "isBottomText"
+                    value: true
                 }
             }
         }

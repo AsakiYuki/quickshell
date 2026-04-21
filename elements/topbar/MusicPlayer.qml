@@ -175,10 +175,55 @@ Rectangle {
 
       ScrollText {
         id: lyricText
-        viewHeight: 30
+        viewHeight: parent.height
         resizeSpeed: 0
         anchors.verticalCenter: parent.verticalCenter
         opacity: 1 - nameText.opacity
+
+        textComponent: Item {
+          id: lyricsContainer
+          
+          property string text;
+          property bool isBottomText;
+          property int duration: (((root.lyrics[currentLyricLine]?.time.end || 0) - (root.lyrics[currentLyricLine]?.time.start || 0)) * 1000)
+
+          width: ((lyricsText.width - 200) > 25) ? 200 : lyricsText.width
+          height: lyricsText.height
+          clip: true
+
+          NumberAnimation {
+            id: moveLyricsAnim
+            target: lyricsText
+            running: !lyricsContainer.isBottomText && lyricsContainer.isOverflow
+            properties: "x"
+            from: 0
+            to: 0
+            easing.type: Easing.InOutSine
+            duration: lyricsContainer.duration * 0.7
+          }
+
+          StyledText {
+            id: lyricsText
+            text: lyricsContainer.text
+
+            readonly property bool isPlaying: Mpris.current.playbackState === 1
+            onIsPlayingChanged: {
+              if (lyricsContainer.isBottomText) return;
+              if (isPlaying) {
+                if (lyricsText.width > lyricsContainer.width) moveLyricsAnim.resume()
+              } else moveLyricsAnim.pause()
+            }
+
+            onTextChanged: {
+              if (lyricsContainer.isBottomText) return;
+              moveLyricsAnim.stop();
+              if (lyricsText.width > lyricsContainer.width) {
+                moveLyricsAnim.to = -(lyricsText.width - lyricsContainer.width) - 2;
+                moveLyricsAnim.restart();
+              } else lyricsText.x = 0;
+            }
+          }
+        }
       }
 
       Column {
