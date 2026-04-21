@@ -187,7 +187,7 @@ Rectangle {
           property bool isBottomText;
           property int duration: (((root.lyrics[currentLyricLine]?.time.end || 0) - (root.lyrics[currentLyricLine]?.time.start || 0)) * 1000)
 
-          width: ((lyricsText.width - 200) > 25) ? 200 : lyricsText.width
+          width: ((lyricsText.width - 250) > 25) ? 250 : lyricsText.width
           height: lyricsText.height
           clip: true
 
