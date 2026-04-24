@@ -6,11 +6,32 @@ Item {
   property Component backgroundComponent: RadiusRectangle {
     radius: 15
   }
+
   required property Component content;
   
   property bool active: false
   property int verticalPadding: 0
   property int horizontalPadding: 0
+
+  property int direction: 0
+
+  function hiddenY() {
+    if (direction === 0) {
+      return -root.height - 10;
+    } else {
+      return parent ? parent.height + 10 : root.viewY + root.height + 10;
+    }
+  }
+
+  function showY() {
+    if (direction === 0) {
+      return root.viewY;
+    } else {
+      return parent
+        ? parent.height - root.height - root.verticalPadding + root.viewY
+        : root.viewY;
+    }
+  }
 
   property int viewX: 0
   property int viewY: 0
@@ -35,6 +56,7 @@ Item {
       property: "children"
       value: Loader {
         id: contentLoader
+        active: bgLoader.active
         anchors.centerIn: parent
         sourceComponent: root.content
       }
@@ -70,8 +92,8 @@ Item {
     properties: "y"
     duration: 350
     easing.type: Easing.OutQuint
-    from: -root.height - 10
-    to: root.viewY
+    from: root.hiddenY()
+    to: root.showY()
   }
 
   NumberAnimation {
@@ -80,10 +102,12 @@ Item {
     properties: "y"
     duration: 350
     easing.type: Easing.OutQuint
-    from: root.viewY
-    to: -root.height - 10
+    from: root.showY()
+    to: root.hiddenY()
     onFinished: bgLoader.active = false
   }
+
+  onHeightChanged: y = showY()
 
   Component.onCompleted: bgLoader.active = root.active
 }

@@ -7,35 +7,17 @@ import "../../base"
 
 import "../../commands" as Cmd
 
-Loader {
+DropPanel {
+    id: root
+    active: SharedState.isLauncherOpened
+    direction: 1
+
     anchors.horizontalCenter: parent.horizontalCenter
-    anchors.bottom: parent.bottom
-    anchors.bottomMargin: 7
+    viewY: -7
 
-    id: launcher
-    active: false
-    
-    property bool launcherOpened: SharedState.isLauncherOpened
-
-    Timer {
-        running: !launcher.launcherOpened
-        interval: 150
-        onTriggered: {
-            launcher.active = false;
-        }
-    }
-
-    Timer {
-        running: launcher.launcherOpened
-        interval: 0
-        onTriggered: {
-            launcher.active = true;
-        }
-    }
-
-    sourceComponent: RadiusRectangle {
+    content: Item {
         id: _root
-
+        
         width: _list_container.width
         height: _list_container.height
         clip: true
@@ -48,25 +30,6 @@ Loader {
         property int count: _e.model.length
         property int maxSelector: Math.min(_e.maxView, count)
 
-        NumberAnimation {
-            running: true
-            target: _root
-            properties: "y"
-            from: 20 + _root.height
-            to: 0
-            easing.type: Easing.OutQuint
-            duration: 350
-        }
-
-        NumberAnimation {
-            running: !launcher.launcherOpened
-            target: _root
-            properties: "y"
-            from: _root.y
-            to: 20 + _root.height
-            easing.type: Easing.OutQuint
-            duration: 350
-        }
 
         onVisibleChanged: {
             if (launcher.launcherOpened) openAnim.start();
@@ -80,6 +43,7 @@ Loader {
         onViewIndexChanged: {
             _e.viewIndex = viewIndex = Math.max(0, Math.min(count - maxSelector, viewIndex));
         }
+
 
         function goUp() {
             if (selectorIndex < 1) {

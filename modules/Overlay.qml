@@ -51,6 +51,8 @@ Variants {
             anchors.bottom: true
             anchors.left: true
             anchors.right: true
+            
+            focusable: true
 
             Component.onCompleted: {
                 _root.width = modelData.width;
@@ -89,7 +91,6 @@ Variants {
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
                 Elements.SystemPopup {}
-                Elements.ActivateNixOS {}
 
                 MouseArea {
                     anchors.fill: parent
@@ -99,6 +100,7 @@ Variants {
                 }
 
                 Launcher.Launcher {}
+                Elements.ActivateNixOS {}
             }
 
             Image {
