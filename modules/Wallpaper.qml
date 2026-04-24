@@ -31,6 +31,7 @@ Variants {
             readonly property string wallpaper: configuration.wallpaper
 
             onWallpaperChanged: {
+                anim.stop()
                 first.source = second.source;
                 if (loadedState === -1) second.source = `${Paths.wallpapers}/${_root.wallpaper}`
             }

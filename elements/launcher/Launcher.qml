@@ -22,60 +22,69 @@ DropPanel {
         height: _list_container.height
         clip: true
 
+        
+        readonly property int rowHeight: 55
+        readonly property int topOffset: 10
+        readonly property int listHeaderArea: 0
+
         property int viewIndex: 0
         property int selectorIndex: 0
 
         readonly property var _e: _textField.commandMode ? _cmd_list : _list
 
-        property int count: _e.model.length
-        property int maxSelector: Math.min(_e.maxView, count)
+        property int count: _e.model ? _e.model.length : 0
+        property int maxSelector: Math.min(_e.maxView || 0, count)
 
-
-        onVisibleChanged: {
-            if (launcher.launcherOpened) openAnim.start();
-            else closeAnim.start();
-        }
-
+        
         onSelectorIndexChanged: {
-            selectorIndex = Math.max(0, Math.min(selectorIndex, maxSelector - 1));
+            let clamped = Math.max(0, Math.min(selectorIndex, maxSelector - 1));
+            if (selectorIndex !== clamped) selectorIndex = clamped;
         }
 
         onViewIndexChanged: {
-            _e.viewIndex = viewIndex = Math.max(0, Math.min(count - maxSelector, viewIndex));
+            let clamped = Math.max(0, Math.min(count - maxSelector, viewIndex));
+            if (viewIndex !== clamped) {
+                viewIndex = clamped;
+            }
+            _e.viewIndex = viewIndex;
         }
-
 
         function goUp() {
             if (selectorIndex < 1) {
                 if (viewIndex === 0) {
                     selectorIndex = maxSelector - 1;
                     viewIndex = count;
-                } else
+                } else {
                     viewIndex--;
-            } else
+                }
+            } else {
                 selectorIndex--;
+            }
         }
 
         function goDown() {
             if (selectorIndex > maxSelector - 2) {
-                if (viewIndex + maxSelector === count) {
+                if (viewIndex + maxSelector >= count) { 
                     selectorIndex = 0;
                     viewIndex = 0;
-                } else
+                } else {
                     viewIndex++;
-            } else
+                }
+            } else {
                 selectorIndex++;
+            }
         }
 
         function mouseClick(index) {
             if (selectorIndex === index) {
                 execute(viewIndex + selectorIndex);
-            } else
+            } else {
                 selectorIndex = index;
+            }
         }
 
         function execute(index) {
-            if (!_textField.searchText.trim().startsWith("/")) {
+            if (!_textField.commandMode) {
                 _e.model[index].entry.execute();
                 SharedState.isLauncherOpened = false;
                 return;
@@ -89,7 +98,7 @@ DropPanel {
         }
 
         function reset() {
-            _root.viewIndex = 0;
+            viewIndex = 0;
             selectorIndex = 0;
         }
 
@@ -98,54 +107,64 @@ DropPanel {
             cursorShape: _command_panel.isActive ? Qt.ArrowCursor : Qt.PointingHandCursor
             enabled: !_command_panel.isActive
 
-            onClicked: ({
-                    x,
-                    y
-                }) => {
-                if (y <= 50)
-                    return;
-                _root.mouseClick((y / 55 >> 0) - 1);
+            onClicked: (mouse) => {
+                if (mouse.y <= _root.listHeaderArea) return;
+                
+                let clickedIndex = (mouse.y / _root.rowHeight >> 0);
+                _root.mouseClick(clickedIndex);
             }
 
-            onWheel: ({
-                    angleDelta
-                }) => {
-                const isScrollUp = angleDelta.y > 0;
-                if (isScrollUp)
-                    _root.goUp();
-                else
-                    _root.goDown();
+            onWheel: (wheel) => {
+                if (wheel.angleDelta.y > 0) _root.goUp();
+                else _root.goDown();
             }
         }
 
-        Keys.onPressed: ev => {
+        
+        Keys.onPressed: (ev) => {
             if (ev.modifiers === Qt.AltModifier && ev.key === Qt.Key_Left) {
                 if (_command_panel.isActive) {
                     _command_panel.isActive = false;
                     _textField.customPlaceHolder = "";
                     _textField.allowTyping = true;
                     _textField.text = _textField.searchText;
-                } else if (_textField.text === "")
+                } else if (_textField.text === "") {
                     SharedState.isLauncherOpened = false;
-                else
+                } else {
                     _textField.text = "";
-            } else if (ev.key === Qt.Key_Escape)
+                }
+                ev.accepted = true;
+                return;
+            } 
+            
+            if (ev.key === Qt.Key_Escape) {
                 SharedState.isLauncherOpened = false;
-
-            if (_command_panel.isActive) {
-                _command_panel.onKeyPressed(ev);
+                ev.accepted = true;
                 return;
             }
 
-            if (ev.modifiers > Qt.NoModifier)
+            if (_command_panel.isActive) {
+                _command_panel.onKeyPressed(ev);
+                ev.accepted = true;
                 return;
+            }
 
-            if (ev.key === Qt.Key_Down) 
-                _root.goDown();
-            else if (ev.key === Qt.Key_Up)
-                _root.goUp();
-            else if (ev.key === Qt.Key_Enter || ev.key === Qt.Key_Return) {
-                _root.execute(viewIndex + selectorIndex);
+            if (ev.modifiers > Qt.NoModifier) return;
+
+            switch (ev.key) {
+                case Qt.Key_Down:
+                    _root.goDown();
+                    ev.accepted = true;
+                    break;
+                case Qt.Key_Up:
+                    _root.goUp();
+                    ev.accepted = true;
+                    break;
+                case Qt.Key_Enter:
+                case Qt.Key_Return:
+                    _root.execute(viewIndex + selectorIndex);
+                    ev.accepted = true;
+                    break;
             }
         }
 
@@ -153,97 +172,78 @@ DropPanel {
             id: selector_panel
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width - 20
-            height: 55
+            height: _root.rowHeight
             color: Catppuccin.surface0
-            y: 10 + _root.selectorIndex * 55
+            
+            
+            y: _root.topOffset + _root.selectorIndex * _root.rowHeight
             border.width: 0
 
             opacity: _command_panel.isActive ? 0 : 1
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 120
-                }
-            }
-
-            Behavior on y {
-                NumberAnimation {
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-            }
+            Behavior on opacity { NumberAnimation { duration: 120 } }
+            Behavior on y { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
         }
 
         Column {
             id: _list_container
-
-            Behavior on width {
-                NumberAnimation {
-                    duration: 350
-                    easing.type: Easing.OutExpo
-                }
-            }
-
             spacing: 10
             topPadding: 10
             bottomPadding: 10
             width: _command_panel.isActive ? (_command_panel.width + 20) : 650
+
+            Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
 
             Item {
                 width: parent.width
                 height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height) - 5
                 clip: true
 
-                Behavior on height {
-                    NumberAnimation {
-                        duration: 350
-                        easing.type: Easing.OutExpo
-                    }
-                }
+                Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
 
                 Cmd.CommandPanel {
                     id: _command_panel
                     anchors.horizontalCenter: parent.horizontalCenter
-                    opacity: Number(isActive)
+                    opacity: isActive ? 1 : 0
+                    
+                    
+                    enabled: isActive
                     visible: opacity > 0
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 120
-                        }
-                    }
+                    Behavior on opacity { NumberAnimation { duration: 120 } }
+                    
                     onIsActiveChanged: {
-                        if (isActive)
-                            _textField.text = "";
+                        if (isActive) _textField.text = "";
                     }
                 }
 
                 Commands {
                     id: _cmd_list
                     opacity: (_textField.commandMode && !_command_panel.isActive) ? 1 : 0
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 120
-                        }
-                    }
+                    enabled: opacity === 1 
+                    visible: opacity > 0   
+                    Behavior on opacity { NumberAnimation { duration: 120 } }
                 }
 
                 Applications {
                     id: _list
                     opacity: (!_textField.commandMode && !_command_panel.isActive) ? 1 : 0
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 120
-                        }
-                    }
+                    enabled: opacity === 1
+                    visible: opacity > 0
+                    Behavior on opacity { NumberAnimation { duration: 120 } }
                 }
             }
 
             StyledTextField {
                 id: _textField
                 width: parent.width - 20
+                anchors.horizontalCenter: parent.horizontalCenter
+
                 property string searchText: ""
-                
                 property bool isLauncherMode: SharedState.overlayDropPanelType
+                readonly property bool commandMode: searchText.startsWith("/")
+                property string customPlaceHolder: ""
+
+                placeholderText: qsTr(customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder)
 
                 onTextChanged: {
                     if (!_command_panel.isActive) {
@@ -251,12 +251,7 @@ DropPanel {
                     }
                 }
 
-                anchors.horizontalCenter: parent.horizontalCenter
-                readonly property bool commandMode: searchText[0] === "/"
-
-                property string customPlaceHolder: ""
-                placeholderText: qsTr(customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder)
-                Component.onCompleted: _textField.forceActiveFocus()
+                Component.onCompleted: forceActiveFocus()
             }
         }
     }
