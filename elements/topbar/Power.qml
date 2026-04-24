@@ -25,7 +25,7 @@ Rectangle {
 
     ScrollText {
       anchors.verticalCenter: parent.verticalCenter
-      text: `${(UPower.displayDevice.percentage * 100) >> 0}%`
+      text: `${(UPower.displayDevice.percentage * 100) >> 0}`
     }
 
     ImageIcon {
