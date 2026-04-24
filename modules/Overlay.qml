@@ -45,7 +45,7 @@ Variants {
 
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
-            WlrLayershell.keyboardFocus: (SharedState.overlayDropPanelType === 1) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: SharedState.isLauncherOpened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
             anchors.top: true
             anchors.bottom: true
@@ -66,7 +66,7 @@ Variants {
                 anchors.fill: parent
                 focus: SharedState.isOverlay
                 onPressed: SharedState.onOverlayClicked()
-                anchors.topMargin: (Workspaces.hasFullscreen || (SharedState.overlayDropPanelType === 1)) ? 0 : 45
+                anchors.topMargin: (Workspaces.hasFullscreen || SharedState.isLauncherOpened) ? 0 : 45
 
                 Keys.onPressed: ev => {
                     if (ev.key === Qt.Key_Escape) 
@@ -86,12 +86,19 @@ Variants {
                     }
                 }
 
-                Launcher.Launcher {}
-
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
                 Elements.SystemPopup {}
                 Elements.ActivateNixOS {}
+
+                MouseArea {
+                    anchors.fill: parent
+                    visible: SharedState.isLauncherOpened
+                    hoverEnabled: true
+                    onPressed: SharedState.onOverlayClicked()
+                }
+
+                Launcher.Launcher {}
             }
 
             Image {

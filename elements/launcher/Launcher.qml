@@ -9,13 +9,13 @@ import "../../commands" as Cmd
 
 Loader {
     anchors.horizontalCenter: parent.horizontalCenter
-    anchors.top: parent.top
-    anchors.topMargin: 7
+    anchors.bottom: parent.bottom
+    anchors.bottomMargin: 7
 
     id: launcher
     active: false
     
-    property bool launcherOpened: SharedState.overlayDropPanelType === 1
+    property bool launcherOpened: SharedState.isLauncherOpened
 
     Timer {
         running: !launcher.launcherOpened
@@ -40,13 +40,6 @@ Loader {
         height: _list_container.height
         clip: true
 
-        Behavior on height {
-            NumberAnimation {
-                duration: 350
-                easing.type: Easing.OutExpo
-            }
-        }
-
         property int viewIndex: 0
         property int selectorIndex: 0
 
@@ -59,7 +52,7 @@ Loader {
             running: true
             target: _root
             properties: "y"
-            from: -20 - _root.height
+            from: 20 + _root.height
             to: 0
             easing.type: Easing.OutQuint
             duration: 350
@@ -70,7 +63,7 @@ Loader {
             target: _root
             properties: "y"
             from: _root.y
-            to: -20 - _root.height
+            to: 20 + _root.height
             easing.type: Easing.OutQuint
             duration: 350
         }
@@ -120,7 +113,7 @@ Loader {
         function execute(index) {
             if (!_textField.searchText.trim().startsWith("/")) {
                 _e.model[index].entry.execute();
-                SharedState.overlayDropPanelType = 0;
+                SharedState.isLauncherOpened = false;
                 return;
             }
 
@@ -169,11 +162,11 @@ Loader {
                     _textField.allowTyping = true;
                     _textField.text = _textField.searchText;
                 } else if (_textField.text === "")
-                    SharedState.overlayDropPanelType = 0;
+                    SharedState.isLauncherOpened = false;
                 else
                     _textField.text = "";
             } else if (ev.key === Qt.Key_Escape)
-                SharedState.overlayDropPanelType = 0;
+                SharedState.isLauncherOpened = false;
 
             if (_command_panel.isActive) {
                 _command_panel.onKeyPressed(ev);
@@ -198,7 +191,7 @@ Loader {
             width: parent.width - 20
             height: 55
             color: Catppuccin.surface0
-            y: 45 + _root.selectorIndex * 55
+            y: 10 + _root.selectorIndex * 55
             border.width: 0
 
             opacity: _command_panel.isActive ? 0 : 1
@@ -219,14 +212,65 @@ Loader {
         Column {
             id: _list_container
 
-            spacing: 10
-            topPadding: 10
-            bottomPadding: 10
-            width: _command_panel.isActive ? (_command_panel.width + 20) : 650
             Behavior on width {
                 NumberAnimation {
                     duration: 350
                     easing.type: Easing.OutExpo
+                }
+            }
+
+            spacing: 10
+            topPadding: 10
+            bottomPadding: 10
+            width: _command_panel.isActive ? (_command_panel.width + 20) : 650
+
+            Item {
+                width: parent.width
+                height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height) - 5
+                clip: true
+
+                Behavior on height {
+                    NumberAnimation {
+                        duration: 350
+                        easing.type: Easing.OutExpo
+                    }
+                }
+
+                Cmd.CommandPanel {
+                    id: _command_panel
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    opacity: Number(isActive)
+                    visible: opacity > 0
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 120
+                        }
+                    }
+                    onIsActiveChanged: {
+                        if (isActive)
+                            _textField.text = "";
+                    }
+                }
+
+                Commands {
+                    id: _cmd_list
+                    opacity: (_textField.commandMode && !_command_panel.isActive) ? 1 : 0
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 120
+                        }
+                    }
+                }
+
+                Applications {
+                    id: _list
+                    opacity: (!_textField.commandMode && !_command_panel.isActive) ? 1 : 0
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 120
+                        }
+                    }
                 }
             }
 
@@ -249,50 +293,6 @@ Loader {
                 property string customPlaceHolder: ""
                 placeholderText: qsTr(customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder)
                 Component.onCompleted: _textField.forceActiveFocus()
-            }
-
-            Item {
-                width: parent.width
-                height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height) - 5
-
-                Cmd.CommandPanel {
-                    id: _command_panel
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    opacity: Number(isActive)
-                    visible: opacity > 0
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 120
-                        }
-                    }
-                    onIsActiveChanged: {
-                        if (isActive)
-                            _textField.text = "";
-                    }
-                }
-
-                Commands {
-                    id: _cmd_list
-                    y: -5
-                    opacity: (_textField.commandMode && !_command_panel.isActive) ? 1 : 0
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 120
-                        }
-                    }
-                }
-
-                Applications {
-                    id: _list
-                    y: -5
-                    opacity: (!_textField.commandMode && !_command_panel.isActive) ? 1 : 0
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 120
-                        }
-                    }
-                }
             }
         }
     }

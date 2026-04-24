@@ -8,7 +8,7 @@ import "../core"
 Scope {
     CustomShortcut {
         name: "launcher"
-        onPressed: SharedState.toggleOverlay(1)
+        onPressed: SharedState.isLauncherOpened = !SharedState.isLauncherOpened
     }
 
     CustomShortcut {

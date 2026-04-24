@@ -7,6 +7,7 @@ Singleton {
     id: _root
 
     property int overlayDropPanelType: 0
+    property bool isLauncherOpened: false
     readonly property bool isOverlay: overlayDropPanelType > 0
     
     onIsOverlayChanged: {
@@ -22,7 +23,8 @@ Singleton {
     }
     
     function onOverlayClicked() {
-        overlayDropPanelType = 0;
+        if (isLauncherOpened) isLauncherOpened = false;
+        else overlayDropPanelType = 0;
     }
 
     function parseIconPath(icon) {
