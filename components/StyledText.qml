@@ -9,5 +9,5 @@ Text {
     font.pixelSize: 13
     font.family: "segoe ui"
     font.weight: 500
-    font.letterSpacing: 0.5
+    font.letterSpacing: 0.2
 }

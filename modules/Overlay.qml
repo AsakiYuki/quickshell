@@ -85,9 +85,11 @@ Variants {
                 }
 
                 Launcher.Launcher {}
+
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
                 Elements.SystemPopup {}
+                Elements.ActivateNixOS {}
             }
 
             Image {
