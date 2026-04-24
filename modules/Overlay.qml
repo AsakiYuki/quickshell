@@ -68,7 +68,7 @@ Variants {
                 anchors.fill: parent
                 focus: SharedState.isOverlay
                 onPressed: SharedState.onOverlayClicked()
-                anchors.topMargin: (Workspaces.hasFullscreen || SharedState.isLauncherOpened || `${_root.trayIcon}` !== "") ? 0 : 45
+                anchors.topMargin: (Workspaces.hasFullscreen || SharedState.isLauncherOpened || (`${_root.trayIcon}`[0]) === "0") ? 0 : 45
 
                 Keys.onPressed: ev => {
                     if (ev.key === Qt.Key_Escape) 
@@ -110,7 +110,7 @@ Variants {
                 height: 20
                 x: _root.trayDragPosX
                 y: _root.trayDragPosY
-                source: _root.trayIcon
+                source: _root.trayIcon.slice(1)
                 mipmap: true
             }
         }

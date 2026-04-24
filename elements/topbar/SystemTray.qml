@@ -78,7 +78,7 @@ Rectangle{
           onDrag: (ev, delta) => {
             if (Math.abs(delta.x) > 1.5 || Math.abs(delta.y) > 1.5) {
               _root.isTrayDragging = true;
-              overlay.setDragIcon(modelData.icon)
+              overlay.setDragIcon(`0${modelData.icon}`)
             }
 
             const {x, y} = this.mapToGlobal(ev.x, ev.y)

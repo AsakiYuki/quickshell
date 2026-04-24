@@ -60,7 +60,7 @@ DropPanel {
 
           onDrag: (ev, delta) => {
             if (Math.abs(delta.x) > 1.5 || Math.abs(delta.y) > 1.5) {
-              setDragIcon(modelData.icon)
+              setDragIcon(`0${modelData.icon}`)
               trayDrag = true;
             }
 
