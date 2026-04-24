@@ -6,7 +6,7 @@ import "../../base"
 
 Rectangle {
     width: _text.width + 35
-    height: _text.height + 15
+    height: 35
     color: Catppuccin.surface0
     radius: height / 2
     anchors.verticalCenter: parent.verticalCenter

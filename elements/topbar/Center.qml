@@ -2,8 +2,8 @@ import QtQuick
 
 Row {
     height: parent.height
-    width: _clock.width
     anchors.centerIn: parent
+    spacing: 5
 
     Clock {
         id: _clock

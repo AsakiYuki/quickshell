@@ -11,6 +11,12 @@ Item {
     property string source: ""
     property color color: Catppuccin.text
 
+    Behavior on color {
+        ColorAnimation {
+            duration: 150
+        }
+    }
+
     Image {
         id: sourceImage
         source: root.source

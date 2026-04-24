@@ -36,6 +36,7 @@ DropPanel {
         source: Mpris.current.trackArtUrl || "../assets/fallback.jpg"
         width: 100
         height: 100
+        fillMode: Image.PreserveAspectCrop
       }
 
       Item {

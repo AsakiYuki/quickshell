@@ -68,7 +68,7 @@ Variants {
                 anchors.fill: parent
                 focus: SharedState.isOverlay
                 onPressed: SharedState.onOverlayClicked()
-                anchors.topMargin: (Workspaces.hasFullscreen || SharedState.isLauncherOpened) ? 0 : 45
+                anchors.topMargin: (Workspaces.hasFullscreen || SharedState.isLauncherOpened || `${_root.trayIcon}` !== "") ? 0 : 45
 
                 Keys.onPressed: ev => {
                     if (ev.key === Qt.Key_Escape) 
@@ -91,6 +91,7 @@ Variants {
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
                 Elements.SystemPopup {}
+                Elements.PowerProfile {}
 
                 MouseArea {
                     anchors.fill: parent
@@ -100,10 +101,11 @@ Variants {
                 }
 
                 Launcher.Launcher {}
-                Elements.ActivateNixOS {}
+                // Elements.ActivateNixOS {}
             }
 
             Image {
+                id: dragIcon
                 width: 20
                 height: 20
                 x: _root.trayDragPosX

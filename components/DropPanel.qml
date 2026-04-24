@@ -28,7 +28,7 @@ Item {
       return root.viewY;
     } else {
       return parent
-        ? parent.height - root.height - root.verticalPadding + root.viewY
+        ? parent.height - root.height - root.verticalPadding - root.viewY
         : root.viewY;
     }
   }

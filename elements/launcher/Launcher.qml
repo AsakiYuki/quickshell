@@ -13,7 +13,7 @@ DropPanel {
     direction: 1
 
     anchors.horizontalCenter: parent.horizontalCenter
-    viewY: -7
+    viewY: 7
 
     content: Item {
         id: _root

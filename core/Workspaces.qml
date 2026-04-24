@@ -13,6 +13,10 @@ Singleton {
     }
     property bool hasFullscreen: current?.hasFullscreen || false
 
+    onCurrentChanged: {
+        SharedState.overlayDropPanelType = 0;
+    }
+
     function getById(id) {
         for (const workspace of workspaces.values)
             if (workspace.id === id)
