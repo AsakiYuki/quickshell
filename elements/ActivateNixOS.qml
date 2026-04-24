@@ -12,7 +12,7 @@ Column {
   StyledText {
     color: "white"
     opacity: 0.15
-    font.pixelSize: 20
+    font.pixelSize: 25
     font.weight: 500
     text: "Activate NixOS"
   }
@@ -20,7 +20,7 @@ Column {
   StyledText {
     color: "white"
     opacity: 0.15
-    font.pixelSize: 15
+    font.pixelSize: 18
     font.weight: 300
     text: "Go to Settings to activate NixOS."
   }
