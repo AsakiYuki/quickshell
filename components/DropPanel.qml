@@ -41,6 +41,7 @@ Item {
 
   x: viewX
   y: viewY
+  z: active ? 10 : 0
 
   MouseArea {
     anchors.fill: parent
