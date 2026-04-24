@@ -45,7 +45,7 @@ Variants {
 
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
-            WlrLayershell.keyboardFocus: SharedState.isOverlay ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: (SharedState.overlayDropPanelType === 1) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
             anchors.top: true
             anchors.bottom: true
@@ -57,19 +57,21 @@ Variants {
                 _root.height = modelData.height;
             }
 
+            mask: Region {
+                item: SharedState.isOverlay ? mouseArea : null
+            }
+
             MouseArea {
+                id: mouseArea
                 anchors.fill: parent
                 focus: SharedState.isOverlay
                 onPressed: SharedState.onOverlayClicked()
+                anchors.topMargin: (Workspaces.hasFullscreen || (SharedState.overlayDropPanelType === 1)) ? 0 : 45
 
                 Keys.onPressed: ev => {
                     if (ev.key === Qt.Key_Escape) 
                         SharedState.onOverlayClicked()
                 }
-            }
-
-            mask: Region {
-                item: null
             }
 
             Item {
