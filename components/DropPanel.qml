@@ -17,9 +17,9 @@ Item {
 
   function hiddenY() {
     if (direction === 0) {
-      return -root.height - 10;
+      return -root.height;
     } else {
-      return parent ? parent.height + 10 : root.viewY + root.height + 10;
+      return parent ? parent.height : root.viewY + root.height;
     }
   }
 
@@ -90,7 +90,7 @@ Item {
     id: openAnim
     target: root
     properties: "y"
-    duration: 350
+    duration: 400
     easing.type: Easing.OutQuint
     from: root.hiddenY()
     to: root.showY()
@@ -100,7 +100,7 @@ Item {
     id: closeAnim
     target: root
     properties: "y"
-    duration: 350
+    duration: 400
     easing.type: Easing.OutQuint
     from: root.showY()
     to: root.hiddenY()
