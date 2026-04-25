@@ -90,7 +90,6 @@ Variants {
 
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
-                Elements.SystemPopup {}
                 Elements.PowerProfile {}
 
                 MouseArea {
@@ -101,6 +100,8 @@ Variants {
                 }
 
                 Launcher.Launcher {}
+
+                Elements.SystemPopup {}
                 // Elements.ActivateNixOS {}
             }
 
