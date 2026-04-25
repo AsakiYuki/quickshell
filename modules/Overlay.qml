@@ -101,7 +101,7 @@ Variants {
                 }
 
                 Launcher.Launcher {}
-                Elements.ActivateNixOS {}
+                // Elements.ActivateNixOS {}
             }
 
             Image {

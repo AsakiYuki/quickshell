@@ -79,8 +79,8 @@ Item {
   onActiveChanged: {
     if (active) {
       bgLoader.active = true;
-      openAnim.start();
       closeAnim.stop();
+      openAnim.start();
     } else {
       openAnim.stop();
       closeAnim.start();
@@ -101,14 +101,16 @@ Item {
     id: closeAnim
     target: root
     properties: "y"
-    duration: 400
-    easing.type: Easing.OutQuint
+    duration: 150
+    easing.type: Easing.InSine
     from: root.showY()
     to: root.hiddenY()
     onFinished: bgLoader.active = false
   }
 
-  onHeightChanged: y = showY()
+  onHeightChanged: {
+    if (active) y = showY()
+  }
 
   Component.onCompleted: bgLoader.active = root.active
 }

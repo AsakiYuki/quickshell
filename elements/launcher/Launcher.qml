@@ -85,8 +85,8 @@ DropPanel {
 
         function execute(index) {
             if (!_textField.commandMode) {
-                _e.model[index].entry.execute();
                 SharedState.isLauncherOpened = false;
+                _e.model[index].entry.execute();
                 return;
             }
 
