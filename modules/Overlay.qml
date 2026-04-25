@@ -101,8 +101,8 @@ Variants {
 
                 Launcher.Launcher {}
 
-                Elements.SystemPopup {}
-                // Elements.ActivateNixOS {}
+                Elements.SystemPopup { z: 2 }
+                // Elements.ActivateNixOS { z: 2 }
             }
 
             Image {
