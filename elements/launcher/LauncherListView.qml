@@ -53,13 +53,11 @@ Item {
 
                     Image {
                         anchors.verticalCenter: parent.verticalCenter
-
                         height: _item.height - 20
                         width: height
                         source: _root.model[_item.index].icon
                         visible: (_root.model[_item.index].icon !== undefined)
                         asynchronous: true
-
                         fillMode: Image.PreserveAspectCrop
                     }
 

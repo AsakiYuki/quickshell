@@ -8,30 +8,13 @@ Item {
   }
 
   required property Component content;
+  property int viewPadding: 0
   
   property bool active: false
   property int verticalPadding: 0
   property int horizontalPadding: 0
 
   property int direction: 0
-
-  function hiddenY() {
-    if (direction === 0) {
-      return -root.height;
-    } else {
-      return parent ? parent.height : root.viewY + root.height;
-    }
-  }
-
-  function showY() {
-    if (direction === 0) {
-      return root.viewY;
-    } else {
-      return parent
-        ? parent.height - root.height - root.verticalPadding - root.viewY
-        : root.viewY;
-    }
-  }
 
   property int viewX: 0
   property int viewY: 0
@@ -87,30 +70,33 @@ Item {
     }
   }
 
+
   NumberAnimation {
     id: openAnim
     target: root
-    properties: "y"
+    properties: "viewPadding"
     duration: 400
     easing.type: Easing.OutQuint
-    from: root.hiddenY()
-    to: root.showY()
+    from: -root.height
+    to: root.viewY
   }
 
   NumberAnimation {
     id: closeAnim
     target: root
-    properties: "y"
-    duration: 150
+    properties: "viewPadding"
+    duration: 200
     easing.type: Easing.InSine
-    from: root.showY()
-    to: root.hiddenY()
+    from: root.viewY
+    to: -root.height
     onFinished: bgLoader.active = false
   }
 
-  onHeightChanged: {
-    if (active) y = showY()
-  }
+  anchors.bottom: direction ? parent.bottom : null
+  anchors.bottomMargin: direction * viewPadding
+
+  anchors.top: direction ? null : parent.top
+  anchors.topMargin: (!direction) * viewPadding
 
   Component.onCompleted: bgLoader.active = root.active
 }
