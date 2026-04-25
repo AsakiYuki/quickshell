@@ -85,18 +85,24 @@ Item {
     id: closeAnim
     target: root
     properties: "viewPadding"
-    duration: 200
+    duration: 180
     easing.type: Easing.InSine
     from: root.viewY
     to: -root.height
     onFinished: bgLoader.active = false
   }
 
-  anchors.bottom: direction ? parent.bottom : null
-  anchors.bottomMargin: direction * viewPadding
+  anchors.top: (direction === 0) ? parent.top : null
+  anchors.topMargin: (direction === 0) * viewPadding
 
-  anchors.top: direction ? null : parent.top
-  anchors.topMargin: (!direction) * viewPadding
+  anchors.bottom: (direction === 1) ? parent.bottom : null
+  anchors.bottomMargin: (direction === 1) * viewPadding
+
+  anchors.left: (direction === 2) ? parent.left : null
+  anchors.leftMargin: (direction === 2) * viewPadding
+  
+  anchors.right: (direction === 3) ? parent.right : null
+  anchors.rightMargin: (direction === 3) * viewPadding
 
   Component.onCompleted: bgLoader.active = root.active
 }
