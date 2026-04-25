@@ -13,7 +13,6 @@ Item {
     readonly property int maxVisible: 5
     readonly property int visibleCount: Math.min(wallpapers.length, maxVisible)
     
-    
     width: imageWidth * visibleCount + Math.max(0, visibleCount - 1) * 5 + 20
     height: imageHeight + 28
 

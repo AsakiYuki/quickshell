@@ -10,6 +10,12 @@ Item {
     width: Math.max(_loader.width, 150)
     height: Math.max(_loader.height, 75)
 
+    function onTextfieldTyping(text) {
+        if (_loader.children.length === 0) return
+        const func = _loader.children[0].onTextfieldTyping;
+        if (func) func(text)
+    }
+
     function onKeyPressed(ev) {
         if (_loader.children.length === 0) return
         const func = _loader.children[0].onKeyPressed;
@@ -19,7 +25,6 @@ Item {
     Loader {
         id: _loader
         active: _root.isActive
-
         source: `${_root.command}.qml`
     }
 }

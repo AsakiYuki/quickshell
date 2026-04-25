@@ -246,9 +246,8 @@ DropPanel {
                 placeholderText: qsTr(customPlaceHolder === "" ? "Type '/' to enter a command..." : customPlaceHolder)
 
                 onTextChanged: {
-                    if (!_command_panel.isActive) {
-                        searchText = text.trim();
-                    }
+                    if (!_command_panel.isActive) searchText = text.trim();
+                    else _command_panel.onTextfieldTyping(text);
                 }
 
                 Component.onCompleted: forceActiveFocus()
