@@ -101,7 +101,7 @@ Variants {
 
                 Launcher.Launcher {}
 
-                Elements.SystemPopup { z: 2 }
+                Elements.SystemPopup { z: 100 }
                 // Elements.ActivateNixOS { z: 2 }
             }
 
