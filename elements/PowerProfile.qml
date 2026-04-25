@@ -8,11 +8,11 @@ import "../core"
 DropPanel {
   id: root
 
-  anchors.right: parent.right
-  anchors.rightMargin: 5
-  
   active: SharedState.overlayDropPanelType === 1
+  
+  direction: 3
   viewY: 5
+  viewX: 5
 
   content: Item {
     width: 205

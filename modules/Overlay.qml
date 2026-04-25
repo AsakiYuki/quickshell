@@ -51,7 +51,7 @@ Variants {
             anchors.bottom: true
             anchors.left: true
             anchors.right: true
-            
+
             focusable: true
 
             Component.onCompleted: {
@@ -71,8 +71,8 @@ Variants {
                 anchors.topMargin: (Workspaces.hasFullscreen || SharedState.isLauncherOpened || (`${_root.trayIcon}`[0]) === "0") ? 0 : 45
 
                 Keys.onPressed: ev => {
-                    if (ev.key === Qt.Key_Escape) 
-                        SharedState.onOverlayClicked()
+                    if (ev.key === Qt.Key_Escape)
+                        SharedState.onOverlayClicked();
                 }
             }
 
@@ -97,11 +97,14 @@ Variants {
                     visible: SharedState.isLauncherOpened
                     hoverEnabled: true
                     onPressed: SharedState.onOverlayClicked()
+                    z: 10
                 }
 
                 Launcher.Launcher {}
 
-                Elements.SystemPopup { z: 100 }
+                Elements.SystemPopup {
+                    z: 100
+                }
                 // Elements.ActivateNixOS { z: 2 }
             }
 

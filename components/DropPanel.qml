@@ -19,6 +19,11 @@ Item {
   property int viewX: 0
   property int viewY: 0
 
+  property int openDuration: 400
+  property int openEasingType: Easing.OutQuint
+  property int closeDuration: 180
+  property int closeEasingType: Easing.InSine
+
   height: bgLoader.height
   width: bgLoader.width
 
@@ -70,25 +75,24 @@ Item {
     }
   }
 
-
   NumberAnimation {
     id: openAnim
     target: root
     properties: "viewPadding"
-    duration: 400
-    easing.type: Easing.OutQuint
-    from: -root.height
-    to: root.viewY
+    duration: root.openDuration
+    easing.type: root.openEasingType
+    from: (root.direction > 1) ? -root.width : -root.height
+    to: (root.direction > 1) ? root.viewX : root.viewY
   }
 
   NumberAnimation {
     id: closeAnim
     target: root
     properties: "viewPadding"
-    duration: 180
-    easing.type: Easing.InSine
-    from: root.viewY
-    to: -root.height
+    duration: root.closeDuration
+    easing.type: root.closeEasingType
+    from: (root.direction > 1) ? root.viewX : root.viewY
+    to: (root.direction > 1) ? -root.width : -root.height
     onFinished: bgLoader.active = false
   }
 

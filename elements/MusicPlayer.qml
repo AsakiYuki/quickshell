@@ -10,20 +10,17 @@ DropPanel {
   id: root
 
   active: SharedState.overlayDropPanelType === 3
+  viewX: 5
   viewY: 5
+  direction: 2
 
-  onActiveChanged: {
-    if (root.active) {
-      const topbarMusicPlayerPosition = topbar.musicPlayer.mapToGlobal(0, 0).x
-      root.viewX = Math.max(5, topbarMusicPlayerPosition - 200)
-    }
-  }
+  openDuration: 500
 
   verticalPadding: 40
   horizontalPadding: verticalPadding
 
   content: Item {
-    width: contents.width 
+    width: 420
     height: contents.height
 
     Row {
