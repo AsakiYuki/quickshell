@@ -1,112 +1,112 @@
 import QtQuick
 
 Item {
-  id: root
+    id: root
 
-  property Component backgroundComponent: RadiusRectangle {
-    radius: 15
-  }
-
-  required property Component content;
-  property int viewPadding: 0
-  
-  property bool active: false
-  property int verticalPadding: 0
-  property int horizontalPadding: 0
-
-  property int direction: 0
-
-  property int viewX: 0
-  property int viewY: 0
-
-  property int openDuration: 400
-  property int openEasingType: Easing.OutQuint
-  property int closeDuration: 180
-  property int closeEasingType: Easing.InSine
-
-  height: bgLoader.height
-  width: bgLoader.width
-
-  x: viewX
-  y: viewY
-  z: active ? 10 : 0
-
-  MouseArea {
-    anchors.fill: parent
-  }
-
-  Loader {
-    id: bgLoader
-    sourceComponent: root.backgroundComponent
-    active: false
-
-    Binding {
-      target: bgLoader.item
-      property: "children"
-      value: Loader {
-        id: contentLoader
-        active: bgLoader.active
-        anchors.centerIn: parent
-        sourceComponent: root.content
-      }
+    property Component backgroundComponent: RadiusRectangle {
+        radius: 15
     }
 
-    Binding {
-      target: bgLoader.item
-      property: "width"
-      value: (bgLoader.item?.children[0].width || 0) + root.horizontalPadding
+    required property Component content
+    property int viewPadding: 0
+
+    property bool active: false
+    property int verticalPadding: 0
+    property int horizontalPadding: 0
+
+    property int direction: 0
+
+    property int viewX: 0
+    property int viewY: 0
+
+    property int openDuration: 400
+    property int openEasingType: Easing.OutQuint
+    property int closeDuration: 180
+    property int closeEasingType: Easing.InSine
+
+    height: bgLoader.height
+    width: bgLoader.width
+
+    x: viewX
+    y: viewY
+    z: active ? 10 : 0
+
+    MouseArea {
+        anchors.fill: parent
     }
 
-    Binding {
-      target: bgLoader.item
-      property: "height"
-      value: (bgLoader.item?.children[0].height || 0) + root.verticalPadding
+    Loader {
+        id: bgLoader
+        sourceComponent: root.backgroundComponent
+        active: false
+
+        Binding {
+            target: bgLoader.item
+            property: "children"
+            value: Loader {
+                id: contentLoader
+                active: bgLoader.active
+                anchors.centerIn: parent
+                sourceComponent: root.content
+            }
+        }
+
+        Binding {
+            target: bgLoader.item
+            property: "width"
+            value: (bgLoader.item?.children[0].width || 0) + root.horizontalPadding
+        }
+
+        Binding {
+            target: bgLoader.item
+            property: "height"
+            value: (bgLoader.item?.children[0].height || 0) + root.verticalPadding
+        }
     }
-  }
 
-  onActiveChanged: {
-    if (active) {
-      bgLoader.active = true;
-      closeAnim.stop();
-      openAnim.start();
-    } else {
-      openAnim.stop();
-      closeAnim.start();
+    onActiveChanged: {
+        if (active) {
+            bgLoader.active = true;
+            closeAnim.stop();
+            openAnim.start();
+        } else {
+            openAnim.stop();
+            closeAnim.start();
+        }
     }
-  }
 
-  NumberAnimation {
-    id: openAnim
-    target: root
-    properties: "viewPadding"
-    duration: root.openDuration
-    easing.type: root.openEasingType
-    from: (root.direction > 1) ? -root.width : -root.height
-    to: (root.direction > 1) ? root.viewX : root.viewY
-  }
+    NumberAnimation {
+        id: openAnim
+        target: root
+        properties: "viewPadding"
+        duration: root.openDuration
+        easing.type: root.openEasingType
+        from: (root.direction > 1) ? -root.width : -root.height
+        to: (root.direction > 1) ? root.viewX : root.viewY
+    }
 
-  NumberAnimation {
-    id: closeAnim
-    target: root
-    properties: "viewPadding"
-    duration: root.closeDuration
-    easing.type: root.closeEasingType
-    from: (root.direction > 1) ? root.viewX : root.viewY
-    to: (root.direction > 1) ? -root.width : -root.height
-    onFinished: bgLoader.active = false
-  }
+    NumberAnimation {
+        id: closeAnim
+        target: root
+        properties: "viewPadding"
+        duration: root.closeDuration
+        easing.type: root.closeEasingType
+        from: (root.direction > 1) ? root.viewX : root.viewY
+        to: (root.direction > 1) ? -root.width : -root.height
+        onFinished: bgLoader.active = false
+    }
 
-  anchors.top: (direction === 0) ? parent.top : null
-  anchors.topMargin: (direction === 0) * viewPadding
+    anchors.top: (direction === 0) ? parent.top : undefined
+    anchors.topMargin: (direction === 0) * viewPadding
 
-  anchors.bottom: (direction === 1) ? parent.bottom : null
-  anchors.bottomMargin: (direction === 1) * viewPadding
+    anchors.bottom: (direction === 1) ? parent.bottom : undefined
+    anchors.bottomMargin: (direction === 1) * viewPadding
 
-  anchors.left: (direction === 2) ? parent.left : null
-  anchors.leftMargin: (direction === 2) * viewPadding
-  
-  anchors.right: (direction === 3) ? parent.right : null
-  anchors.rightMargin: (direction === 3) * viewPadding
+    anchors.left: (direction === 2) ? parent.left : undefined
+    anchors.leftMargin: (direction === 2) * viewPadding
 
-  Component.onCompleted: bgLoader.active = root.active
+    anchors.right: (direction === 3) ? parent.right : undefined
+    anchors.rightMargin: (direction === 3) * viewPadding
+
+    Component.onCompleted: bgLoader.active = root.active
 }

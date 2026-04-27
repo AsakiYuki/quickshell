@@ -6,7 +6,7 @@ import "../../components"
 import "../../base"
 import "../../core"
 
-Rectangle {
+SimpleButton {
     id: _root
 
     width: _workspaces.width + 10

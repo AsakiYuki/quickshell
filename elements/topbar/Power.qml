@@ -5,7 +5,7 @@ import "../../components"
 import "../../core"
 import "../../base"
 
-Rectangle {
+SimpleButton {
   width: viewer.width + 30
   height: 35
   color: Catppuccin.surface0

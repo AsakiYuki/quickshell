@@ -34,10 +34,10 @@ function clamp(v) {
 }
 
 function toHex({ a, r, g, b }, hasAlpha) {
-  const hex = (v) => v.toString(16).padStart(2, "0").toUpperCase();
+  const hex = (v) => (v >> 0).toString(16).padStart(2, "0").toUpperCase();
   return hasAlpha
-    ? `${hex(a)}${hex(r)}${hex(g)}${hex(b)}`
-    : `${hex(r)}${hex(g)}${hex(b)}`;
+    ? `#${hex(a)}${hex(r)}${hex(g)}${hex(b)}`
+    : `#${hex(r)}${hex(g)}${hex(b)}`;
 }
 
 function darken(color, amount) {

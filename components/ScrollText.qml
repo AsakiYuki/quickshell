@@ -3,7 +3,9 @@ import QtQuick
 Item {
     id: root
 
-    property Component textComponent: StyledText {}
+    property Component textComponent: StyledText {
+        property bool isBottomText
+    }
     property string text: ""
 
     property int viewWidth: 0
@@ -93,7 +95,7 @@ Item {
                 property string text: ""
                 anchors.centerIn: parent
                 sourceComponent: root.textComponent
-                
+
                 Binding {
                     target: loaderBottom.item
                     property: "text"
