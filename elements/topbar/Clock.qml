@@ -4,12 +4,16 @@ import "../../components"
 import "../../core"
 import "../../base"
 
-Rectangle {
+SimpleButton {
     width: _text.width + 35
     height: 35
     color: Catppuccin.surface0
     radius: height / 2
     anchors.verticalCenter: parent.verticalCenter
+
+    onClicked: {
+        SharedState.toggleOverlay(5);
+    }
 
     StyledText {
         id: _text

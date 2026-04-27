@@ -91,6 +91,7 @@ Variants {
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
                 Elements.PowerProfile {}
+                Elements.Calendar {}
 
                 MouseArea {
                     anchors.fill: parent
