@@ -19,6 +19,9 @@ Item {
     property int viewX: 0
     property int viewY: 0
 
+    property int activeIndex: 10
+    property int inactiveIndex: 0
+
     property int openDuration: 400
     property int openEasingType: Easing.OutQuint
     property int closeDuration: 180
@@ -29,7 +32,7 @@ Item {
 
     x: viewX
     y: viewY
-    z: active ? 10 : 0
+    z: active ? activeIndex : inactiveIndex
 
     MouseArea {
         anchors.fill: parent
