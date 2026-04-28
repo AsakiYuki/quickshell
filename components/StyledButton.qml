@@ -63,21 +63,21 @@ Rectangle {
 
     onClicked: ev => {
       if (ev.button === Qt.LeftButton) {
-        _root.clicked();
+        _root.clicked(ev);
       } else if (ev.button === Qt.RightButton) {
-        _root.rightClicked();
+        _root.rightClicked(ev);
       } else if (ev.button === Qt.MiddleButton) {
-        _root.middleClicked();
+        _root.middleClicked(ev);
       }
     }
 
     onDoubleClicked: ev => {
       if (ev.button === Qt.LeftButton) {
-        _root.doubleClicked();
+        _root.doubleClicked(ev);
       } else if (ev.button === Qt.RightButton) {
-        _root.rightDoubleClicked();
+        _root.rightDoubleClicked(ev);
       } else if (ev.button === Qt.MiddleButton) {
-        _root.middleDoubleClicked();
+        _root.middleDoubleClicked(ev);
       }
     }
 
