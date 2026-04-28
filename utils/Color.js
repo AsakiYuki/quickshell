@@ -36,8 +36,8 @@ function clamp(v) {
 function toHex({ a, r, g, b }, hasAlpha) {
   const hex = (v) => (v >> 0).toString(16).padStart(2, "0").toUpperCase();
   return hasAlpha
-    ? `#${hex(a)}${hex(r)}${hex(g)}${hex(b)}`
-    : `#${hex(r)}${hex(g)}${hex(b)}`;
+    ? `${hex(a)}${hex(r)}${hex(g)}${hex(b)}`
+    : `${hex(r)}${hex(g)}${hex(b)}`;
 }
 
 function darken(color, amount) {
@@ -46,7 +46,7 @@ function darken(color, amount) {
   c.r = clamp(c.r - amount);
   c.g = clamp(c.g - amount);
   c.b = clamp(c.b - amount);
-  return toHex(c, hasAlpha);
+  return (color[0] === "#" ? "#" : "") + toHex(c, hasAlpha);
 }
 
 function lighten(color, amount) {
@@ -55,11 +55,11 @@ function lighten(color, amount) {
   c.r = clamp(c.r + amount);
   c.g = clamp(c.g + amount);
   c.b = clamp(c.b + amount);
-  return toHex(c, hasAlpha);
+  return (color[0] === "#" ? "#" : "") + toHex(c, hasAlpha);
 }
 
 function opacity(color, value) {
   const c = split(color);
   c.a = clamp(Math.round(value * 255));
-  return toHex(c, true);
+  return (color[0] === "#" ? "#" : "") + toHex(c, true);
 }
