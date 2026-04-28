@@ -17,12 +17,13 @@ Rectangle {
 
   color: normalColor
 
-  signal clicked()
-  signal doubleClicked()
-  signal rightClicked()
-  signal rightDoubleClicked()
-  signal middleClicked()
-  signal middleDoubleClicked()
+  signal clicked(MouseEvent ev)
+  signal doubleClicked(MouseEvent ev)
+  signal rightClicked(MouseEvent ev)
+  signal rightDoubleClicked(MouseEvent ev)
+  signal middleClicked(MouseEvent ev)
+  signal middleDoubleClicked(MouseEvent ev)
+  signal wheel(WheelEvent ev)
 
   signal mouseMoved(MouseEvent ev)
   signal drag(MouseEvent ev, var delta)
@@ -57,6 +58,8 @@ Rectangle {
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+
+    onWheel: ev => _root.wheel(ev)
 
     onClicked: ev => {
       if (ev.button === Qt.LeftButton) {

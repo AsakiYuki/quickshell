@@ -24,20 +24,15 @@ SimpleButton {
     radius: height / 2
     anchors.verticalCenter: parent.verticalCenter
 
-    MouseArea {
-        cursorShape: Qt.PointingHandCursor
-        anchors.fill: parent
-        onWheel: event => {
-            if (event.angleDelta.y < 0)
-                Workspaces.next();
-            else
-                Workspaces.prev();
-        }
-        onClicked: event => {
-            const x = event.x - 5; // 5 is the left margin
-            const index = Math.min(Math.max(0, Math.floor(x / 25)), Hyprland.workspaces.values.length - 1); // 25 is the workspace size
-            Workspaces.set(Hyprland.workspaces.values[index].id);
-        }
+    onWheel: ev => {
+        if (ev.angleDelta.y < 0) Workspaces.next();
+        else Workspaces.prev();
+    }
+
+    onClicked: ev => {
+        const x = ev.x - 5; // 5 is the left margin
+        const index = Math.min(Math.max(0, Math.floor(x / 25)), Hyprland.workspaces.values.length - 1); // 25 is the workspace size
+        Workspaces.set(Hyprland.workspaces.values[index].id);
     }
 
     Rectangle {
