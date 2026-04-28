@@ -39,6 +39,7 @@ Grid {
       
       Column {
         anchors.centerIn: parent
+        spacing: -3
         
         StyledText {
           text: day.modelData.day
