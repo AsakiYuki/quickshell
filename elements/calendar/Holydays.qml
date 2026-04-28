@@ -31,6 +31,7 @@ Singleton {
     "20/3": { name: "Hạnh phúc" },
     "26/3": { name: "Đoàn TNCS", startYear: 1931 },
     "1/4": { name: "Cá tháng Tư" },
+    "28/4": { isSpecial: true, },
     "30/4": { isSpecial: true, name: "Giải phóng", startYear: 1975 },
     "1/5": { isSpecial: true, name: "Lao động" },
     "7/5": { name: "ĐBP", startYear: 1954 },

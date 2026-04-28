@@ -9,7 +9,9 @@ import "./CalendarUtils.js" as CalendarUtils
 
 Grid {
   id: root
+
   columns: 7
+  spacing: 5
 
   property int currentMonth: new Date().getMonth()
   property int currentDay: new Date().getDate()
@@ -18,75 +20,155 @@ Grid {
   property int viewMonth: 0
   property int viewYear: 0
 
-  spacing: 5
-
   Repeater {
     model: CalendarUtils.getDaysArray(root.viewMonth + 1, root.viewYear)
 
     SimpleButton {
-      radius: 5
-
       id: day
-      required property var modelData;
 
-      readonly property var lunar: new DateUtils.SolarDate(modelData.date).toLunarDate().get();
-      readonly property bool isCurrentDay: (day.modelData.year === root.currentYear) && (day.modelData.month === root.currentMonth + 1) && (day.modelData.day === root.currentDay)
-      readonly property bool isSpecialDay: {
-        if (modelData.date.getDay() === 0 || modelData.date.getDay() === 6) return true
-        return Holydays.lunar[`${day.lunar.day}/${day.lunar.month}`]?.isSpecial || Holydays.solar[`${modelData.day}/${modelData.month}`]?.isSpecial || false;
-      }
-      readonly property string holydayName: {
-        const lunarHolidayName = Holydays.lunar[`${day.lunar.day}/${day.lunar.month}`]?.name;
-        const solarHoliday = Holydays.solar[`${modelData.day}/${modelData.month}`];
-        if (!solarHoliday?.isSpecial && lunarHolidayName) return lunarHolidayName;
-        if (!solarHoliday || solarHoliday.startYear > modelData.year) return ""
-        return solarHoliday.name
-      }
+      required property var modelData
 
-      readonly property string mainTextColor: {
-        if (day.modelData.isCurrentMonth) {
-          return day.isCurrentDay ? Catppuccin.base : isSpecialDay ? Catppuccin.red : Catppuccin.text
-        } else {
-          return isCurrentDay ? Catppuccin.base : ColorUtils.darken(isSpecialDay ? Catppuccin.red : Catppuccin.text, 50)
-        }
-      }
-
-      readonly property string subTextColor: {
-        if (day.modelData.isCurrentMonth) {
-          return day.isCurrentDay ? Catppuccin.base : isSpecialDay ? ColorUtils.darken(Catppuccin.red, 40) : ColorUtils.darken(Catppuccin.text, 90)
-        } else {
-          return day.isCurrentDay ? Catppuccin.base : ColorUtils.darken(isSpecialDay ? Catppuccin.red : Catppuccin.text, 80)
-        }
-      }
-      
-      normalColor: isCurrentDay ? Catppuccin.lavender : ColorUtils.lighten(Catppuccin.base, 3)
+      radius: 5
 
       width: 80
       height: width
-      
+
+      readonly property var lunar:
+        new DateUtils.SolarDate(modelData.date)
+          .toLunarDate()
+          .get()
+
+      readonly property bool isCurrentDay:
+        modelData.year === root.currentYear
+        && modelData.month === root.currentMonth + 1
+        && modelData.day === root.currentDay
+
+      readonly property bool isSpecialDay: {
+        const lunarHoliday =
+          Holydays.lunar[`${lunar.day}/${lunar.month}`]
+
+        const solarHoliday =
+          Holydays.solar[`${modelData.day}/${modelData.month}`]
+
+        return modelData.date.getDay() === 0
+          || modelData.date.getDay() === 6
+          || lunarHoliday?.isSpecial
+          || solarHoliday?.isSpecial
+          || false
+      }
+
+      readonly property string holydayName: {
+        const lunarHolidayName =
+          Holydays.lunar[`${lunar.day}/${lunar.month}`]?.name
+
+        const solarHoliday =
+          Holydays.solar[`${modelData.day}/${modelData.month}`]
+
+        if (!solarHoliday?.isSpecial && lunarHolidayName) {
+          return lunarHolidayName
+        }
+
+        if (
+          !solarHoliday
+          || (
+            solarHoliday.startYear
+            && solarHoliday.startYear > modelData.year
+          )
+        ) {
+          return ""
+        }
+
+        return solarHoliday.name
+      }
+
+      readonly property color mainTextColor: {
+        if (modelData.isCurrentMonth) {
+          return isCurrentDay
+            ? (
+              isSpecialDay
+                ? ColorUtils.darken(Catppuccin.red, 100)
+                : Catppuccin.base
+            )
+            : (
+              isSpecialDay
+                ? ColorUtils.darken(Catppuccin.red, 40)
+                : Catppuccin.text
+            )
+        }
+
+        return isCurrentDay
+          ? (
+            isSpecialDay
+              ? ColorUtils.darken(Catppuccin.red, 100)
+              : Catppuccin.base
+          )
+          : ColorUtils.darken(
+            isSpecialDay
+              ? Catppuccin.red
+              : Catppuccin.text,
+            50
+          )
+      }
+
+      readonly property color subTextColor: {
+        if (modelData.isCurrentMonth) {
+          return isCurrentDay
+            ? (
+              isSpecialDay
+                ? ColorUtils.darken(Catppuccin.red, 100)
+                : Catppuccin.base
+            )
+            : (
+              isSpecialDay
+                ? ColorUtils.darken(Catppuccin.red, 40)
+                : ColorUtils.darken(Catppuccin.text, 90)
+            )
+        }
+
+        return isCurrentDay
+          ? (
+            isSpecialDay
+              ? ColorUtils.darken(Catppuccin.red, 100)
+              : Catppuccin.base
+          )
+          : ColorUtils.darken(
+            isSpecialDay
+              ? Catppuccin.red
+              : Catppuccin.text,
+            80
+          )
+      }
+
+      normalColor:
+        isCurrentDay
+          ? Catppuccin.lavender
+          : ColorUtils.lighten(Catppuccin.base, 3)
+
       Column {
         anchors.centerIn: parent
-        
+        spacing: 2
+
         StyledText {
-          text: day.modelData.day
+          text: modelData.day
           font.weight: 1000
           font.pixelSize: 16
           anchors.horizontalCenter: parent.horizontalCenter
-          color: day.mainTextColor
+          color: mainTextColor
         }
 
         StyledText {
-          text: day.holydayName
+          visible: holydayName.length > 0
+          text: holydayName
           font.pixelSize: 12
           anchors.horizontalCenter: parent.horizontalCenter
-          color: day.subTextColor
+          color: subTextColor
         }
 
         StyledText {
+          text: `${lunar.day}/${lunar.month}`
           font.pixelSize: 12
           anchors.horizontalCenter: parent.horizontalCenter
-          text: `${day.lunar.day}/${day.lunar.month}`
-          color: day.subTextColor
+          color: subTextColor
         }
       }
     }
