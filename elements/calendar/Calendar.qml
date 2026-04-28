@@ -97,11 +97,11 @@ DropPanel {
       Row {
         spacing: 5
         Repeater {
-          model: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+          model: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
           Item {
             required property string modelData;
-            width: 70
+            width: 80
             height: 50
 
             StyledText {
