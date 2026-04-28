@@ -11,7 +11,7 @@ import "../../utils/Color.js" as ColorUtils
 SimpleButton {
     id: root
 
-    readonly property var metadata: `${Mpris.current.identity}|${Mpris.current.trackArtists}|${Mpris.current.trackAlbum}`
+    readonly property var metadata: `${Mpris.current?.identity}|${Mpris.current?.trackArtists}|${Mpris.current?.trackAlbum}`
     readonly property string ciderToken: "rqwqpw7m99wazqxzg05z2em3"
     property list<var> lyrics: []
 
@@ -20,7 +20,7 @@ SimpleButton {
     property double timeOffset: 0
 
     property double position: 0
-    property double length: realLength || Mpris.current.length
+    property double length: realLength || Mpris.current?.length
 
     property double lyricsDelay: 0.3
     property int fetchId: 0
@@ -72,7 +72,7 @@ SimpleButton {
             time: {}
         };
         lyricText.text = (currentLyricLine & 1 ? "‎" : "") + lyrics.text;
-        console.info(`Lyrics ${currentLyricLine} ${lyrics.time.start.toFixed(2)}-${lyrics.time.end.toFixed(2)}: ${lyricText.text}`);
+        if (lyrics.text) console.info(`Lyrics ${currentLyricLine} ${lyrics.time.start.toFixed(2)}-${lyrics.time.end.toFixed(2)}: ${lyricText.text}`);
     }
 
     height: 35
@@ -91,9 +91,9 @@ SimpleButton {
     onMetadataChanged: {
         root.lyrics = [];
         root.realLength = currentLyricLine = 0;
-        if (Mpris.current.identity === "Cider") {
+        if (Mpris.current?.identity === "Cider") {
             const currentId = ++root.fetchId;
-            root.timeOffset = Mpris.current.position;
+            root.timeOffset = Mpris.current?.position;
             HttpRequest.fetchJson("http://localhost:10767/api/v1/playback/now-playing", {
                 headers: {
                     apptoken: root.ciderToken
@@ -173,7 +173,7 @@ SimpleButton {
     }
 
     function updatePositionView() {
-        root.position = Mpris.current.position - root.timeOffset;
+        root.position = Mpris.current?.position - root.timeOffset;
         root.arcEnd = ((root.position / root.length) * 360) >> 0;
         if (!Workspaces.current?.hasFullscreen) {
             progressCircle.arcEnd = root.arcEnd;
@@ -181,7 +181,7 @@ SimpleButton {
     }
 
     function updateLyrics() {
-        const timeCurr = Math.max(0, Mpris.current.position + root.lyricsDelay - root.timeOffset);
+        const timeCurr = Math.max(0, Mpris.current?.position + root.lyricsDelay - root.timeOffset);
         const {
             time
         } = root.lyrics[root.currentLyricLine] || {};
@@ -215,7 +215,7 @@ SimpleButton {
     }
 
     FrameAnimation {
-        running: (Mpris.current && Mpris.current.playbackState === 1) && !Workspaces.current?.hasFullscreen || (SharedState.overlayDropPanelType === 3)
+        running: (Mpris.current && Mpris.current?.playbackState === 1) && !Workspaces.current?.hasFullscreen || (SharedState.overlayDropPanelType === 3)
         onTriggered: {
             root.updatePositionView();
             if (root.lyrics.length && !Workspaces.current?.hasFullscreen)
@@ -255,13 +255,13 @@ SimpleButton {
                 }
 
                 anchors.centerIn: parent
-                source: Mpris.current.playbackState === 1 ? "../assets/icons/pause.png" : "../assets/icons/play.png"
+                source: Mpris.current?.playbackState === 1 ? "../assets/icons/pause.png" : "../assets/icons/play.png"
             }
         }
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: ((`${lyricText.text}` === "") || (`${lyricText.text}` === "‎") || (Mpris.current.playbackState === 2)) ? nameText.width : lyricText.width
+            width: ((`${lyricText.text}` === "") || (`${lyricText.text}` === "‎") || (Mpris.current?.playbackState === 2)) ? nameText.width : lyricText.width
             height: nameText.height
 
             Behavior on width {
@@ -304,7 +304,7 @@ SimpleButton {
                         id: lyricsText
                         text: lyricsContainer.text
 
-                        readonly property bool isPlaying: Mpris.current.playbackState === 1
+                        readonly property bool isPlaying: Mpris.current?.playbackState === 1
                         onIsPlayingChanged: {
                             if (lyricsContainer.isBottomText)
                                 return;
@@ -333,7 +333,7 @@ SimpleButton {
                 id: nameText
                 y: -1
                 spacing: -2
-                opacity: ((`${lyricText.text}` === "") || (`${lyricText.text}` === "‎") || (Mpris.current.playbackState === 2))
+                opacity: ((`${lyricText.text}` === "") || (`${lyricText.text}` === "‎") || (Mpris.current?.playbackState === 2))
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -342,7 +342,7 @@ SimpleButton {
                 }
 
                 OverflowScrollText {
-                    text: Mpris.current.trackTitle || "Unknown Track"
+                    text: Mpris.current?.trackTitle || "Unknown Track"
                     paused: !nameText.opacity
                     textComponent: StyledText {
                         font.pixelSize: 12
@@ -350,7 +350,7 @@ SimpleButton {
                 }
 
                 OverflowScrollText {
-                    text: `${Mpris.current.trackArtists}${Mpris.current.trackAlbum ? ` - ${Mpris.current.trackAlbum}` : ""}`
+                    text: `${Mpris.current?.trackArtists}${Mpris.current?.trackAlbum ? ` - ${Mpris.current?.trackAlbum}` : ""}`
                     paused: !nameText.opacity
                     textComponent: StyledText {
                         font.pixelSize: 12

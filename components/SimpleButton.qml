@@ -9,8 +9,7 @@ Rectangle {
     id: _root
 
     property color normalColor: Catppuccin.surface0
-    property color hoverColor: ColorUtils.lighten(Catppuccin.surface0, 10)
-    property color pressedColor: Catppuccin.sky
+    property color hoverColor: ColorUtils.lighten(`${normalColor}`, 15)
 
     property bool isDrag: false
     property bool isPressed: false

@@ -9,6 +9,7 @@ import "../components"
 import "../core"
 import "../elements" as Elements
 import "../elements/launcher" as Launcher
+import "../elements/calendar" as Calendar
 
 Variants {
     id: _root
@@ -91,7 +92,7 @@ Variants {
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
                 Elements.PowerProfile {}
-                Elements.Calendar {}
+                Calendar.Calendar {}
 
                 MouseArea {
                     anchors.fill: parent

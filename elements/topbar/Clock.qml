@@ -12,7 +12,7 @@ SimpleButton {
     anchors.verticalCenter: parent.verticalCenter
 
     onClicked: {
-        SharedState.toggleOverlay(5);
+        SharedState.toggleOverlay(4);
     }
 
     StyledText {
