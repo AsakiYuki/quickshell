@@ -13,7 +13,7 @@ Item {
     property int spacing: 50
     property int maxWidth: 200
     property int delayRepeat: 1500
-    property int moveSpeed: 2500
+    property int durationPerPixel: 25
     property int easingType: Easing.InOutSine 
 
     onPausedChanged: {
@@ -72,7 +72,7 @@ Item {
             property: "x"
             from: root.scrollToRight ? -root.scrollDistance : 0
             to: root.scrollToRight ? 0 : -root.scrollDistance
-            duration: root.scrollDistance * (root.moveSpeed / 100)
+            duration: root.scrollDistance * root.durationPerPixel
             easing.type: root.easingType
         }
 
