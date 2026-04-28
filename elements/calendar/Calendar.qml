@@ -37,6 +37,7 @@ DropPanel {
 
     width: container.width + 50
     height: container.height + 50
+    clip: true
 
     Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
 

@@ -13,6 +13,7 @@ Grid {
 
   property int currentMonth: new Date().getMonth()
   property int currentDay: new Date().getDate()
+  property int currentYear: new Date().getFullYear()
 
   property int viewMonth: 0
   property int viewYear: 0
@@ -29,7 +30,7 @@ Grid {
       required property var modelData;
 
       readonly property var lunar: new DateUtils.SolarDate(modelData.date).toLunarDate().get();
-      readonly property bool isCurrentDay: (day.modelData.month === root.currentMonth + 1) && (day.modelData.day === root.currentDay)
+      readonly property bool isCurrentDay: (day.modelData.year === root.currentYear) && (day.modelData.month === root.currentMonth + 1) && (day.modelData.day === root.currentDay)
       
       normalColor: isCurrentDay ? Catppuccin.lavender : ColorUtils.lighten(Catppuccin.base, 3)
 
