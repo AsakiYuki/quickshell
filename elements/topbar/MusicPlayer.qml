@@ -152,7 +152,7 @@ SimpleButton {
                             if (currentId !== root.fetchId)
                                 return;
                             console.info(`Found lyrics for ${name} - ${artist}`);
-                            root.lyrcs = v;
+                            root.lyrics = v;
                         }).catch(() => {
                             console.info(`Lyrics for ${name} - ${artist} not found!`);
                         });

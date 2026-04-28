@@ -48,7 +48,7 @@ Rectangle {
       const deltaY = ev.y - lastMouseY
 
       lastMouseX = ev.x
-      lastMouseY = ev.x
+      lastMouseY = ev.y
 
       return {x: deltaX, y: deltaY}
     }

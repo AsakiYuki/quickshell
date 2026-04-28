@@ -45,26 +45,25 @@ Item {
 
         Binding {
             target: bgLoader.item
-            property: "children"
-            value: Loader {
-                id: contentLoader
-                active: bgLoader.active
-                anchors.centerIn: parent
-                sourceComponent: root.content
-            }
-        }
-
-        Binding {
-            target: bgLoader.item
             property: "width"
-            value: (bgLoader.item?.children[0].width || 0) + root.horizontalPadding
+            value: contentLoader.width + root.horizontalPadding
+            when: bgLoader.item !== null
         }
 
         Binding {
             target: bgLoader.item
             property: "height"
-            value: (bgLoader.item?.children[0].height || 0) + root.verticalPadding
+            value: contentLoader.height + root.verticalPadding
+            when: bgLoader.item !== null
         }
+    }
+
+    Loader {
+        id: contentLoader
+        sourceComponent: root.content
+        active: bgLoader.active
+        parent: bgLoader.item ? bgLoader.item : root
+        anchors.centerIn: parent
     }
 
     onActiveChanged: {

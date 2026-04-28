@@ -55,7 +55,7 @@ Item {
         width: Math.max(loaderTop.item?.height || 0, loaderBottom.item?.height || 0)
         height: displayHeight * 2
 
-        readonly property int displayHeight: root.viewHeight || width
+        readonly property int displayHeight: root.viewHeight || loaderBottom.item?.height || 0
         readonly property int displayWidth: root.viewWidth || loaderBottom.item?.width || 0
 
         Item {
