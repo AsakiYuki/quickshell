@@ -4,7 +4,12 @@ Item {
     id: root
 
     property Component textComponent: StyledText {}
+    property Component shaderComponent: ShaderEffectSource {}
+
     property string text: ""
+
+    readonly property int displayWidth: textStack.displayWidth
+    readonly property int displayHeight: textStack.displayHeight
 
     property int viewWidth: 0
     property int viewHeight: 0
@@ -15,12 +20,11 @@ Item {
 
     property Item topText: loaderTop.item
 
-    width: textStack.displayWidth
-    height: textStack.displayHeight
+    width: displayWidth
+    height: displayHeight
     clip: true
 
     onTextChanged: {
-        loaderTop.text = loaderBottom.text;
         loaderBottom.text = text.trim();
         moveAnim.restart();
     }
@@ -42,7 +46,10 @@ Item {
         properties: "y"
 
         onFinished: {
-            loaderTop.text = loaderBottom.text;
+            loaderTop.width = loaderBottom.width
+            loaderTop.height = loaderBottom.height
+            loaderTop.item?.scheduleUpdate()
+            if (loaderTop?.item.onUpdate) loaderTop.item.onUpdate()
             textStack.y = 0;
         }
     }
@@ -50,7 +57,6 @@ Item {
     Item {
         id: textStack
 
-        width: Math.max(loaderTop.item?.height || 0, loaderBottom.item?.height || 0)
         height: displayHeight * 2
 
         readonly property int displayHeight: root.viewHeight || loaderBottom.item?.height || 0
@@ -64,11 +70,14 @@ Item {
 
             Loader {
                 id: loaderTop
-                property string text: ""
                 anchors.centerIn: parent
-                sourceComponent: root.textComponent
-                onTextChanged: if (item) item.text = text;
-                onLoaded: item.text = text;
+                sourceComponent: root.shaderComponent
+                onLoaded: {
+                    item.sourceItem = loaderBottom;
+                    item.live = false;
+                    item.format = ShaderEffectSource.RGBA;
+                    if (item.onUpdate) item.onUpdate();
+                }
             }
         }
 
@@ -84,10 +93,7 @@ Item {
                 anchors.centerIn: parent
                 sourceComponent: root.textComponent
                 onTextChanged: if (item) item.text = text;
-                onLoaded: {
-                    if (item.isBottomText !== undefined) item.isBottomText = true;
-                    item.text = text;
-                }
+                onLoaded: item.text = text;
             }
         }
     }

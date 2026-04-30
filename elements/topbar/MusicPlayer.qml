@@ -277,53 +277,38 @@ SimpleButton {
                 resizeSpeed: 0
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: 1 - nameText.opacity
+                
+                width: ((displayWidth - 225) > 25) ? 225 : displayWidth
 
-                textComponent: Item {
-                    id: lyricsContainer
+                shaderComponent: ShaderEffectSource {
+                    id: shader
+                    readonly property int duration: (((root.lyrics[currentLyricLine]?.time.end || 0) - (root.lyrics[currentLyricLine]?.time.start || 0)) * 1000)
+                    readonly property bool isOverflow: width > lyricText.width
+                    readonly property bool isPlaying: Mpris.current?.playbackState === 1
 
-                    property string text
-                    property bool isBottomText
-                    property int duration: (((root.lyrics[currentLyricLine]?.time.end || 0) - (root.lyrics[currentLyricLine]?.time.start || 0)) * 1000)
+                    onIsPlayingChanged: {
+                        if (isOverflow) {
+                            if (isPlaying) moveLyricsAnim.pause();
+                            else moveLyricsAnim.resume();
+                        }
+                    }
 
-                    width: ((lyricsText.width - 225) > 25) ? 225 : lyricsText.width
-                    height: lyricsText.height
-                    clip: true
+                    function onUpdate() {
+                        if (isOverflow) {
+                            moveLyricsAnim.to = -(width - lyricText.width);
+                            moveLyricsAnim.restart();
+                        } else lyricText.x = 0;
+                    }
 
                     NumberAnimation {
                         id: moveLyricsAnim
-                        target: lyricsText
+                        target: shader
                         running: false
                         properties: "x"
                         from: 0
                         to: 0
                         easing.type: Easing.InOutSine
-                        duration: lyricsContainer.duration * 0.7
-                    }
-
-                    StyledText {
-                        id: lyricsText
-                        text: lyricsContainer.text
-
-                        readonly property bool isPlaying: Mpris.current?.playbackState === 1
-                        onIsPlayingChanged: {
-                            if (lyricsContainer.isBottomText)
-                                return;
-                            if (isPlaying) {
-                                if (lyricsText.width > lyricsContainer.width)
-                                    moveLyricsAnim.resume();
-                            } else if (moveLyricsAnim.running) moveLyricsAnim.pause();
-                        }
-
-                        onTextChanged: {
-                            if (lyricsContainer.isBottomText)
-                                return;
-                            moveLyricsAnim.stop();
-                            if (lyricsText.width > lyricsContainer.width) {
-                                moveLyricsAnim.to = -(lyricsText.width - lyricsContainer.width);
-                                moveLyricsAnim.restart();
-                            } else
-                                lyricsText.x = 0;
-                        }
+                        duration: shader.duration * 0.7
                     }
                 }
             }

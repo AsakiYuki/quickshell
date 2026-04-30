@@ -45,6 +45,7 @@ Item {
 
         ShaderEffectSource {
             live: false
+            id: textShader
             width: loaderTextViewer.item?.implicitWidth
             height: loaderTextViewer.item?.implicitHeight
             sourceItem: loaderTextViewer.item
@@ -81,7 +82,11 @@ Item {
     }
 
     onTextChanged: {
+        textStack.x = 0;
         if (loaderText) loaderText.text = text.trim();
-        if (scrollAnimation.running) scrollAnimation.restart()
+        if (scrollAnimation.running) {
+            scrollAnimation.restart();
+            textShader.scheduleUpdate();
+        }
     }
 }
