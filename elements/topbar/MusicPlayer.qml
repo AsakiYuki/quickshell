@@ -311,8 +311,7 @@ SimpleButton {
                             if (isPlaying) {
                                 if (lyricsText.width > lyricsContainer.width)
                                     moveLyricsAnim.resume();
-                            } else
-                                moveLyricsAnim.pause();
+                            } else if (moveLyricsAnim.running) moveLyricsAnim.pause();
                         }
 
                         onTextChanged: {

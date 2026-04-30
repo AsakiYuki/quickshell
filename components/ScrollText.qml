@@ -3,9 +3,7 @@ import QtQuick
 Item {
     id: root
 
-    property Component textComponent: StyledText {
-        property bool isBottomText
-    }
+    property Component textComponent: StyledText {}
     property string text: ""
 
     property int viewWidth: 0
@@ -22,7 +20,6 @@ Item {
     clip: true
 
     onTextChanged: {
-        if (loaderTop.text === text) return
         loaderTop.text = loaderBottom.text;
         loaderBottom.text = text.trim();
         moveAnim.restart();
@@ -70,10 +67,8 @@ Item {
                 property string text: ""
                 anchors.centerIn: parent
                 sourceComponent: root.textComponent
-
-                onTextChanged: {
-                    item.text = text;
-                }
+                onTextChanged: if (item) item.text = text;
+                onLoaded: item.text = text;
             }
         }
 
@@ -88,12 +83,11 @@ Item {
                 property string text: ""
                 anchors.centerIn: parent
                 sourceComponent: root.textComponent
-
-                onTextChanged: {
+                onTextChanged: if (item) item.text = text;
+                onLoaded: {
+                    if (item.isBottomText !== undefined) item.isBottomText = true;
                     item.text = text;
                 }
-
-                Component.onCompleted: parent.item.isBottomText = true;
             }
         }
     }
