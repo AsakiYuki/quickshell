@@ -283,9 +283,6 @@ SimpleButton {
                 shaderComponent: ShaderEffectSource {
                     id: shader
 
-                    smooth: true
-                    mipmap: true
-
                     readonly property int duration: (((root.lyrics[currentLyricLine]?.time.end || 0) - (root.lyrics[currentLyricLine]?.time.start || 0)) * 1000)
                     readonly property bool isOverflow: width > lyricText.width
                     readonly property bool isPlaying: Mpris.current?.playbackState === 1
@@ -301,7 +298,10 @@ SimpleButton {
                         if (isOverflow) {
                             moveLyricsAnim.to = -(width - lyricText.width);
                             moveLyricsAnim.restart();
-                        } else lyricText.x = 0;
+                        } else {
+                            moveLyricsAnim.stop();
+                            lyricText.x = 0;
+                        }
                     }
 
                     NumberAnimation {

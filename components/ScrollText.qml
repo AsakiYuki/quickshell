@@ -73,7 +73,7 @@ Item {
                 anchors.centerIn: parent
                 sourceComponent: root.shaderComponent
                 onLoaded: {
-                    item.sourceItem = loaderBottom;
+                    item.sourceItem = loaderBottom.item;
                     item.live = false;
                     if (item.onUpdate) item.onUpdate();
                 }
