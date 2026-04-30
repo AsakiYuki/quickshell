@@ -22,6 +22,7 @@ Item {
     clip: true
 
     onTextChanged: {
+        if (loaderTop.text === text) return
         loaderTop.text = loaderBottom.text;
         loaderBottom.text = text.trim();
         moveAnim.restart();
@@ -70,16 +71,8 @@ Item {
                 anchors.centerIn: parent
                 sourceComponent: root.textComponent
 
-                Binding {
-                    target: loaderTop.item
-                    property: "text"
-                    value: loaderTop.text
-                }
-
-                Binding {
-                    target: loaderTop.item
-                    property: "isBottomText"
-                    value: false
+                onTextChanged: {
+                    item.text = text;
                 }
             }
         }
@@ -96,17 +89,11 @@ Item {
                 anchors.centerIn: parent
                 sourceComponent: root.textComponent
 
-                Binding {
-                    target: loaderBottom.item
-                    property: "text"
-                    value: loaderBottom.text
+                onTextChanged: {
+                    item.text = text;
                 }
 
-                Binding {
-                    target: loaderBottom.item
-                    property: "isBottomText"
-                    value: true
-                }
+                Component.onCompleted: parent.item.isBottomText = true;
             }
         }
     }

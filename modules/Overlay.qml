@@ -107,7 +107,7 @@ Variants {
                 Elements.SystemPopup {
                     z: 100
                 }
-                Elements.ActivateNixOS { z: 2 }
+                // Elements.ActivateNixOS { z: 2 }
             }
     
             Image {
