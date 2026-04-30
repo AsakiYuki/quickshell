@@ -75,7 +75,6 @@ Item {
                 onLoaded: {
                     item.sourceItem = loaderBottom;
                     item.live = false;
-                    item.format = ShaderEffectSource.RGBA;
                     if (item.onUpdate) item.onUpdate();
                 }
             }

@@ -45,6 +45,7 @@ Item {
 
         ShaderEffectSource {
             live: false
+            recursive: true
             id: textShader
             width: loaderTextViewer.item?.implicitWidth
             height: loaderTextViewer.item?.implicitHeight
