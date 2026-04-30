@@ -22,11 +22,10 @@ Item {
         else scrollAnimation.resume() 
     }
 
-    property Item leftText: loaderLeft.item
-    property Item rightText: loaderRight.item
+    property Item loaderText: loaderTextViewer.item
 
-    readonly property real textWidth: leftText ? leftText.width : 0
-    readonly property real textHeight: leftText ? leftText.height : 0
+    readonly property real textWidth: loaderText ? loaderText.implicitWidth : 0
+    readonly property real textHeight: loaderText ? loaderText.implicitHeight : 0
     readonly property real scrollDistance: textWidth + root.spacing
     readonly property bool shouldScroll: textWidth > root.maxWidth
 
@@ -39,16 +38,16 @@ Item {
         spacing: root.spacing
         
         Loader {
-            id: loaderLeft
+            id: loaderTextViewer
             sourceComponent: root.textComponent
-            Binding { target: loaderLeft.item; property: "text"; value: root.text.trim(); restoreMode: Binding.RestoreBinding }
+            onLoaded: item.text = root.text.trim()
         }
 
-        Loader {
-            id: loaderRight
-            sourceComponent: root.textComponent
-            active: scrollAnimation.running
-            Binding { target: loaderRight.item; property: "text"; value: root.text.trim(); restoreMode: Binding.RestoreBinding }
+        ShaderEffectSource {
+            live: false
+            width: loaderTextViewer.item?.implicitWidth
+            height: loaderTextViewer.item?.implicitHeight
+            sourceItem: loaderTextViewer.item
         }
     }
 
@@ -82,8 +81,7 @@ Item {
     }
 
     onTextChanged: {
-        if (scrollAnimation.running) {
-            scrollAnimation.restart()
-        }
+        if (loaderText) loaderText.text = text.trim();
+        if (scrollAnimation.running) scrollAnimation.restart()
     }
 }
