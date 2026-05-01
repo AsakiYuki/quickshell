@@ -79,7 +79,7 @@ Variants {
 
             Item {
                 anchors.fill: parent
-                anchors.topMargin: Workspaces.hasFullscreen ? 0 : 45
+                anchors.topMargin: (!Workspaces.hasFullscreen) * 45
                 clip: true
 
                 Behavior on anchors.topMargin {

@@ -33,4 +33,5 @@ ShellRoot {
 
     Modules.Shortcuts {}
     Modules.Wallpaper {}
+    Modules.Desktop {}
 }
