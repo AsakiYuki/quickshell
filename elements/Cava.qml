@@ -14,7 +14,7 @@ Item {
   onBarsChanged: soundVisualizer.requestPaint();
 
   width: parent.width
-  height: 500
+  height: 350
   anchors.bottom: parent.bottom
 
   Canvas {
@@ -23,19 +23,27 @@ Item {
     onPaint: {
       const ctx = getContext("2d");
       const bars = root.bars;
-      const spacing = width / (bars.length - 2);
-      ctx.reset()
+
+      const mirrored = [
+        ...bars.slice().reverse().slice(1, -1),
+        ...bars.slice(2, -1)
+      ];
+
+      const spacing = width / (mirrored.length - 2);
+
+      ctx.reset();
       ctx.beginPath();
 
       ctx.moveTo(0, height);
 
       let lastX = 0;
-      let lastY = height - bars[0];
-      ctx.fillStyle = ColorUtils.opacity(Catppuccin.peach, 0.5);
+      let lastY = height - mirrored[0] * root.barScale;
 
-      for (let index = 0; index < bars.length; index++) {
-        const x = index * spacing;
-        const y = height - bars[index] * root.barScale;
+      ctx.fillStyle = ColorUtils.opacity(Catppuccin.yellow, 0.35);
+
+      for (let i = 0; i < mirrored.length; i++) {
+        const x = i * spacing;
+        const y = height - mirrored[i] * root.barScale;
 
         const midX = (lastX + x) >> 1;
         const midY = (lastY + y) >> 1;
@@ -46,8 +54,7 @@ Item {
         lastY = y;
       }
 
-      ctx.lineTo(width, height)
-
+      ctx.lineTo(width, height);
       ctx.fill();
     }
   }

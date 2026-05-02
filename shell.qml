@@ -11,7 +11,7 @@ ShellRoot {
 
     Modules.ChillProcess {
         id: chillProcess
-    }
+    } 
 
     Modules.FileSystem {
         id: fs

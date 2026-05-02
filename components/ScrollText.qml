@@ -17,6 +17,7 @@ Item {
     property int resizeSpeed: 350
     property int moveEasingType: Easing.OutQuint
     property int resizeEasingType: Easing.OutQuint
+    property bool isBottomToTop: false
 
     property Item topText: loaderTop.item
 
@@ -40,8 +41,8 @@ Item {
         id: moveAnim
         duration: root.moveSpeed
         easing.type: root.moveEasingType
-        from: 0
-        to: -root.height
+        from: root.isBottomToTop ? -root.height : 0
+        to: root.isBottomToTop ? 0 : -root.height
         target: textStack
         properties: "y"
 
@@ -65,7 +66,8 @@ Item {
         Item {
             width: loaderTop.item?.width || 0
             height: textStack.displayHeight
-            anchors.top: parent.top
+            anchors.bottom: root.isBottomToTop ? parent.bottom : undefined
+            anchors.top: root.isBottomToTop ? undefined : parent.top
             clip: true
 
             Loader {
@@ -83,7 +85,8 @@ Item {
         Item {
             width: loaderBottom.item?.width || 0
             height: textStack.displayHeight
-            anchors.bottom: parent.bottom
+            anchors.bottom: root.isBottomToTop ? undefined : parent.bottom
+            anchors.top: root.isBottomToTop ? parent.top : undefined
             clip: true
 
             Loader {

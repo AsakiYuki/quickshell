@@ -7,6 +7,13 @@ Item {
         radius: 15
     }
 
+    enum Direction {
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT
+    }
+
     required property Component content
     property int viewPadding: 0
 

@@ -277,6 +277,7 @@ SimpleButton {
                 resizeSpeed: 0
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: 1 - nameText.opacity
+                isBottomToTop: true
                 
                 width: ((displayWidth - 225) > 25) ? 225 : displayWidth
 
