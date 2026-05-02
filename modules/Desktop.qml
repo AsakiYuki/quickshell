@@ -6,6 +6,8 @@ import Quickshell.Wayland
 import "../components"
 import "../core"
 
+import "../elements" as Elements
+
 Variants {
   id: root
   model: Quickshell.screens
@@ -27,6 +29,8 @@ Variants {
       anchors.right: true
 
       margins.top: (!Workspaces.hasFullscreen) * 45
+      
+      Elements.Cava {}
     }
   }
 }
