@@ -1,5 +1,4 @@
 import QtQuick
-
 import "../../core"
 import "../../utils/FuzzySort.js" as FuzzySort
 import "../../commands" as Cmd
@@ -7,45 +6,35 @@ import "../../commands" as Cmd
 LauncherListView {
     id: _list
 
-    property list<var> entries: Cmd.List.commands.map(a => ({
-        name: FuzzySort.prepare(a.name),
+    model: []
+
+    readonly property list<var> entries: Cmd.List.commands.map(a => ({
+        name:    FuzzySort.prepare(a.name),
         comment: FuzzySort.prepare(a.comment),
-        entry: a
+        entry:   a
     }))
 
     readonly property string search: _textField.searchText
 
     onSearchChanged: {
-        const $search = search.trim();
+        const s = search.trim();
+        if (!s.startsWith("/")) return;
 
-        if (!$search.startsWith("/"))
-            return;
-
-        if ($search === "/") {
-            model = entries.map(v => ({
-                icon: v.entry.icon,
-                text: v.entry.name,
+        model = s === "/"
+            ? entries.map(v => ({
+                icon:    v.entry.icon,
+                text:    v.entry.name,
                 subtext: v.entry.comment,
                 entry: {
-                    target: v.entry.target,
+                    target:               v.entry.target,
                     textfieldPlaceHolder: v.entry.textfieldPlaceHolder,
-                    allowTyping: v.entry.allowTyping,
-                    isSearchList: v.entry.isSearchList
+                    allowTyping:          v.entry.allowTyping,
+                    isSearchList:         v.entry.isSearchList
                 }
-            }));
-        } else {
-            model = SharedState.search($search.slice(1), entries, false);
-        }
+            }))
+            : SharedState.search(s.slice(1), entries, false);
 
         if (model.length === 0)
-            model = [
-                {
-                    text: "No results",
-                    subtext: "Try again",
-                    icon: "../../assets/icons/search_off.png"
-                }
-            ];
+            model = [{ text: "No results", subtext: "Try again", icon: "../../assets/icons/search_off.png" }];
     }
-
-    model: []
 }
