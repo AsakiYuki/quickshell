@@ -9,10 +9,11 @@ Singleton {
     // Flavors: latte, frappe, macchiato, mocha
     property string flavors: "mocha"
 
-    Component.onCompleted: {
-        if (!["latte", "frappe", "macchiato", "mocha"].includes(_root.flavors)) {
-            _root.flavors = "mocha";
-        }
+    onFlavorsChanged: updateColor()
+    Component.onCompleted: updateColor()
+
+    function updateColor() {
+        if (!["latte", "frappe", "macchiato", "mocha"].includes(_root.flavors)) _root.flavors = "mocha";
 
         switch (_root.flavors) {
         case "latte":

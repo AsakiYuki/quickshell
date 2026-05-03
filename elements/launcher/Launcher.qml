@@ -22,7 +22,6 @@ DropPanel {
         height: _list_container.height
         clip: true
 
-        
         readonly property int rowHeight: 55
         readonly property int topOffset: 10
         readonly property int listHeaderArea: 0
@@ -34,7 +33,6 @@ DropPanel {
 
         property int count: _e.model ? _e.model.length : 0
         property int maxSelector: Math.min(_e.maxView || 0, count)
-
         
         onSelectorIndexChanged: {
             let clamped = Math.max(0, Math.min(selectorIndex, maxSelector - 1));
@@ -175,7 +173,6 @@ DropPanel {
             height: _root.rowHeight
             color: Catppuccin.surface0
             
-            
             y: _root.topOffset + _root.selectorIndex * _root.rowHeight
             border.width: 0
 
@@ -186,7 +183,7 @@ DropPanel {
 
         Column {
             id: _list_container
-            spacing: 10
+            spacing: _command_panel.isActive ? 5 : 10
             topPadding: 10
             bottomPadding: 10
             width: _command_panel.isActive ? (_command_panel.width + 20) : 650
@@ -204,16 +201,10 @@ DropPanel {
                     id: _command_panel
                     anchors.horizontalCenter: parent.horizontalCenter
                     opacity: isActive ? 1 : 0
-                    
-                    
                     enabled: isActive
                     visible: opacity > 0
-
                     Behavior on opacity { NumberAnimation { duration: 120 } }
-                    
-                    onIsActiveChanged: {
-                        if (isActive) _textField.text = "";
-                    }
+                    onIsActiveChanged: if (isActive) _textField.text = "";
                 }
 
                 Commands {

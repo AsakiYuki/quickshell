@@ -8,7 +8,7 @@ Item {
     clip: true
 
     width: Math.max(_loader.width, 150)
-    height: Math.max(_loader.height, 75)
+    height: Math.max(_loader.height, 25)
 
     function onTextfieldTyping(text) {
         if (_loader.children.length === 0) return

@@ -10,10 +10,10 @@ LauncherListView {
     id: _list
 
     property list<var> entries: DesktopEntries.applications.values.filter(v => !v.noDisplay).sort((a, b) => a.name.localeCompare(b.name)).map(a => ({
-                name: FuzzySort.prepare(a.name),
-                comment: FuzzySort.prepare(a.comment),
-                entry: a
-            }))
+        name: FuzzySort.prepare(a.name),
+        comment: FuzzySort.prepare(a.comment),
+        entry: a
+    }))
 
     readonly property string search: _textField.searchText
 
@@ -24,11 +24,11 @@ LauncherListView {
 
         if ($search === "") {
             model = entries.map(v => ({
-                        icon: SharedState.parseIconPath(v.entry.icon),
-                        text: v.entry.name,
-                        subtext: v.entry.comment,
-                        entry: v.entry
-                    }));
+                icon: SharedState.parseIconPath(v.entry.icon),
+                text: v.entry.name,
+                subtext: v.entry.comment,
+                entry: v.entry
+            }));
         }
 
         if ($search.startsWith("/"))
@@ -56,10 +56,10 @@ LauncherListView {
 
     onEntriesChanged: {
         model = entries.map(v => ({
-                    icon: SharedState.parseIconPath(v.entry.icon),
-                    text: v.entry.name,
-                    subtext: v.entry.comment,
-                    entry: v.entry
-                }));
+            icon: SharedState.parseIconPath(v.entry.icon),
+            text: v.entry.name,
+            subtext: v.entry.comment,
+            entry: v.entry
+        }));
     }
 }

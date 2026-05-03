@@ -4,6 +4,7 @@ import Quickshell
 import QtQuick
 
 import "./modules" as Modules
+import "./base"
 import "./core"
 
 ShellRoot {
@@ -31,7 +32,12 @@ ShellRoot {
         property var musicPlayer;
     }
 
-    Modules.Shortcuts {}
-    Modules.Wallpaper {}
+    Modules.Wallpaper {
+        id: wallpaper
+        property string avgColor: "#000000"
+        property bool isLightColor: false
+    }
+
     Modules.Desktop {}
+    Modules.Shortcuts {}
 }

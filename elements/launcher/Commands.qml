@@ -8,10 +8,10 @@ LauncherListView {
     id: _list
 
     property list<var> entries: Cmd.List.commands.map(a => ({
-                name: FuzzySort.prepare(a.name),
-                comment: FuzzySort.prepare(a.comment),
-                entry: a
-            }))
+        name: FuzzySort.prepare(a.name),
+        comment: FuzzySort.prepare(a.comment),
+        entry: a
+    }))
 
     readonly property string search: _textField.searchText
 
@@ -23,15 +23,16 @@ LauncherListView {
 
         if ($search === "/") {
             model = entries.map(v => ({
-                        icon: v.entry.icon,
-                        text: v.entry.name,
-                        subtext: v.entry.comment,
-                        entry: {
-                            target: v.entry.target,
-                            textfieldPlaceHolder: v.entry.textfieldPlaceHolder,
-                            allowTyping: v.entry.allowTyping
-                        }
-                    }));
+                icon: v.entry.icon,
+                text: v.entry.name,
+                subtext: v.entry.comment,
+                entry: {
+                    target: v.entry.target,
+                    textfieldPlaceHolder: v.entry.textfieldPlaceHolder,
+                    allowTyping: v.entry.allowTyping,
+                    isSearchList: v.entry.isSearchList
+                }
+            }));
         } else {
             model = SharedState.search($search.slice(1), entries, false);
         }

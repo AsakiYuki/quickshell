@@ -13,7 +13,7 @@ Item {
     readonly property int visibleCount: Math.min(wallpapers.length, maxVisible)
 
     width: imageWidth * visibleCount + Math.max(0, visibleCount - 1) * 5 + 20
-    height: imageHeight + 28
+    height: imageHeight + 23
 
     property list<string> wallpapers: []
     property bool isLoaded: false

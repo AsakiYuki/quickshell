@@ -22,7 +22,9 @@ SimpleButton {
         property var date: new Date()
         text: Qt.formatDateTime(date, format)
 
-        FrameAnimation {
+        Timer {
+            interval: 1000
+            repeat: true
             running: !Workspaces.current?.hasFullscreen
             onTriggered: _text.date = new Date()
         }

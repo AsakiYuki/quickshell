@@ -20,6 +20,9 @@ Item {
   Canvas {
     id: soundVisualizer
     anchors.fill: parent
+
+    property string fillStyle: ColorUtils.opacity(ColorUtils.lighten(wallpaper.avgColor, wallpaper.isLightColor ? -50 : 25), 0.35);
+
     onPaint: {
       const ctx = getContext("2d");
       const bars = root.bars;
@@ -39,7 +42,7 @@ Item {
       let lastX = 0;
       let lastY = height - mirrored[0] * root.barScale;
 
-      ctx.fillStyle = ColorUtils.opacity(Catppuccin.yellow, 0.35);
+      ctx.fillStyle = fillStyle;
 
       for (let i = 0; i < mirrored.length; i++) {
         const x = i * spacing;
