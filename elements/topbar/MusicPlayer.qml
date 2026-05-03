@@ -277,7 +277,6 @@ SimpleButton {
                 resizeSpeed: 0
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: 1 - nameText.opacity
-                isBottomToTop: true
                 
                 width: ((displayWidth - 225) > 25) ? 225 : displayWidth
 
@@ -285,7 +284,7 @@ SimpleButton {
                     id: shader
 
                     readonly property int duration: (((root.lyrics[currentLyricLine]?.time.end || 0) - (root.lyrics[currentLyricLine]?.time.start || 0)) * 1000)
-                    readonly property bool isOverflow: width > lyricText.width
+                    readonly property bool isOverflow: (width >> 0) > lyricText.width
                     readonly property bool isPlaying: Mpris.current?.playbackState === 1
 
                     onIsPlayingChanged: {
@@ -299,10 +298,8 @@ SimpleButton {
                         if (isOverflow) {
                             moveLyricsAnim.to = -(width - lyricText.width);
                             moveLyricsAnim.restart();
-                        } else {
-                            moveLyricsAnim.stop();
-                            lyricText.x = 0;
-                        }
+                        } else moveLyricsAnim.stop();
+                        x = 0;
                     }
 
                     NumberAnimation {

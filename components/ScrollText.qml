@@ -19,14 +19,14 @@ Item {
     property int resizeEasingType: Easing.OutQuint
     property bool isBottomToTop: false
 
-    property Item topText: loaderTop.item
+    property Item topText: sourceText.item
 
     width: displayWidth
     height: displayHeight
     clip: true
 
     onTextChanged: {
-        loaderBottom.text = text.trim();
+        captureText.text = text.trim();
         moveAnim.restart();
     }
 
@@ -47,10 +47,10 @@ Item {
         properties: "y"
 
         onFinished: {
-            loaderTop.width = loaderBottom.width
-            loaderTop.height = loaderBottom.height
-            loaderTop.item?.scheduleUpdate()
-            if (loaderTop?.item.onUpdate) loaderTop.item.onUpdate()
+            sourceText.width = captureText.width
+            sourceText.height = captureText.height
+            sourceText.item?.scheduleUpdate()
+            if (sourceText?.item.onUpdate) sourceText.item.onUpdate()
             textStack.y = 0;
         }
     }
@@ -60,22 +60,22 @@ Item {
 
         height: displayHeight * 2
 
-        readonly property int displayHeight: root.viewHeight || loaderBottom.item?.height || 0
-        readonly property int displayWidth: root.viewWidth || loaderBottom.item?.width || 0
+        readonly property int displayHeight: root.viewHeight || captureText.item?.height || 0
+        readonly property int displayWidth: root.viewWidth || captureText.item?.width || 0
 
         Item {
-            width: loaderTop.item?.width || 0
+            width: sourceText.item?.width || 0
             height: textStack.displayHeight
             anchors.bottom: root.isBottomToTop ? parent.bottom : undefined
             anchors.top: root.isBottomToTop ? undefined : parent.top
             clip: true
 
             Loader {
-                id: loaderTop
+                id: sourceText
                 anchors.centerIn: parent
                 sourceComponent: root.shaderComponent
                 onLoaded: {
-                    item.sourceItem = loaderBottom.item;
+                    item.sourceItem = captureText.item;
                     item.live = false;
                     if (item.onUpdate) item.onUpdate();
                 }
@@ -83,14 +83,14 @@ Item {
         }
 
         Item {
-            width: loaderBottom.item?.width || 0
+            width: captureText.item?.width || 0
             height: textStack.displayHeight
             anchors.bottom: root.isBottomToTop ? undefined : parent.bottom
             anchors.top: root.isBottomToTop ? parent.top : undefined
             clip: true
 
             Loader {
-                id: loaderBottom
+                id: captureText
                 property string text: ""
                 anchors.centerIn: parent
                 sourceComponent: root.textComponent
