@@ -10,44 +10,22 @@ Singleton {
     property bool isLauncherOpened: false
     readonly property bool isOverlay: overlayDropPanelType > 0
     
-    onIsOverlayChanged: {
-        console.info("Is overlay focus", isOverlay)
-    }
+    onIsOverlayChanged: { console.info("Is overlay focus", isOverlay) }
+    onOverlayDropPanelTypeChanged: { console.info("Overlay Drop Panel:", overlayDropPanelType) }
 
-    onOverlayDropPanelTypeChanged: {
-        console.info("Overlay Drop Panel:", overlayDropPanelType)
-    }
-
-    function toggleOverlay(type) {
-        overlayDropPanelType = (overlayDropPanelType === type) ? 0 : type;
-    }
-    
-    function onOverlayClicked() {
-        if (isLauncherOpened) isLauncherOpened = false;
-        else overlayDropPanelType = 0;
-    }
+    function toggleOverlay(type) { overlayDropPanelType = (overlayDropPanelType === type) ? 0 : type; }
+    function onOverlayClicked() { if (isLauncherOpened) isLauncherOpened = false; else overlayDropPanelType = 0; }
 
     function parseIconPath(icon) {
-        if (icon[0] === "/")
-            return icon;
-        else
-            return `image://icon/${icon}`;
+        return (icon[0] === "/")
+            ? icon
+            : `image://icon/${icon}`;
     }
 
-    function search(search, array, allowParseIcon = true) {
-        return FuzzySort.go(search, array, {
-            all: true,
-            keys: ["name", "comment"],
-            scoreFn: r => (r[0].score > 0) ? r[0].score * 0.9 + r[1].score * 0.1 : 0
-        }).map(r => {
+    function search(search, array, allowParseIcon = true, scoreFn = r => (r[0].score > 0) ? (r[0].score * 0.9 + r[1].score * 0.1) : 0) {
+        return FuzzySort.go(search, array, { all: true, keys: ["name", "comment"], scoreFn }).map(r => {
             const v = r.obj;
-
-            return {
-                icon: allowParseIcon ? SharedState.parseIconPath(v.entry.icon) : v.entry.icon,
-                text: v.entry.name,
-                subtext: v.entry.comment,
-                entry: v.entry
-            };
+            return { icon: allowParseIcon ? SharedState.parseIconPath(v.entry.icon) : v.entry.icon, text: v.entry.name, subtext: v.entry.comment, entry: v.entry };
         });
     }
 

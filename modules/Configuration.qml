@@ -11,36 +11,23 @@ Scope {
     property bool capsLock: false
     property bool hdr: false
     property var trayIndex: ({})
+    property var searchScores: ({})
     property list<string> hideTrayID: []
 
+    function save() { _save.restart() }
     onTrayIndexChanged: save()
-    onHideTrayIDChanged: {
-        save()
-        if (SystemTray.hideTrayID !== hideTrayID) {
-            SystemTray.hideTrayID = hideTrayID;
-        }
-    }
-
     onWallpaperChanged: save()
+    onSearchScoresChanged: save()
+    onHideTrayIDChanged: { save(); if (SystemTray.hideTrayID !== hideTrayID) SystemTray.hideTrayID = hideTrayID; }
+    onTouchpadChanged: { save(); chillProcess.exec(["hyprctl", "keyword", "$LAPTOP_TOUCHPAD_ENABLE", touchpad, "-r"]);}
     onHdrChanged: {
         save();
-        chillProcess.exec([
-            "hyprctl",
-            "keyword",
-            "$CURRENT_STATE_SCREEN",
+        chillProcess.exec([ "hyprctl", "keyword", "$CURRENT_STATE_SCREEN",
             hdr
                 ? "eDP-1, 1920x1200@60, 0x0, 1, sdrbrightness, 1.1, sdrsaturation, 1.25, bitdepth, 10, cm, hdr"
                 : "eDP-1, 1920x1200@60, 0x0, 1",
             "-r"
         ]);
-    }
-    onTouchpadChanged: {
-        save();
-        chillProcess.exec(["hyprctl", "keyword", "$LAPTOP_TOUCHPAD_ENABLE", touchpad, "-r"]);
-    }
-
-    function save() {
-        _save.restart()
     }
 
     Timer {
@@ -60,12 +47,14 @@ Scope {
             hdr = data.hdr || false;
             trayIndex = data.trayIndex ?? {};
             hideTrayID = data.hideTrayID ?? [];
+            searchScores = data.searchScores ?? {};
         }).catch(err => {
             wallpaper = "wallpaper-0.jpg";
             touchpad = true;
             hdr = false;
             trayIndex = {};
             hideTrayID = [];
+            searchScores = {};
         });
 
         chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => capsLock = v.trim() === "yes");
