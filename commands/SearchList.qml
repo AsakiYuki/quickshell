@@ -93,7 +93,6 @@ Item {
         execute: () => console.log(`Execute entry item ${i + 1}`)
     }))
 
-    // ── Selector highlight ─────────────────────────────────────────────────
     RadiusRectangle {
         id: selectorPanel
 

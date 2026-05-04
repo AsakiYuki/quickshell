@@ -27,12 +27,9 @@ Item {
 
     function mapAlign(value) {
         switch (value) {
-        case "center":
-            return Text.AlignHCenter;
-        case "right":
-            return Text.AlignRight;
-        default:
-            return Text.AlignLeft;
+            case "center": return Text.AlignHCenter;
+            case "right": return Text.AlignRight;
+            default: return Text.AlignLeft;
         }
     }
 
@@ -59,39 +56,10 @@ Item {
     ParallelAnimation {
         id: transitionAnim
 
-        NumberAnimation {
-            target: loaderOld
-            property: "opacity"
-            from: 1.0
-            to: 0
-            duration: root.transitionSpeed
-            easing.type: root.transitionEasingType
-        }
-        NumberAnimation {
-            target: loaderOld
-            property: "scale"
-            from: 1.0
-            to: 0.5
-            duration: root.transitionSpeed
-            easing.type: root.transitionEasingType
-        }
-
-        NumberAnimation {
-            target: loaderNew
-            property: "opacity"
-            from: 0.0
-            to: 1.0
-            duration: root.transitionSpeed
-            easing.type: root.transitionEasingType
-        }
-        NumberAnimation {
-            target: loaderNew
-            property: "scale"
-            from: 0.5
-            to: 1.0
-            duration: root.transitionSpeed
-            easing.type: root.transitionEasingType
-        }
+        NumberAnimation { target: loaderOld; property: "opacity"; from: 1.0; to: 0; duration: root.transitionSpeed; easing.type: root.transitionEasingType; }
+        NumberAnimation { target: loaderOld; property: "scale"; from: 1.0; to: 0.5; duration: root.transitionSpeed; easing.type: root.transitionEasingType; }
+        NumberAnimation { target: loaderNew; property: "opacity"; from: 0.0; to: 1.0; duration: root.transitionSpeed; easing.type: root.transitionEasingType; }
+        NumberAnimation { target: loaderNew; property: "scale"; from: 0.5; to: 1.0; duration: root.transitionSpeed; easing.type: root.transitionEasingType; }
 
         onFinished: {
             loaderOld.text = loaderNew.text;
@@ -111,21 +79,9 @@ Item {
         property string text: ""
         sourceComponent: root.textComponent
 
-        Binding {
-            target: loaderOld.item
-            property: "text"
-            value: loaderOld.text
-        }
-        Binding {
-            target: loaderOld.item
-            property: "horizontalAlignment"
-            value: root.mapAlign(root.textAlign)
-        }
-        Binding {
-            target: loaderOld.item
-            property: "width"
-            value: loaderOld.width
-        }
+        Binding { target: loaderOld.item; property: "text"; value: loaderOld.text }
+        Binding { target: loaderOld.item; property: "horizontalAlignment"; value: root.mapAlign(root.textAlign) }
+        Binding { target: loaderOld.item; property: "width"; value: loaderOld.width }
     }
 
     Loader {
@@ -137,20 +93,8 @@ Item {
         property string text: ""
         sourceComponent: root.textComponent
 
-        Binding {
-            target: loaderNew.item
-            property: "text"
-            value: loaderNew.text
-        }
-        Binding {
-            target: loaderNew.item
-            property: "horizontalAlignment"
-            value: root.mapAlign(root.textAlign)
-        }
-        Binding {
-            target: loaderNew.item
-            property: "width"
-            value: loaderNew.width
-        }
+        Binding { target: loaderNew.item; property: "text"; value: loaderNew.text }
+        Binding { target: loaderNew.item; property: "horizontalAlignment"; value: root.mapAlign(root.textAlign) }
+        Binding { target: loaderNew.item; property: "width"; value: loaderNew.width }
     }
 }

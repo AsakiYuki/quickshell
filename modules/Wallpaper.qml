@@ -1,14 +1,16 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
-
 import Qt5Compat.GraphicalEffects
-
 import "../components"
 import "../core"
 
 Variants {
     id: root
+
+    property color avgColor: "black"
+    property bool isLightColor: false
+
     model: Quickshell.screens
 
     Scope {
@@ -19,11 +21,8 @@ Variants {
             id: _root
             name: "wallpaper"
 
-            property int loadedState: -1
-
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Bottom
-
             anchors.top: true
             anchors.bottom: true
             anchors.left: true
@@ -33,8 +32,8 @@ Variants {
 
             onWallpaperChanged: {
                 anim.stop()
-                first.source = second.source;
-                if (loadedState === -1) second.source = `${Paths.wallpapers}/${_root.wallpaper}`
+                first.source = second.source
+                second.source = `${Paths.wallpapers}/${_root.wallpaper}`
             }
 
             OpacityAnimator {
@@ -43,7 +42,7 @@ Variants {
                 target: second
                 from: 0
                 to: 1
-                onFinished: first.source = "";
+                onFinished: first.source = ""
             }
 
             Image {
@@ -53,7 +52,6 @@ Variants {
                 asynchronous: true
                 source: ""
                 onStatusChanged: if (status === Image.Ready) {
-                    second.source = `${Paths.wallpapers}/${_root.wallpaper}`;
                     second.opacity = 0
                 }
             }
@@ -63,41 +61,41 @@ Variants {
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
-                source: ""
+                source: `${Paths.wallpapers}/${_root.wallpaper}`
                 onStatusChanged: if (status === Image.Ready) {
-                    anim.restart();
+                    anim.restart()
                     grabToImage(function(result) {
                         canvas.imageData = result
                         canvas.requestPaint()
-                    }, Qt.size(1, 1)) 
+                    }, Qt.size(16, 16))
                 }
             }
 
             Canvas {
                 id: canvas
-                width: 16; height: 16
+                width: 16
+                height: 16
                 visible: false
 
                 property var imageData: null
-                property color averageColor: "black"
 
                 onPaint: {
                     if (!imageData) return
                     const ctx = getContext("2d")
-                    ctx.drawImage(imageData.url, 0, 0, 1, 1)
-
-                    const data = ctx.getImageData(0, 0, 1, 1).data
+                    ctx.drawImage(imageData.url, 0, 0, 16, 16)
+                    const data = ctx.getImageData(0, 0, 16, 16).data
                     const count = data.length / 4
                     let r = 0, g = 0, b = 0
-
                     for (let i = 0; i < data.length; i += 4) {
                         r += data[i]
                         g += data[i + 1]
                         b += data[i + 2]
                     }
-
-                    root.avgColor = Qt.rgba(r/count/255, g/count/255, b/count/255, 1);
-                    root.isLightColor = Math.sqrt(0.299*r*r + 0.587*g*g + 0.114*b*b) > 127.5
+                    const ar = r / count
+                    const ag = g / count
+                    const ab = b / count
+                    root.avgColor = Qt.rgba(ar / 255, ag / 255, ab / 255, 1)
+                    root.isLightColor = Math.sqrt(0.299 * ar * ar + 0.587 * ag * ag + 0.114 * ab * ab) > 127.5
                 }
             }
         }
