@@ -11,31 +11,27 @@ Item {
     width: 630
     height: launcherListView.height
 
-    property int viewIndex:    0
+    property int viewIndex: 0
     property int selectorIndex: 0
-    property int count:        launcherListView.model.length
-    property int maxSelector:  Math.min(launcherListView.maxView ?? 0, count)
+    property int count: launcherListView.model.length
+    property int maxSelector: Math.min(launcherListView.maxView ?? 0, count)
 
     function clampSelector(v) { return Math.max(0, Math.min(v, maxSelector - 1)) }
     function clampView(v)     { return Math.max(0, Math.min(v, count - maxSelector)) }
 
     function goUp() {
-        if (selectorIndex > 0) {
-            selectorIndex--;
-        } else if (viewIndex > 0) {
-            viewIndex--;
-        } else {
+        if (selectorIndex > 0) selectorIndex--;
+        else if (viewIndex > 0) viewIndex--;
+        else {
             selectorIndex = maxSelector - 1;
             viewIndex     = count - maxSelector;
         }
     }
 
     function goDown() {
-        if (selectorIndex < maxSelector - 1) {
-            selectorIndex++;
-        } else if (viewIndex + maxSelector < count) {
-            viewIndex++;
-        } else {
+        if (selectorIndex < maxSelector - 1) selectorIndex++;
+        else if (viewIndex + maxSelector < count) viewIndex++;
+        else {
             selectorIndex = 0;
             viewIndex     = 0;
         }
@@ -52,19 +48,23 @@ Item {
     }
 
     function reset() {
-        viewIndex     = 0;
+        viewIndex = 0;
         selectorIndex = 0;
     }
 
-    function onExecute() {
+    function onExecute(index) {
         SharedState.isLauncherOpened = false;
+    }
+
+    function scoreFn(r) {
+        return (r[0].score > 0) ? (r[0].score * 0.9 + r[1].score * 0.1) : 0
     }
 
     function execute(index) {
         if (index < 0 || index >= launcherListView.model.length) return;
         const exec = launcherListView.model[index].execute;
         if (typeof exec === "function") exec();
-        onExecute();
+        onExecute(index);
     }
 
     function onTextfieldTyping(text) {
@@ -87,9 +87,9 @@ Item {
     }
 
     readonly property list<var> listEntries: Array.from({ length: 5 }, (_, i) => ({
-        text:    `Entry Item ${i + 1}`,
+        text: `Entry Item ${i + 1}`,
         subtext: `Entry Item ${i + 1}`,
-        icon:    "../../assets/icons/images.png",
+        icon: "../../assets/icons/images.png",
         execute: () => console.log(`Execute entry item ${i + 1}`)
     }))
 
@@ -97,14 +97,12 @@ Item {
         id: selectorPanel
 
         anchors.horizontalCenter: parent.horizontalCenter
-        color:  Catppuccin.surface0
-        width:  parent.width
+        color: Catppuccin.surface0
+        width: parent.width
         height: 55
-        y:      root.selectorIndex * 55
+        y: root.selectorIndex * 55
 
-        Behavior on y {
-            NumberAnimation { duration: 350; easing.type: Easing.OutExpo }
-        }
+        Behavior on y { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
     }
 
     MouseArea {
@@ -113,10 +111,8 @@ Item {
 
         onClicked: (ev) => {
             const clicked = Math.floor(mouseY / 55);
-            if (root.selectorIndex === clicked)
-                root.execute(clicked + root.viewIndex);
-            else
-                root.selectorIndex = clicked;
+            if (root.selectorIndex === clicked) root.execute(clicked + root.viewIndex);
+            else root.selectorIndex = clicked;
         }
 
         onWheel: (ev) => {
@@ -130,30 +126,29 @@ Item {
 
         width: parent.width - 20
         viewIndex: root.viewIndex
+        model: root.listEntries
 
         property string search: ""
 
         readonly property list<var> preparedEntries: root.listEntries.map(a => ({
-            name:    FuzzySort.prepare(a.text),
+            name: FuzzySort.prepare(a.text),
             comment: FuzzySort.prepare(a.subtext),
-            entry:   a
+            entry: a
         }))
 
         onSearchChanged: {
             root.reset();
             model = search.length === 0
                 ? root.listEntries
-                : (SharedState.search(search, preparedEntries, false).map(v => v.entry) || [noResult()]);
+                : (SharedState.search(search, preparedEntries, false, root.scoreFn).map(v => v.entry) || [noResult()]);
             if (model.length === 0) model = noResult();
         }
 
-        model: root.listEntries
-
         function noResult() {
             return [{
-                text:    "No results",
+                text: "No results",
                 subtext: "Try again",
-                icon:    "../../assets/icons/search_off.png"
+                icon: "../../assets/icons/search_off.png"
             }];
         }
     }
