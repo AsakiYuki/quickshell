@@ -65,7 +65,9 @@ DropPanel {
         function execute(index) {
             if (!_textField.commandMode) {
                 SharedState.isLauncherOpened = false;
-                _e.model[index].entry.execute();
+                const entry = _e.model[index].entry;
+                configuration.addSearchScore("application", entry.id)
+                entry.execute();
                 return;
             }
             const entry = _e.model[index].entry;
@@ -169,9 +171,7 @@ DropPanel {
 
             Item {
                 width: parent.width
-                height: _command_panel.isActive
-                    ? _command_panel.height
-                    : (_textField.commandMode ? _cmd_list.height : _list.height) - 5
+                height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height) - 5
                 clip: true
 
                 Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }

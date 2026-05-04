@@ -14,17 +14,9 @@ ShellRoot {
         id: chillProcess
     } 
 
-    Modules.FileSystem {
-        id: fs
-    }
-
-    Modules.Configuration {
-        id: configuration
-    }
-
-    Modules.Overlay {
-        id: overlay
-    }
+    Modules.FileSystem { id: fs }
+    Modules.Configuration { id: configuration }
+    Modules.Overlay { id: overlay }
     
     Modules.Topbar {
         id: topbar

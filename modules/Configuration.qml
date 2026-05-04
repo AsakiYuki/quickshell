@@ -14,10 +14,32 @@ Scope {
     property var searchScores: ({})
     property list<string> hideTrayID: []
 
+    function getSearchScore(searchType, id) {
+        const data = searchScores[searchType]?.[id];
+        if (!data) return 0;
+        const now = Date.now();
+        const timePassed = now - data.lastUpdate;
+        const decayScore = data.score * Math.pow(0.5, timePassed / 604800000);
+        return decayScore;
+    }
+
+    function addSearchScore(searchType, id, score = 1) {
+        if (!searchScores[searchType]) searchScores[searchType] = {};
+        const prev = searchScores[searchType][id] || { score: 0 };
+
+        const currentDecayScore = getSearchScore(searchType, id);
+        
+        searchScores[searchType][id] = {
+            score: Math.min(currentDecayScore + score, 500),
+            lastUpdate: Date.now()
+        };
+
+        save();
+    }
+
     function save() { _save.restart() }
     onTrayIndexChanged: save()
     onWallpaperChanged: save()
-    onSearchScoresChanged: save()
     onHideTrayIDChanged: { save(); if (SystemTray.hideTrayID !== hideTrayID) SystemTray.hideTrayID = hideTrayID; }
     onTouchpadChanged: { save(); chillProcess.exec(["hyprctl", "keyword", "$LAPTOP_TOUCHPAD_ENABLE", touchpad, "-r"]);}
     onHdrChanged: {
@@ -34,9 +56,7 @@ Scope {
         id: _save
         running: false
         interval: 1000
-        onTriggered: {
-            fs.writefile(Paths.settings, JSON.stringify(_configuration));
-        }
+        onTriggered: { fs.writefile(Paths.settings, JSON.stringify(_configuration)); }
     }
 
     Component.onCompleted: {
