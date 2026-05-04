@@ -27,7 +27,7 @@ LauncherListView {
     onSearchChanged: {
         _root.reset();
         const s = search.trim();
-        if (s.startsWith("/")) return;
+        if (s.startsWith("/") || s.startsWith("=")) return;
         model = s === "" ? entries.map(toModelEntry) : (SharedState.search(s, entries, true, r => {
             if (r[0].score > 0) {
                 const clickCount = configuration.getSearchScore("application", r.obj.entry.id);

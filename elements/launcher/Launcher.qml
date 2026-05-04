@@ -95,11 +95,13 @@ DropPanel {
             enabled: !_command_panel.isActive
 
             onClicked: (mouse) => {
+                if (commandContainer.spotMode === 3) return
                 if (mouse.y <= _root.listHeaderArea) return;
                 _root.mouseClick(mouse.y / _root.rowHeight >> 0);
             }
 
             onWheel: (wheel) => {
+                if (commandContainer.spotMode === 3) return
                 if (wheel.angleDelta.y > 0) _root.goUp();
                 else _root.goDown();
             }
@@ -120,7 +122,7 @@ DropPanel {
                 return;
             }
 
-            if (_command_panel.isActive) {
+            if (commandContainer.spotMode === 1) {
                 _command_panel.onKeyPressed(ev);
                 ev.accepted = true;
                 return;
@@ -128,6 +130,7 @@ DropPanel {
 
             if (ev.modifiers > Qt.NoModifier) return;
 
+            if (commandContainer.spotMode === 3) return
             switch (ev.key) {
             case Qt.Key_Down:
                 _root.goDown();
@@ -154,7 +157,7 @@ DropPanel {
             border.width: 0
 
             y: _root.topOffset + _root.selectorIndex * _root.rowHeight
-            opacity: _command_panel.isActive ? 0 : 1
+            opacity: (_command_panel.isActive || (commandContainer.spotMode === 3)) ? 0 : 1
 
             Behavior on opacity { NumberAnimation { duration: 120 } }
             Behavior on y { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
@@ -170,9 +173,25 @@ DropPanel {
             Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
 
             Item {
-                width: parent.width
-                height: _command_panel.isActive ? _command_panel.height : (_textField.commandMode ? _cmd_list.height : _list.height) - 5
+                id: commandContainer
                 clip: true
+
+                width: parent.width
+                height: {
+                    switch (spotMode) {
+                        case 0: return _list.height - 5
+                        case 1: return _command_panel.height;
+                        case 2: return _cmd_list.height - 5
+                        case 3: return _caculator.height
+                    }
+                }
+
+                readonly property int spotMode: {
+                    if (_command_panel.isActive) return 1;
+                    if (_textField.commandMode) return 2;
+                    if (_textField.caculatorMode) return 3;
+                    return 0;
+                } 
 
                 Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
 
@@ -188,7 +207,7 @@ DropPanel {
 
                 Commands {
                     id: _cmd_list
-                    opacity: (_textField.commandMode && !_command_panel.isActive) ? 1 : 0
+                    opacity: (commandContainer.spotMode === 2) ? 1 : 0
                     enabled: opacity === 1
                     visible: opacity > 0
                     Behavior on opacity { NumberAnimation { duration: 120 } }
@@ -196,7 +215,15 @@ DropPanel {
 
                 Applications {
                     id: _list
-                    opacity: (!_textField.commandMode && !_command_panel.isActive) ? 1 : 0
+                    opacity: (commandContainer.spotMode === 0) ? 1 : 0
+                    enabled: opacity === 1
+                    visible: opacity > 0
+                    Behavior on opacity { NumberAnimation { duration: 120 } }
+                }
+
+                Caculator {
+                    id: _caculator
+                    opacity: (commandContainer.spotMode === 3) ? 1 : 0
                     enabled: opacity === 1
                     visible: opacity > 0
                     Behavior on opacity { NumberAnimation { duration: 120 } }
@@ -211,6 +238,7 @@ DropPanel {
                 property string searchText: ""
                 property bool isLauncherMode: SharedState.overlayDropPanelType
                 readonly property bool commandMode: searchText.startsWith("/")
+                readonly property bool caculatorMode: searchText.startsWith("=")
                 property string customPlaceHolder: ""
 
                 placeholderText: qsTr(customPlaceHolder || "Looking for something? Type '/' for commands or '=' for calculation...")
