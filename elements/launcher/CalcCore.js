@@ -7,17 +7,6 @@ function isNumber(char) { return /\d/.test(char); }
 /** @param {string} char */
 function isWord(char) { return char ? /\w/.test(char) : false; }
 
-const constant = {
-    e: Math.E,
-    ln10: Math.LN10,
-    ln2: Math.LN2,
-    log10e: Math.LOG10E,
-    log2e: Math.LOG2E,
-    pi: Math.PI,
-    sqrt1_2: Math.SQRT1_2,
-    sqrt2: Math.SQRT2
-};
-
 const func = {
     abs: Math.abs,
     sqrt: Math.sqrt,
@@ -49,6 +38,18 @@ const func = {
     random: Math.random,
 };
 
+const constant = {
+    e: Math.E,
+    ln10: Math.LN10,
+    ln2: Math.LN2,
+    log10e: Math.LOG10E,
+    log2e: Math.LOG2E,
+    pi: Math.PI,
+    sqrt1_2: Math.SQRT1_2,
+    sqrt2: Math.SQRT2,
+    random: Math.random
+};
+
 /**
  * @readonly
  * @enum {number}
@@ -78,8 +79,10 @@ function calc(input) {
     let position = 0;
     const tokens = lexer(input);
 
+    function prev() { return tokens[position - 1]; }
     function at() { return tokens[position]; }
     function eat() { return tokens[position++]; }
+    function next() { return tokens[position + 1]; }
     function last() { return tokens[tokens.length - 1]; }
 
     function expression() { return bitwiseExpression(); }
@@ -104,13 +107,19 @@ function calc(input) {
             (current.tokenKind === TokenKind.OPERATOR) &&
             (["&", "^", "|"].includes(current.token))
         ) {
-            const operator = eat();
-            const right = bitwiseExpression();
+            if (at().token === "|") {
+                if ((!next()) || next().tokenKind === TokenKind.OPERATOR) return left;
+                const operator = eat();
+                const right = bitwiseExpression();
+                return left | right;
+            } else {
+                const operator = eat();
+                const right = bitwiseExpression();
 
-            switch (operator.token) {
-                case "&": return left & right;
-                case "^": return left ^ right;
-                case "|": return left | right;
+                switch (operator.token) {
+                    case "&": return left & right;
+                    case "^": return left ^ right;
+                }
             }
         }
 
@@ -289,12 +298,12 @@ function calc(input) {
                     if (!functionToCall) throw Error(`Unknown function: ${name}`);
                     
                     return functionToCall(...args);
+                } else {
+                    const constValue = constant[name];
+                    if (constValue === undefined) throw Error(`Invalid constant or function name: ${name}`);
+                    if (typeof constValue === "function") return constValue();
+                    return constValue;
                 }
-
-                const constValue = constant[name];
-                if (constValue === undefined) throw Error(`Invalid constant or function name: ${name}`);
-                
-                return constValue;
             };
 
             case TokenKind.OPEN_PARENTHESIS: {
@@ -316,7 +325,12 @@ function calc(input) {
             };
 
             case TokenKind.OPERATOR: {
-                if (["+", "-"].includes(left.token)) {
+                if (left.token === "|" && (prev()?.tokenKind === TokenKind.OPERATOR) || (!prev())) {
+                    eat()
+                    const ret = expression();
+                    if (eat().token !== "|") throw Error("Invalid abs expression!");
+                    return Math.abs(ret);
+                } else if (["+", "-"].includes(left.token)) {
                     eat();
 
                     if (left.token === "-") return -1 * primaryExpression();
