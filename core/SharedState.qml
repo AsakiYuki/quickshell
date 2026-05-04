@@ -15,12 +15,7 @@ Singleton {
 
     function toggleOverlay(type) { overlayDropPanelType = (overlayDropPanelType === type) ? 0 : type; }
     function onOverlayClicked() { if (isLauncherOpened) isLauncherOpened = false; else overlayDropPanelType = 0; }
-
-    function parseIconPath(icon) {
-        return (icon[0] === "/")
-            ? icon
-            : `image://icon/${icon}`;
-    }
+    function parseIconPath(icon) { return (icon[0] === "/") ? icon : `image://icon/${icon}`; }
 
     function search(search, array, allowParseIcon = true, scoreFn = r => (r[0].score > 0) ? (r[0].score * 0.9 + r[1].score * 0.1) : 0) {
         return FuzzySort.go(search, array, { all: true, keys: ["name", "comment"], scoreFn }).map(r => {

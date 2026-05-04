@@ -25,16 +25,14 @@ Scope {
                         line = line.trim();
                         if (!line) continue;
 
-                        // ví dụ: dir/sub:
                         if (line.endsWith(":")) {
                             current = line.slice(0, -1);
 
-                            // convert thành relative
                             if (current.startsWith(dir)) {
                                 current = current.slice(dir.length);
                             }
 
-                            current = current.replace(/^\/+/, ""); // bỏ /
+                            current = current.replace(/^\/+/, "");
                             continue;
                         }
 

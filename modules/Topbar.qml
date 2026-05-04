@@ -49,15 +49,8 @@ Variants {
                     startX: 0
                     startY: 0
 
-                    PathLine {
-                        x: _shape.width
-                        y: 0
-                    }
-
-                    PathLine {
-                        x: _shape.width
-                        y: _shape.height
-                    }
+                    PathLine { x: _shape.width; y: 0 }
+                    PathLine { x: _shape.width; y: _shape.height }
 
                     PathCubic {
                         x: _shape.width - 15
@@ -70,10 +63,7 @@ Variants {
                         control2Y: _shape.height - 15
                     }
 
-                    PathLine {
-                        x: 15
-                        y: _shape.height - 15
-                    }
+                    PathLine { x: 15; y: _shape.height - 15 }
 
                     PathCubic {
                         x: 0
@@ -84,10 +74,7 @@ Variants {
                         control2Y: _shape.height - 5
                     }
 
-                    PathLine {
-                        x: 0
-                        y: 0
-                    }
+                    PathLine { x: 0; y: 0; }
                 }
 
                 Item {
@@ -126,10 +113,7 @@ Variants {
                         control2Y: _shape.height - 15
                     }
 
-                    PathLine {
-                        x: 15
-                        y: _shape.height - 15
-                    }
+                    PathLine { x: 15; y: _shape.height - 15; }
 
                     PathCubic {
                         x: 0

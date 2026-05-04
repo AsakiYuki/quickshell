@@ -23,14 +23,8 @@ Variants {
     property int trayDragPosY: 0
     property string trayIcon: ""
 
-    function setDragIcon(icon) {
-        trayIcon = icon;
-    }
-
-    function setOverlayPosition(x, y) {
-        trayDragPosX = x;
-        trayDragPosY = y;
-    }
+    function setDragIcon(icon) { trayIcon = icon; }
+    function setOverlayPosition(x, y) { trayDragPosX = x; trayDragPosY = y; }
 
     Scope {
         id: _scope
@@ -40,9 +34,7 @@ Variants {
             id: _overlay
             name: "overlay"
 
-            function setDragIcon(icon) {
-                _root.trayIcon = icon;
-            }
+            function setDragIcon(icon) { _root.trayIcon = icon; }
 
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -55,14 +47,8 @@ Variants {
 
             focusable: true
 
-            Component.onCompleted: {
-                _root.width = modelData.width;
-                _root.height = modelData.height;
-            }
-
-            mask: Region {
-                item: SharedState.isOverlay ? mouseArea : null
-            }
+            Component.onCompleted: { _root.width = modelData.width; _root.height = modelData.height; }
+            mask: Region { item: SharedState.isOverlay ? mouseArea : null }
 
             MouseArea {
                 id: mouseArea
@@ -70,11 +56,7 @@ Variants {
                 focus: SharedState.isOverlay
                 onPressed: SharedState.onOverlayClicked()
                 anchors.topMargin: (Workspaces.hasFullscreen || SharedState.isLauncherOpened || (`${_root.trayIcon}`[0]) === "0") ? 0 : 45
-
-                Keys.onPressed: ev => {
-                    if (ev.key === Qt.Key_Escape)
-                        SharedState.onOverlayClicked();
-                }
+                Keys.onPressed: ev => { if (ev.key === Qt.Key_Escape) SharedState.onOverlayClicked(); }
             }
 
             Item {
@@ -82,31 +64,15 @@ Variants {
                 anchors.topMargin: (!Workspaces.hasFullscreen) * 45
                 clip: true
 
-                Behavior on anchors.topMargin {
-                    NumberAnimation {
-                        duration: 350
-                        easing.type: Easing.OutQuint
-                    }
-                }
+                Behavior on anchors.topMargin { NumberAnimation { duration: 350; easing.type: Easing.OutQuint } }
 
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
                 Elements.PowerProfile {}
                 Calendar.Calendar {}
-
-                MouseArea {
-                    anchors.fill: parent
-                    visible: SharedState.isLauncherOpened
-                    hoverEnabled: true
-                    onPressed: SharedState.onOverlayClicked()
-                    z: 10
-                }
-
+                MouseArea { anchors.fill: parent; visible: SharedState.isLauncherOpened; hoverEnabled: true; onPressed: SharedState.onOverlayClicked(); z: 10; }
                 Launcher.Launcher {}
-
-                Elements.SystemPopup {
-                    z: 100
-                }
+                Elements.SystemPopup { z: 100 }
                 // Elements.ActivateNixOS { z: 2 }
             }
     
