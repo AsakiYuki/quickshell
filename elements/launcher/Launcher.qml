@@ -46,25 +46,15 @@ DropPanel {
         }
 
         function goUp() {
-            if (selectorIndex > 0) {
-                selectorIndex--;
-            } else if (viewIndex > 0) {
-                viewIndex--;
-            } else {
-                selectorIndex = maxSelector - 1;
-                viewIndex = count - maxSelector;
-            }
+            if (selectorIndex > 0) selectorIndex--;
+            else if (viewIndex > 0) viewIndex--;
+            else { selectorIndex = maxSelector - 1; viewIndex = count - maxSelector; }
         }
 
         function goDown() {
-            if (selectorIndex < maxSelector - 1) {
-                selectorIndex++;
-            } else if (viewIndex + maxSelector < count) {
-                viewIndex++;
-            } else {
-                selectorIndex = 0;
-                viewIndex = 0;
-            }
+            if (selectorIndex < maxSelector - 1) selectorIndex++;
+            else if (viewIndex + maxSelector < count) viewIndex++;
+            else { selectorIndex = 0; viewIndex = 0; }
         }
 
         function mouseClick(index) {
