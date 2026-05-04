@@ -16,9 +16,11 @@ Item {
         if (!input.startsWith("=")) return;
         try {
             const output = CalcCore.calc(input.slice(1)); 
+            inputText.text = input.slice(1);
             outputText.text = output;
             errorText.text = "";
         } catch(err) {
+            inputText.text = ""
             outputText.text = `Math Error`
             errorText.text = String(err);
         }
@@ -26,6 +28,13 @@ Item {
 
     Column {
         anchors.centerIn: parent
+
+        StyledText {
+            id: inputText
+            anchors.horizontalCenter: parent.horizontalCenter
+            font.pixelSize: 15
+            color: Catppuccin.subtext1
+        }
 
         StyledText {
             id: outputText
