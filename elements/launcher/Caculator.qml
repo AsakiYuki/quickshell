@@ -15,7 +15,7 @@ Item {
     onInputChanged: {
         if (!input.startsWith("=")) return;
         try {
-            const output = CalcCore.calc(input.slice(1));
+            const output = CalcCore.calc(input.slice(1)); 
             outputText.text = output;
             errorText.text = "";
         } catch(err) {

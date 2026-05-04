@@ -7,6 +7,48 @@ function isNumber(char) { return /\d/.test(char); }
 /** @param {string} char */
 function isWord(char) { return char ? /\w/.test(char) : false; }
 
+const constant = {
+    e: Math.E,
+    ln10: Math.LN10,
+    ln2: Math.LN2,
+    log10e: Math.LOG10E,
+    log2e: Math.LOG2E,
+    pi: Math.PI,
+    sqrt1_2: Math.SQRT1_2,
+    sqrt2: Math.SQRT2
+};
+
+const func = {
+    abs: Math.abs,
+    sqrt: Math.sqrt,
+    cbrt: Math.cbrt,
+    pow: Math.pow,
+    hypot: Math.hypot,
+    
+    floor: Math.floor,
+    ceil: Math.ceil,
+    round: Math.round,
+    trunc: Math.trunc,
+    sign: Math.sign,
+
+    sin: Math.sin,
+    cos: Math.cos,
+    tan: Math.tan,
+    asin: Math.asin,
+    acos: Math.acos,
+    atan: Math.atan,
+    atan2: Math.atan2,
+
+    log: Math.log,
+    log10: Math.log10,
+    log2: Math.log2,
+    exp: Math.exp,
+
+    max: Math.max,
+    min: Math.min,
+    random: Math.random,
+};
+
 /**
  * @readonly
  * @enum {number}
@@ -17,6 +59,7 @@ const TokenKind = {
 
     OPERATOR: 50,
 
+    COMMA: 99,
     OPEN_PARENTHESIS: 100,
     CLOSE_PARENTHESIS: 101,
     
@@ -39,7 +82,64 @@ function calc(input) {
     function eat() { return tokens[position++]; }
     function last() { return tokens[tokens.length - 1]; }
 
-    function expression() { return additiveExpression(); }
+    function expression() { return bitwiseExpression(); }
+
+    function bitwiseExpression() {
+        /** @type {Token} */
+        let current;
+        while (
+            (current = at()) &&
+            (current.tokenKind === TokenKind.OPERATOR) &&
+            (current.token === "!")
+        ) {
+            eat();
+            const ret = bitwiseExpression();
+            return ~ret;
+        }
+
+        let left = bitshiftExpression();
+
+        while (
+            (current = at()) &&
+            (current.tokenKind === TokenKind.OPERATOR) &&
+            (["&", "^", "|"].includes(current.token))
+        ) {
+            const operator = eat();
+            const right = bitwiseExpression();
+
+            switch (operator.token) {
+                case "&": return left & right;
+                case "^": return left ^ right;
+                case "|": return left | right;
+            }
+        }
+
+        return left;
+    }
+
+    function bitshiftExpression() {
+        let left = additiveExpression();
+
+        /** @type {Token} */
+        let current;
+
+        while (
+            (current = at()) &&
+            (current.tokenKind === TokenKind.OPERATOR) &&
+            (["<<", ">>", ">>>"].includes(current.token))
+        ) {
+            const operator = eat();
+            const right = bitshiftExpression();
+
+            switch (operator.token) {
+                case "<<": return left << right;
+                case ">>": return left >> right;
+                case ">>>": return left >>> right;
+            }
+        }
+
+        return left;
+    }
     
     function additiveExpression() {
         let left = multiplicativeExpression();
@@ -152,28 +252,58 @@ function calc(input) {
 
         return left;
     }
-    
+
     function primaryExpression() {
         let left = at();
 
         if (!left) return 0;
 
         switch (left.tokenKind) {
-            case TokenKind.NUMBER: return Number(eat().token);
+            case TokenKind.NUMBER: {
+                let ret = Number(eat().token)
+                if (at()?.tokenKind === TokenKind.WORD) ret *= primaryExpression();
+                return ret;
+            };
+
             case TokenKind.WORD: {
-                switch (eat().token.toLowerCase()) {
-                    case "pi": return Math.PI;
-                    case "e": return Math.E;
-                    default: throw Error ("Invalid word!");
+                const name = eat().token.toLowerCase();
+                
+                if (at()?.tokenKind === TokenKind.OPEN_PARENTHESIS) {
+                    eat();
+
+                    const args = [];
+                    if (at()?.tokenKind !== TokenKind.CLOSE_PARENTHESIS) {
+                        args.push(expression());
+                        while (at()?.tokenKind === TokenKind.COMMA) {
+                            eat();
+                            args.push(expression());
+                        }
+                    }
+
+                    if (at()?.tokenKind !== TokenKind.CLOSE_PARENTHESIS) {
+                        throw Error("Expected closing parenthesis after function arguments");
+                    }
+                    eat(); 
+
+                    const functionToCall = func[name];
+                    if (!functionToCall) throw Error(`Unknown function: ${name}`);
+                    
+                    return functionToCall(...args);
                 }
+
+                const constValue = constant[name];
+                if (constValue === undefined) throw Error(`Invalid constant or function name: ${name}`);
+                
+                return constValue;
             };
 
             case TokenKind.OPEN_PARENTHESIS: {
                 eat();
-                const output = additiveExpression();
+                const output = expression();
                 eat();
                 switch (at()?.tokenKind) {
-                    case TokenKind.NUMBER: {
+                    case TokenKind.NUMBER:
+                    case TokenKind.WORD: {
                         const right = multiplicativeExpression();
                         return output * right;
                     }
@@ -235,7 +365,26 @@ function lexer(input) {
         }
 
         switch (char) {
-            case "+": case "-": case "/": case "%": case "!": pushToken(TokenKind.OPERATOR, index++, 1); break;
+            case "+":
+            case "-":
+            case "/":
+            case "%":
+            case "!":
+            case "&":
+            case "|":
+            case "^":
+                pushToken(TokenKind.OPERATOR, index++, 1);
+                break;
+
+            case ">":
+            case "<": {
+                if (input[++index] === char) {
+                    if (input[index + 1] === ">") pushToken(TokenKind.OPERATOR, ((index += 2) - 3), 3);
+                    else pushToken(TokenKind.OPERATOR, (index++) - 1, 2);
+                } else throw Error("Invalid token!");
+            } break;
+            
+            case ",": pushToken(TokenKind.COMMA, index++, 1); break;
 
             case "*": {
                 if (input[++index] === char) pushToken(TokenKind.OPERATOR, (index++) - 1, 2)
@@ -251,6 +400,18 @@ function lexer(input) {
                 if (isNumber(char)) {
                     index++;
                     while (isNumber(input[index])) index++;
+                    
+                    if (input[index] === ".") {
+                        index++;
+                        while (isNumber(input[index])) index++;
+                    }
+
+                    if (input[index]?.toLowerCase() === "e") {
+                        index++;
+                        if (input[index] === "-") index++;
+                        while (isNumber(input[index])) index++;
+                    }
+
                     pushToken(TokenKind.NUMBER, startIndex, index - startIndex);
                     continue;
                 } else if (isWord(char)) {
