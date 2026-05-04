@@ -20,9 +20,11 @@ Singleton {
         showTray = [];
         hideTray = [];
 
+        const isHideTrayIDSet = new Set(hideTrayID);
+
         for (const trayItem of allTray) {
             const fullId = [trayItem.id, trayItem.tooltipTitle, trayItem.title].join("&")
-            const isHide = hideTrayID.includes(fullId)
+            const isHide = isHideTrayIDSet.has(fullId)
             if (isHide) hideTray.push(trayItem)
             else showTray.push(trayItem)
         }

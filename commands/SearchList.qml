@@ -128,7 +128,7 @@ Item {
     Launcher.LauncherListView {
         id: launcherListView
 
-        width:     parent.width - 20
+        width: parent.width - 20
         viewIndex: root.viewIndex
 
         property string search: ""
