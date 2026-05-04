@@ -22,19 +22,18 @@ LauncherListView {
 
         model = s === "/"
             ? entries.map(v => ({
-                icon:    v.entry.icon,
-                text:    v.entry.name,
+                icon: v.entry.icon,
+                text: v.entry.name,
                 subtext: v.entry.comment,
                 entry: {
-                    target:               v.entry.target,
+                    target: v.entry.target,
                     textfieldPlaceHolder: v.entry.textfieldPlaceHolder,
-                    allowTyping:          v.entry.allowTyping,
-                    isSearchList:         v.entry.isSearchList
+                    allowTyping: v.entry.allowTyping,
+                    isSearchList: v.entry.isSearchList
                 }
             }))
             : SharedState.search(s.slice(1), entries, false);
 
-        if (model.length === 0)
-            model = [{ text: "No results", subtext: "Try again", icon: "../../assets/icons/search_off.png" }];
+        if (model.length === 0) model = [{ text: "No results", subtext: "Try again", icon: "../../assets/icons/search_off.png" }];
     }
 }

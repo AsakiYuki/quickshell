@@ -20,16 +20,10 @@ LauncherListView {
         }))
 
     readonly property string search: _textField.searchText
-
     readonly property var noResult: [{ text: "No results", subtext: "Try again", icon: "../../assets/icons/search_off.png" }]
 
     function toModelEntry(v) {
-        return {
-            icon:    SharedState.parseIconPath(v.entry.icon),
-            text:    v.entry.name,
-            subtext: v.entry.comment,
-            entry:   v.entry
-        };
+        return { icon: SharedState.parseIconPath(v.entry.icon), text: v.entry.name, subtext: v.entry.comment, entry: v.entry };
     }
 
     onEntriesChanged: model = entries.map(toModelEntry)
@@ -38,9 +32,7 @@ LauncherListView {
         _root.reset();
         const s = search.trim();
         if (s.startsWith("/")) return;
-        model = s === ""
-            ? entries.map(toModelEntry)
-            : (SharedState.search(s, entries) || []);
+        model = s === "" ? entries.map(toModelEntry) : (SharedState.search(s, entries) || []);
         if (model.length === 0) model = noResult;
     }
 }

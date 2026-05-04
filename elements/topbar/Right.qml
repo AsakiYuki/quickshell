@@ -7,11 +7,6 @@ Row {
     anchors.rightMargin: 5
     spacing: 5
 
-    SystemTray {
-        id: systemTray
-    }
-
-    Power {
-        id: _power
-    }
+    SystemTray { id: systemTray }
+    Power { id: _power }
 }

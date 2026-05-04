@@ -33,44 +33,21 @@ SimpleButton {
             body: JSON.stringify(data)
         }).then(data => {
             const lyrics = Lyrics.parseMxm(data.body);
-            if (lyrics[0].time.start === 0)
-                return lyrics;
-            else
-                return [
-                    {
-                        text: "",
-                        time: {
-                            start: 0,
-                            end: lyrics[0].time.start
-                        }
-                    },
-                    ...lyrics];
+            if (lyrics[0].time.start === 0) return lyrics;
+            else return [{ text: "", time: { start: 0, end: lyrics[0].time.start }}, ...lyrics];
         });
     }
 
     function fetchLrclibLyrics(data) {
         return HttpRequest.fetchJson(`https://lrclib.net/api/get${Utils.buildSearchQuery(data)}`).then(v => {
             const lyrics = Lyrics.parseLrclib(v.syncedLyrics);
-            if (lyrics[0].time.start === 0)
-                return lyrics;
-            else
-                return [
-                    {
-                        text: "",
-                        time: {
-                            start: 0,
-                            end: lyrics[0].time.start
-                        }
-                    },
-                    ...lyrics];
+            if (lyrics[0].time.start === 0) return lyrics;
+            else return [{ text: "", time: { start: 0, end: lyrics[0].time.start }}, ...lyrics];
         });
     }
 
     onCurrentLyricLineChanged: {
-        const lyrics = root.lyrics[currentLyricLine] || {
-            text: "",
-            time: {}
-        };
+        const lyrics = root.lyrics[currentLyricLine] || { text: "", time: {} };
         lyricText.text = (currentLyricLine & 1 ? "‎" : "") + lyrics.text;
         if (lyrics.text) console.info(`Lyrics ${currentLyricLine} ${lyrics.time.start.toFixed(2)}-${lyrics.time.end.toFixed(2)}: ${lyricText.text}`);
     }
@@ -82,25 +59,15 @@ SimpleButton {
 
     visible: Mpris.players.length
     clip: true
-
-    onVisibleChanged: {
-        if (!visible)
-            SharedState.overlayDropPanelType = 0;
-    }
-
+    onVisibleChanged: if (!visible) SharedState.overlayDropPanelType = 0;
     onMetadataChanged: {
         root.lyrics = [];
         root.realLength = currentLyricLine = 0;
         if (Mpris.current?.identity === "Cider") {
             const currentId = ++root.fetchId;
             root.timeOffset = Mpris.current?.position;
-            HttpRequest.fetchJson("http://localhost:10767/api/v1/playback/now-playing", {
-                headers: {
-                    apptoken: root.ciderToken
-                }
-            }).then(({
-                    info
-                }) => {
+            HttpRequest.fetchJson("http://localhost:10767/api/v1/playback/now-playing", { headers: { apptoken: root.ciderToken }}).then(({ info }) =>
+            {
                 if (currentId !== root.fetchId)
                     return;
                 root.timeOffset -= info.currentPlaybackTime;
@@ -116,31 +83,19 @@ SimpleButton {
                 const duration = info.durationInMillis;
 
                 console.info(`Fetching lyrics for ${name} - ${artist}`);
-                const callback = () => fetchAppleMxmLyrics({
-                        id,
-                        name,
-                        artist,
-                        album,
-                        duration
-                    }).then(v => {
-                        if (currentId === root.fetchId)
-                            root.lyrics = v;
-                    });
+                const callback = () => fetchAppleMxmLyrics({ id, name, artist, album, duration }).then(v => { if (currentId === root.fetchId) root.lyrics = v; });
+                
                 callback().then(() => {
-                    if (currentId !== root.fetchId)
-                        return;
+                    if (currentId !== root.fetchId) return;
                     console.info(`Found lyrics for ${name} - ${artist}`);
                 }).catch(() => {
-                    if (currentId !== root.fetchId)
-                        return;
+                    if (currentId !== root.fetchId) return;
                     console.info(`Fetch lyrics for ${name} - ${artist} failed, retry!`);
                     return callback().then(() => {
-                        if (currentId !== root.fetchId)
-                            return;
+                        if (currentId !== root.fetchId) return;
                         console.info(`Found lyrics for ${name} - ${artist}`);
                     }).catch(() => {
-                        if (currentId !== root.fetchId)
-                            return;
+                        if (currentId !== root.fetchId) return;
                         console.info(`Lyrics for ${name} - ${artist} not found!`);
                         console.info(`Try to fetch the lyrics from lrclib!`);
 
@@ -149,8 +104,7 @@ SimpleButton {
                             track_name: name,
                             duration: duration / 1000 >> 0
                         }).then(v => {
-                            if (currentId !== root.fetchId)
-                                return;
+                            if (currentId !== root.fetchId) return;
                             console.info(`Found lyrics for ${name} - ${artist}`);
                             root.lyrics = v;
                         }).catch(() => {
@@ -158,16 +112,12 @@ SimpleButton {
                         });
                     });
                 }).then(v => {
-                    if (currentId !== root.fetchId)
-                        return;
-                    if (currentId === root.fetchId)
-                        console.info(`DONE!`);
-                    else
-                        console.info("CANCELED!");
+                    if (currentId !== root.fetchId) return;
+                    if (currentId === root.fetchId) console.info(`DONE!`);
+                    else console.info("CANCELED!");
                 });
             });
-        } else
-            root.timeOffset = 0;
+        } else root.timeOffset = 0;
 
         root.updatePositionView();
     }
@@ -182,18 +132,12 @@ SimpleButton {
 
     function updateLyrics() {
         const timeCurr = Math.max(0, Mpris.current?.position + root.lyricsDelay - root.timeOffset);
-        const {
-            time
-        } = root.lyrics[root.currentLyricLine] || {};
+        const { time } = root.lyrics[root.currentLyricLine] || {};
 
-        if (time?.start <= timeCurr && timeCurr <= time?.end)
-            return;
+        if (time?.start <= timeCurr && timeCurr <= time?.end) return;
         if (time?.start > timeCurr) {
             for (let index = root.currentLyricLine; index > -1; index--) {
-                const {
-                    text,
-                    time
-                } = root.lyrics[index];
+                const { text, time } = root.lyrics[index];
                 if (timeCurr >= time.start && timeCurr <= time.end) {
                     root.currentLyricLine = index;
                     return;
@@ -201,10 +145,7 @@ SimpleButton {
             }
         } else if (timeCurr > time?.end) {
             for (let index = root.currentLyricLine; index < root.lyrics.length; index++) {
-                const {
-                    text,
-                    time
-                } = root.lyrics[index];
+                const { text, time } = root.lyrics[index];
                 if (timeCurr >= time.start && timeCurr <= time.end) {
                     root.currentLyricLine = index;
                     return;
@@ -218,8 +159,7 @@ SimpleButton {
         running: (Mpris.current && Mpris.current?.playbackState === 1) && !Workspaces.current?.hasFullscreen || (SharedState.overlayDropPanelType === 3)
         onTriggered: {
             root.updatePositionView();
-            if (root.lyrics.length && !Workspaces.current?.hasFullscreen)
-                root.updateLyrics();
+            if (root.lyrics.length && !Workspaces.current?.hasFullscreen) root.updateLyrics();
         }
     }
 
@@ -248,11 +188,7 @@ SimpleButton {
                 width: 15
                 height: width
 
-                Behavior on width {
-                    NumberAnimation {
-                        duration: 150
-                    }
-                }
+                Behavior on width { NumberAnimation { duration: 150 }}
 
                 anchors.centerIn: parent
                 source: Mpris.current?.playbackState === 1 ? "../assets/icons/pause.png" : "../assets/icons/play.png"
@@ -264,12 +200,7 @@ SimpleButton {
             width: ((`${lyricText.text}` === "") || (`${lyricText.text}` === "‎") || (Mpris.current?.playbackState === 2)) ? nameText.width : lyricText.width
             height: nameText.height
 
-            Behavior on width {
-                NumberAnimation {
-                    duration: 350
-                    easing.type: Easing.OutQuint
-                }
-            }
+            Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutQuint } }
 
             ScrollText {
                 id: lyricText
@@ -287,12 +218,7 @@ SimpleButton {
                     readonly property bool isOverflow: (width >> 0) > lyricText.width
                     readonly property bool isPlaying: Mpris.current?.playbackState === 1
 
-                    onIsPlayingChanged: {
-                        if (isOverflow) {
-                            if (isPlaying) moveLyricsAnim.pause();
-                            else moveLyricsAnim.resume();
-                        }
-                    }
+                    onIsPlayingChanged: if (isOverflow) { if (isPlaying) moveLyricsAnim.pause(); else moveLyricsAnim.resume(); }
 
                     function onUpdate() {
                         if (isOverflow) {
@@ -321,33 +247,22 @@ SimpleButton {
                 spacing: -2
                 opacity: ((`${lyricText.text}` === "") || (`${lyricText.text}` === "‎") || (Mpris.current?.playbackState === 2))
 
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 150
-                    }
-                }
+                Behavior on opacity { NumberAnimation { duration: 150 } }
 
                 OverflowScrollText {
                     text: Mpris.current?.trackTitle || "Unknown Track"
                     paused: !nameText.opacity
-                    textComponent: StyledText {
-                        font.pixelSize: 12
-                    }
+                    textComponent: StyledText { font.pixelSize: 12 }
                 }
 
                 OverflowScrollText {
                     text: `${Mpris.current?.trackArtists}${Mpris.current?.trackAlbum ? ` - ${Mpris.current?.trackAlbum}` : ""}`
                     paused: !nameText.opacity
-                    textComponent: StyledText {
-                        font.pixelSize: 12
-                        color: Catppuccin.subtext0
-                    }
+                    textComponent: StyledText { font.pixelSize: 12; color: Catppuccin.subtext0 }
                 }
             }
         }
     }
 
-    Component.onCompleted: {
-        topbar.musicPlayer = this;
-    }
+    Component.onCompleted: { topbar.musicPlayer = this; }
 }

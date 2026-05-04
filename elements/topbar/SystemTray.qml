@@ -24,13 +24,7 @@ Rectangle {
     property bool isTrayDragging: false
 
     visible: SystemTray.systemTray.length
-
-    Behavior on width {
-        NumberAnimation {
-            duration: 200
-            easing.type: Easing.OutQuint
-        }
-    }
+    Behavior on width { NumberAnimation { duration: 200 ;easing.type: Easing.OutQuint; }}
 
     Row {
         id: _tray
@@ -81,10 +75,7 @@ Rectangle {
                             overlay.setDragIcon(`0${modelData.icon}`);
                         }
 
-                        const {
-                            x,
-                            y
-                        } = this.mapToGlobal(ev.x, ev.y);
+                        const { x, y } = this.mapToGlobal(ev.x, ev.y);
                         overlay.setOverlayPosition(x - _root.offsetX, y - _root.offsetY);
                     }
 
@@ -105,16 +96,11 @@ Rectangle {
                             overlay.setDragIcon("");
                             if (_root.isTrayDragging) {
                                 _root.isTrayDragging = false;
-                                const {
-                                    x,
-                                    y
-                                } = this.mapToGlobal(ev.x, ev.y);
+                                const { x, y } = this.mapToGlobal(ev.x, ev.y);
                                 if (Utils.isMouseInsideTargetElement(x, y, 0, 0, _moreTrayButton)) {
                                     configuration.hideTrayID.push([modelData.id, modelData.tooltipTitle, modelData.title].join("&"));
                                 }
-                            } else {
-                                modelData.activate();
-                            }
+                            } else modelData.activate();
                         }
                     }
 
@@ -142,12 +128,7 @@ Rectangle {
                 rotation: (SharedState.overlayDropPanelType === 2) ? -90 : 90
                 source: "../assets/icons/chevron_right.png"
 
-                Behavior on rotation {
-                    NumberAnimation {
-                        duration: 200
-                        easing.type: Easing.OutQuint
-                    }
-                }
+                Behavior on rotation { NumberAnimation { duration: 200; easing.type: Easing.OutQuint; }}
             }
 
             onClicked: SharedState.toggleOverlay(2)
@@ -155,8 +136,5 @@ Rectangle {
     }
 
     color: Catppuccin.surface0
-
-    Component.onCompleted: {
-        topbar.systemTrayElement = this;
-    }
+    Component.onCompleted: { topbar.systemTrayElement = this; }
 }
