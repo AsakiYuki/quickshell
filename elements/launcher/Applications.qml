@@ -8,7 +8,7 @@ import "../../utils/FuzzySort.js" as FuzzySort
 LauncherListView {
     id: _list
 
-    model: [{ text: "No results", subtext: "Try again", icon: "../../assets/icons/search_off.png" }]
+    model: [{ text: "Nothing found!", subtext: "Try searching for something more general...", icon: "../../assets/icons/search_off.png" }]
 
     readonly property list<var> entries: DesktopEntries.applications.values
         .filter(v => !v.noDisplay)
@@ -16,7 +16,7 @@ LauncherListView {
         .map(a => ({ name: FuzzySort.prepare(a.name), comment: FuzzySort.prepare(a.comment), entry: a }))
 
     readonly property string search: _textField.searchText
-    readonly property var noResult: [{ text: "No results", subtext: "Try again", icon: "../../assets/icons/search_off.png" }]
+    readonly property var noResult: [{ text: "Nothing found!", subtext: "Try searching for something more general...", icon: "../../assets/icons/search_off.png" }]
 
     function toModelEntry(v) {
         return { icon: SharedState.parseIconPath(v.entry.icon), text: v.entry.name, subtext: v.entry.comment, entry: v.entry };

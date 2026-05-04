@@ -34,6 +34,6 @@ LauncherListView {
             }))
             : SharedState.search(s.slice(1), entries, false);
 
-        if (model.length === 0) model = [{ text: "No results", subtext: "Try again", icon: "../../assets/icons/search_off.png" }];
+        if (model.length === 0) model = [{ text: "Nothing found!", subtext: "Try searching for something more general...", icon: "../../assets/icons/search_off.png" }];
     }
 }

@@ -146,8 +146,8 @@ Item {
 
         function noResult() {
             return [{
-                text: "No results",
-                subtext: "Try again",
+                text: "Nothing found!",
+                subtext: "Try searching for something more general...",
                 icon: "../../assets/icons/search_off.png"
             }];
         }
