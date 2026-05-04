@@ -7,17 +7,17 @@ Singleton {
         {
             allowTyping: true,
             name: "Steam Game Launcher",
-            comment: "Launch your Steam game",
+            comment: "Quickly launch your favorite Steam games",
             icon: "../../assets/services/steam.png",
-            textfieldPlaceHolder: "Search a game...",
+            textfieldPlaceHolder: "Find a game to play...",
             target: "GameLauncher"
         },
         {
             allowTyping: false,
             name: "Wallpaper",
-            comment: "Change your current wallpaper",
+            comment: "Personalize your desktop background",
             icon: "../../assets/icons/images.png",
-            textfieldPlaceHolder: "Choose your wallpaper",
+            textfieldPlaceHolder: "Choose a wallpaper...",
             target: "Wallpapers"
         },
     ]

@@ -213,7 +213,7 @@ DropPanel {
                 readonly property bool commandMode: searchText.startsWith("/")
                 property string customPlaceHolder: ""
 
-                placeholderText: qsTr(customPlaceHolder || "Type '/' to enter a command...")
+                placeholderText: qsTr(customPlaceHolder || "Looking for something? Type '/' for commands or '=' for calculation...")
 
                 onTextChanged: {
                     if (!_command_panel.isActive) searchText = text.trim();
