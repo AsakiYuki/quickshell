@@ -15,13 +15,18 @@ Item {
     onInputChanged: {
         if (!input.startsWith("=")) return;
         try {
-            const output = CalcCore.calc(input.slice(1)); 
-            inputText.text = input.slice(1).trim();
-            outputText.text = output;
-            errorText.text = "";
+            if (input.slice("1").trim() === "") {
+                inputText.text = errorText.text= "";
+                outputText.text = "Enter a expression!";
+            } else {
+                const output = CalcCore.calc(input.slice(1)); 
+                inputText.text = input.slice(1).trim();
+                outputText.text = output;
+                errorText.text = "";
+            }
         } catch(err) {
             inputText.text = ""
-            outputText.text = `Math Error`
+            outputText.text =`Math Error`
             errorText.text = String(err);
         }
     }
