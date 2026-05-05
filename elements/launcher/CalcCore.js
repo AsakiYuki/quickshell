@@ -52,7 +52,7 @@ function execBinary(a, b, operation) {
 }
 
 function resMathFunc(value, func) {
-	if (typeof input === "number") return func(value);
+	if (typeof value === "number") return func(value);
 	const { unit, type, value: v } = value;
 	return { unit, type, value: func(v) }
 }
@@ -336,13 +336,13 @@ function calc(input) {
 		while ((current = at()) && current.tokenKind === TokenKind.OPERATOR && current.token === "!") {
 			eat()
 
-			if (left < 0 || !Number.isInteger(left)) {
+			if (left < 0 || !Number.isInteger(typeof left === "number" ? left : left.value)) {
 				throw new Error("Factorial is only defined for non-negative integers.")
 			}
 
 			return execUnary(left, (value) => {
 				let factorial = 1;
-				for (let i = 2; i <= left; i++) factorial *= i;
+				for (let i = 2; i <= value; i++) factorial *= i;
 				return factorial;
 			})
 		}
@@ -358,6 +358,7 @@ function calc(input) {
 
 		while ((current = at()) && (current.tokenKind === TokenKind.KEYWORD) && (current.token === "to")) {
 			eat();
+			if (!at()) throw "Idk what to say";
 			const targetDatatype = getDataType(at().tokenKind);
 			
 			if (typeof left === "number") throw new Error("Cannot convert a number!");
