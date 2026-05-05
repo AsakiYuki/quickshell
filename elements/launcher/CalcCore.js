@@ -1,3 +1,5 @@
+.pragma library
+
 /** @param {string} char */
 function isBlank(char) {
 	return /\s/.test(char)
@@ -635,7 +637,7 @@ function calc(input) {
 					at()?.tokenKind === TokenKind.WORD ||
 					at()?.tokenKind === TokenKind.OPEN_PARENTHESIS
 				) {
-					return execBinary(output, right, (l, r) => l * r)
+					return multiplicative(output, primaryExpression());
 				}
 
 				return output
