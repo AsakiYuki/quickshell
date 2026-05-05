@@ -8,7 +8,7 @@ import "./CalcCore.js" as CalcCore
 Item {
     id: root
     width: parent.width - 20
-    height: 200
+    height: 100
     anchors.horizontalCenter: parent.horizontalCenter
 
     readonly property string input: _textField.text
@@ -16,7 +16,7 @@ Item {
         if (!input.startsWith("=")) return;
         try {
             const output = CalcCore.calc(input.slice(1)); 
-            inputText.text = input.slice(1);
+            inputText.text = input.slice(1).trim();
             outputText.text = output;
             errorText.text = "";
         } catch(err) {

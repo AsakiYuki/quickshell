@@ -13,31 +13,89 @@ function isWord(char) {
 	return char ? /\w/.test(char) : false
 }
 
+function execUnary(value, operation) {
+	if (typeof value === "number") return operation(value);
+	const {unit, type, value: v} = value;
+	return { unit, type, value: operation(v) };
+}
+
+function execBinary(a, b, operation) {
+	if (typeof a === "number") {
+		if (typeof b === "number") return operation(a, b);
+		else {
+			const {unit, type, value} = b;
+			return { unit, type, value: operation(a, value) }
+		}
+	} else {
+		if (typeof b === "number")  {
+			const {unit, type, value} = a;
+			return { unit, type, value: operation(value, b) }
+		} else {
+			if (a.type !== b.type) throw new Error("Invalid conversion unit")
+			switch (a.type) {
+				case DataType.LENGTH:
+				case DataType.AREA: {
+					const lookup = [lengthLookup, areaLookup][a.type];
+					return { unit: b.unit, type: b.type, value: operation(a.value * lookup[a.unit] / lookup[b.unit], b.value) }
+				};
+				case DataType.ANGULAR: {
+					if (a.unit === b.unit) return { unit: b.unit, type: b.type, value: operation(a.value, b.value) }
+					return {
+						unit: b.unit,
+						type: b.type,
+						value: operation(a.value * ((b.unit === "rad") ? (Math.PI / 180) : (180 / Math.PI)), b.value)
+					}
+				};
+			}
+		}
+	}
+}
+
+function resMathFunc(value, func) {
+	if (typeof input === "number") return func(value);
+	const { unit, type, value: v } = value;
+	return { unit, type, value: func(v) }
+}
+
+function resTrigonometricMathFunc(func, value) {
+    if (typeof value === "number") return func(value);
+
+    if (value.type !== DataType.ANGULAR) throw Error("Invalid value!");
+
+    const num = value.value;
+    const unit = value.unit;
+
+    const radians = (unit === "rad") ? num : num * (Math.PI / 180);
+
+    return func(radians);
+}
+
 const func = {
-	abs: Math.abs,
-	sqrt: Math.sqrt,
-	cbrt: Math.cbrt,
+	abs: v => resMathFunc(v, Math.abs),
+
+	sqrt: v => resMathFunc(v, Math.sqrt),
+	cbrt: v => resMathFunc(v, Math.cbrt),
 	pow: Math.pow,
 	hypot: Math.hypot,
 
-	floor: Math.floor,
-	ceil: Math.ceil,
-	round: Math.round,
-	trunc: Math.trunc,
-	sign: Math.sign,
+	floor: v => resMathFunc(v, Math.floor),
+	ceil: v => resMathFunc(v, Math.ceil),
+	round: v => resMathFunc(v, Math.round),
+	trunc: v => resMathFunc(v, Math.trunc),
+	sign: v => resMathFunc(v, Math.sign),
 
-	sin: Math.sin,
-	cos: Math.cos,
-	tan: Math.tan,
-	asin: Math.asin,
-	acos: Math.acos,
-	atan: Math.atan,
+	sin: v => resTrigonometricMathFunc(Math.sin, v),
+	cos: v => resTrigonometricMathFunc(Math.cos, v),
+	tan: v => resTrigonometricMathFunc(Math.tan, v),
+	asin: v => resTrigonometricMathFunc(Math.asin, v),
+	acos: v => resTrigonometricMathFunc(Math.acos, v),
+	atan: v => resTrigonometricMathFunc(Math.atan, v),
 	atan2: Math.atan2,
 
-	log: Math.log,
-	log10: Math.log10,
-	log2: Math.log2,
-	exp: Math.exp,
+	log: v => resMathFunc(v, Math.log),
+	log10: v => resMathFunc(v, Math.log10),
+	log2: v => resMathFunc(v, Math.log2),
+	exp: v => resMathFunc(v, Math.exp),
 
 	max: Math.max,
 	min: Math.min,
@@ -56,6 +114,41 @@ const constant = {
 	random: Math.random,
 }
 
+const keywords = new Set(["to"])
+const lengthUnits = new Set(["km", "hm", "dam", "m", "dm", "cm", "mm"])
+const areaUnits = new Set(["km2", "hm2", "dam2", "a", "ha", "m2", "dm2", "cm2", "mm2"])
+const angularUnits = new Set(["deg", "rad"])
+
+const lengthLookup = {
+    km: 1000,
+    hm: 100,
+    dam: 10,
+    m: 1,
+    dm: 0.1,
+    cm: 0.01,
+    mm: 0.001
+};
+
+const areaLookup = {
+    km2: 1000000,
+    hm2: 10000, ha: 10000,
+    dam2: 100, a: 100,
+    m2: 1,
+    dm2: 0.01,
+    cm2: 0.0001,
+    mm2: 0.000001
+};
+
+/**
+ * @readonly
+ * @enum {number}
+ */
+const DataType = {
+	LENGTH: 0,
+	AREA: 1,
+	ANGULAR: 3
+}
+
 /**
  * @readonly
  * @enum {number}
@@ -65,6 +158,10 @@ const TokenKind = {
 	WORD: 1,
 
 	OPERATOR: 50,
+	KEYWORD: 51,
+	LENGTH_UNIT_KEYWORD: 52,
+	AREA_UNIT_KEYWORD: 53,
+	ANGULAR_UNIT_KEYWORD: 54,
 
 	COMMA: 99,
 	OPEN_PARENTHESIS: 100,
@@ -85,33 +182,28 @@ function calc(input) {
 	let position = 0
 	const tokens = lexer(input)
 
-	function prev() {
-		return tokens[position - 1]
+	function prev() { return tokens[position - 1] }
+	function at() { return tokens[position] }
+	function eat() { return tokens[position++] }
+	function next() { return tokens[position + 1] }
+	function last() { return tokens[tokens.length - 1] }
+	
+	function getDataType(kind) {
+		switch (kind) {
+			case TokenKind.LENGTH_UNIT_KEYWORD: return DataType.LENGTH;
+			case TokenKind.AREA_UNIT_KEYWORD: return DataType.AREA;
+			case TokenKind.ANGULAR_UNIT_KEYWORD: return DataType.ANGULAR;
+		}
 	}
-	function at() {
-		return tokens[position]
-	}
-	function eat() {
-		return tokens[position++]
-	}
-	function next() {
-		return tokens[position + 1]
-	}
-	function last() {
-		return tokens[tokens.length - 1]
-	}
-
-	function expression() {
-		return bitwiseExpression()
-	}
+	
+	function expression() { return bitwiseExpression() }
 
 	function bitwiseExpression() {
 		/** @type {Token} */
 		let current = at()
 		if (current && current.tokenKind === TokenKind.OPERATOR && current.token === "!") {
 			eat()
-			const ret = bitwiseExpression()
-			return ~ret
+			return execUnary(bitwiseExpression(), (ret) => ~ret)
 		}
 
 		let left = bitshiftExpression()
@@ -133,18 +225,12 @@ function calc(input) {
 			const right = bitshiftExpression()
 
 			switch (operator.token) {
-				case "&":
-					left &= right
-					break
-				case "^":
-					left ^= right
-					break
-				case "|":
-					left |= right
-					break
+				case "&": return execBinary(left, right, (l, r) => l & r)
+				case "^": return execBinary(left, right, (l, r) => l ^ r)
+				case "|": return execBinary(left, right, (l, r) => l | r)
 			}
 		}
-
+		
 		return left
 	}
 
@@ -163,15 +249,9 @@ function calc(input) {
 			const right = additiveExpression()
 
 			switch (operator.token) {
-				case "<<":
-					left <<= right
-					break
-				case ">>":
-					left >>= right
-					break
-				case ">>>":
-					left >>>= right
-					break
+				case "<<": return execBinary(left, right, (l, r) => l << r);
+				case ">>": return execBinary(left, right, (l, r) => l >> r);
+				case ">>>": return execBinary(left, right, (l, r) => l  >>> r);
 			}
 		}
 
@@ -186,15 +266,11 @@ function calc(input) {
 
 		while ((current = at()) && current.tokenKind === TokenKind.OPERATOR && ["+", "-"].includes(current.token)) {
 			const operator = eat()
-			const right = multiplicativeExpression()
+			const right = additiveExpression()
 
 			switch (operator.token) {
-				case "+":
-					left += right
-					break
-				case "-":
-					left -= right
-					break
+				case "+": return execBinary(left, right, (l, r) => l + r);
+				case "-": return execBinary(left, right, (l, r) => l - r);
 			}
 		}
 
@@ -209,22 +285,16 @@ function calc(input) {
 
 		while ((current = at()) && current.tokenKind === TokenKind.OPERATOR && ["*", "/", "%"].includes(current.token)) {
 			const operator = eat()
-			const right = openParenthesisMultilicationExpression()
+			const right = multiplicativeExpression()
 
 			if ((operator.token === "/" || operator.token === "%") && right === 0) {
 				throw new Error(`Division by zero: Cannot perform '${operator.token}' when the divisor is 0.`)
 			}
 
 			switch (operator.token) {
-				case "*":
-					left *= right
-					break
-				case "/":
-					left /= right
-					break
-				case "%":
-					left %= right
-					break
+				case "*": return execBinary(left, right, (l, r) => l * r);
+				case "/": return execBinary(left, right, (l, r) => l / r);
+				case "%": return execBinary(left, right, (l, r) => l % r);
 			}
 		}
 
@@ -237,10 +307,8 @@ function calc(input) {
 		/** @type {Token} */
 		let current
 
-		while ((current = at()) && current.tokenKind === TokenKind.OPEN_PARENTHESIS) {
-			const right = powerExpression()
-			left *= right
-		}
+		while ((current = at()) && current.tokenKind === TokenKind.OPEN_PARENTHESIS)
+			return execBinary(left, openParenthesisMultilicationExpression(), (l, r) => l * r);
 
 		return left
 	}
@@ -253,15 +321,14 @@ function calc(input) {
 
 		if ((current = at()) && current.tokenKind === TokenKind.OPERATOR && current.token === "**") {
 			eat()
-			const right = powerExpression()
-			return Math.pow(left, right)
+			return execBinary(left, powerExpression(), (l, r) => Math.pow(l, r));
 		}
 
 		return left
 	}
 
 	function factorialExpression() {
-		let left = primaryExpression()
+		let left = unitConversion()
 
 		/** @type {Token} */
 		let current
@@ -273,12 +340,71 @@ function calc(input) {
 				throw new Error("Factorial is only defined for non-negative integers.")
 			}
 
-			let factorial = 1
-			for (let i = 1; i <= left; i++) factorial *= i
-			left = factorial
+			return execUnary(left, (value) => {
+				let factorial = 1;
+				for (let i = 2; i <= left; i++) factorial *= i;
+				return factorial;
+			})
 		}
 
 		return left
+	}
+
+	function unitConversion() {
+		let left = unitExpression();
+
+		/** @type {Token} */
+		let current
+
+		while ((current = at()) && (current.tokenKind === TokenKind.KEYWORD) && (current.token === "to")) {
+			eat();
+			const targetDatatype = getDataType(at().tokenKind);
+			
+			if (typeof left === "number") throw new Error("Cannot convert a number!");
+			if (left.type !== targetDatatype) throw new Error("Invalid unit conversion!");
+			
+			switch (targetDatatype) {
+				case DataType.LENGTH:
+				case DataType.AREA: {
+					const unit = eat().token;
+					const lookup = [lengthLookup, areaLookup][targetDatatype];
+					return {
+						unit: unit,
+						type: targetDatatype,
+						value: left.value * lookup[left.unit] / lookup[unit]
+					}
+				}
+
+				case DataType.ANGULAR: {
+					const unit = eat().token
+					if (left.unit === unit) return { unit, type: targetDatatype, value: left.value };
+
+					return {
+						unit, type: targetDatatype,
+						value: left.value * ((unit === "rad") ? (Math.PI / 180) : (180 / Math.PI))
+					}
+				}
+			}
+		}
+
+		return left;
+	}
+
+	function unitExpression() {
+		let left = primaryExpression();
+
+		/** @type {Token} */
+		let current
+		
+		while ((current = at()) && [TokenKind.LENGTH_UNIT_KEYWORD, TokenKind.AREA_UNIT_KEYWORD, TokenKind.ANGULAR_UNIT_KEYWORD].includes(current.tokenKind)) {
+			return {
+				unit: at().token,
+				type: getDataType(eat().tokenKind),
+				value: left
+			};
+		}
+
+		return left;
 	}
 
 	function primaryExpression() {
@@ -342,8 +468,7 @@ function calc(input) {
 					at()?.tokenKind === TokenKind.WORD ||
 					at()?.tokenKind === TokenKind.OPEN_PARENTHESIS
 				) {
-					const right = primaryExpression()
-					return output * right
+					return execBinary(output, right, (l, r) => l * r)
 				}
 
 				return output
@@ -352,7 +477,7 @@ function calc(input) {
 			case TokenKind.OPERATOR: {
 				if (["+", "-"].includes(left.token)) {
 					eat()
-					if (left.token === "-") return -1 * primaryExpression()
+					if (left.token === "-") return execUnary(primaryExpression(), v => -1 * v);
 					return primaryExpression()
 				}
 				// else if (
@@ -373,9 +498,16 @@ function calc(input) {
 
 	const output = expression()
 
-	// if (at()) throw Error("Invalid token")
+	if (at()) throw Error("Invalid token")
 
-	return output
+	if (typeof output === "number") return output;
+
+	switch (output.type) {
+		case DataType.LENGTH:
+		case DataType.AREA: 
+		case DataType.ANGULAR:
+			return `${output.value}${output.unit}`;
+	}
 }
 
 /**
@@ -386,10 +518,10 @@ function lexer(input) {
 	/** @type {Token[]} */
 	const tokens = []
 
-	function pushToken(kind, start, length) {
+	function pushToken(kind, start, length, token) {
 		tokens.push({
 			tokenKind: kind,
-			token: input.substring(start, start + length),
+			token: token || input.substring(start, start + length),
 		})
 	}
 
@@ -475,7 +607,14 @@ function lexer(input) {
 					} else if (isWord(char)) {
 						index++
 						while (isWord(input[index])) index++
-						pushToken(TokenKind.WORD, startIndex, index - startIndex)
+						const token = input.substring(startIndex, index).toLowerCase();
+						switch (true) {
+							case keywords.has(token): pushToken(TokenKind.KEYWORD, startIndex, index, token); break;
+							case lengthUnits.has(token): pushToken(TokenKind.LENGTH_UNIT_KEYWORD, startIndex, index, token); break;
+							case areaUnits.has(token): pushToken(TokenKind.AREA_UNIT_KEYWORD, startIndex, index, token); break;
+							case angularUnits.has(token): pushToken(TokenKind.ANGULAR_UNIT_KEYWORD, startIndex, index, token); break;
+							default: pushToken(TokenKind.WORD, startIndex, index, token); break;
+						}
 						continue
 					}
 
