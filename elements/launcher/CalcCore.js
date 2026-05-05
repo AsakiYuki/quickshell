@@ -60,14 +60,13 @@ function resMathFunc(value, func) {
 function resTrigonometricMathFunc(func, value) {
     if (typeof value === "number") return func(value);
 
-    if (value.type !== DataType.ANGULAR) throw Error("Invalid value!");
+    if (!value || value.type !== DataType.ANGULAR)
+        throw Error("Invalid value: Expected an angular data type.");
 
-    const num = value.value;
-    const unit = value.unit;
-
+    const { value: num, unit } = value;
     const radians = (unit === "rad") ? num : num * (Math.PI / 180);
-
-    return func(radians);
+    const result = func(radians);
+    return Math.abs(result) < 1e-15 ? 0 : result;
 }
 
 const func = {
@@ -80,6 +79,12 @@ const func = {
 
 	floor: v => resMathFunc(v, Math.floor),
 	ceil: v => resMathFunc(v, Math.ceil),
+	toFixed: (v, i) => resMathFunc(v, (v) => {
+		if (typeof i !== "number" || i < 0) throw Error("Precision must be a non-negative number");
+		const fixed = Math.pow(10, i);
+		return Math.trunc(v * fixed) / fixed;
+	}),
+
 	round: v => resMathFunc(v, Math.round),
 	trunc: v => resMathFunc(v, Math.trunc),
 	sign: v => resMathFunc(v, Math.sign),
@@ -360,9 +365,9 @@ function calc(input) {
 			eat();
 			if (!at()) throw "Idk what to say";
 			const targetDatatype = getDataType(at().tokenKind);
-			
-			if (typeof left === "number") throw new Error("Cannot convert a number!");
-			if (left.type !== targetDatatype) throw new Error("Invalid unit conversion!");
+
+			if (typeof left === "number") throw new Error("Cannot convert a raw number!");
+       		if (left.type !== targetDatatype) throw new Error("Mismatched units!");
 			
 			switch (targetDatatype) {
 				case DataType.LENGTH:
@@ -385,6 +390,8 @@ function calc(input) {
 						value: left.value * ((unit === "rad") ? (Math.PI / 180) : (180 / Math.PI))
 					}
 				}
+
+				default: throw new Error("Unsupported unit type");
 			}
 		}
 
@@ -497,18 +504,26 @@ function calc(input) {
 		return 0
 	}
 
-	const output = expression()
+	const output = expression();
 
-	if (at()) throw Error("Invalid token")
+    if (at()) throw Error("Invalid token");
 
-	if (typeof output === "number") return output;
+    if (typeof output === "number") return output;
 
-	switch (output.type) {
-		case DataType.LENGTH:
-		case DataType.AREA: 
-		case DataType.ANGULAR:
-			return `${output.value}${output.unit}`;
-	}
+    switch (output.type) {
+        case DataType.LENGTH:
+        case DataType.ANGULAR:
+            return `${output.value}${output.unit}`;
+
+        case DataType.AREA: {
+            const specialUnits = ["ha", "a"];
+            const isSpecial = specialUnits.includes(output.unit);
+            const unitDisplay = isSpecial ? output.unit : `${output.unit.substring(0, output.unit.length - 1)}\u00B2`;
+            return `${output.value}${unitDisplay}`;
+        }
+        
+        default: return output.value;
+    }
 }
 
 /**
