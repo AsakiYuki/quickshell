@@ -142,7 +142,7 @@ const func = {
 		return Math.ceil(v);
 	}),
 
-	toFixed: (v, i) => resMathFunc(v, v => {
+	tofixed: (v, i) => resMathFunc(v, v => {
 		ensureNumber(v);
 		if (typeof i !== "number" || i < 0 || !Number.isInteger(i)) {
 			throw new RangeError(`Precision must be a non-negative integer, got ${i}`);
