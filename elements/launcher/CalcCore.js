@@ -117,17 +117,17 @@ function calc(input) {
 		let left = bitshiftExpression()
 
 		while ((current = at()) && current.tokenKind === TokenKind.OPERATOR && ["&", "^", "|"].includes(current.token)) {
-			if (current.token === "|") {
-				let nxt = next()
-				if (
-					!nxt ||
-					nxt.tokenKind === TokenKind.OPERATOR ||
-					nxt.tokenKind === TokenKind.CLOSE_PARENTHESIS ||
-					nxt.tokenKind === TokenKind.COMMA
-				) {
-					break
-				}
-			}
+			// if (current.token === "|") {
+			// 	let nxt = next()
+			// 	if (
+			// 		!nxt ||
+			// 		nxt.tokenKind === TokenKind.OPERATOR ||
+			// 		nxt.tokenKind === TokenKind.CLOSE_PARENTHESIS ||
+			// 		nxt.tokenKind === TokenKind.COMMA
+			// 	) {
+			// 		break
+			// 	}
+			// }
 
 			const operator = eat()
 			const right = bitshiftExpression()
@@ -319,7 +319,9 @@ function calc(input) {
 					const functionToCall = func[name]
 					if (!functionToCall) throw Error(`Unknown function: ${name}`)
 
-					return functionToCall(...args)
+					const output = functionToCall(...args);
+                    if ([TokenKind.WORD, TokenKind.NUMBER].includes(at()?.tokenKind)) return output * primaryExpression();
+                    else return output;
 				} else {
 					const constValue = constant[name]
 					if (constValue === undefined) throw Error(`Invalid constant or function name: ${name}`)
@@ -352,16 +354,17 @@ function calc(input) {
 					eat()
 					if (left.token === "-") return -1 * primaryExpression()
 					return primaryExpression()
-				} else if (
-					(left.token === "|" && prev()?.tokenKind === TokenKind.OPERATOR) ||
-					!prev() ||
-					prev()?.tokenKind === TokenKind.OPEN_PARENTHESIS
-				) {
-					eat()
-					const ret = expression()
-					if (eat()?.token !== "|") throw Error("Invalid abs expression!")
-					return Math.abs(ret)
 				}
+				// else if (
+				// 	(left.token === "|" && prev()?.tokenKind === TokenKind.OPERATOR) ||
+				// 	!prev() ||
+				// 	prev()?.tokenKind === TokenKind.OPEN_PARENTHESIS
+				// ) {
+				// 	eat()
+				// 	const ret = expression()
+				// 	if (eat()?.token !== "|") throw Error("Invalid abs expression!")
+				// 	return Math.abs(ret)
+				// }
 			}
 		}
 
@@ -370,7 +373,7 @@ function calc(input) {
 
 	const output = expression()
 
-	if (at()) throw Error("Invalid token")
+	// if (at()) throw Error("Invalid token")
 
 	return output
 }
