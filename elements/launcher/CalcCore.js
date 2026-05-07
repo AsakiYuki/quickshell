@@ -1,5 +1,87 @@
 .pragma library
 
+
+const constant = {
+	e: Math.E,
+	ln10: Math.LN10,
+	ln2: Math.LN2,
+	log10e: Math.LOG10E,
+	log2e: Math.LOG2E,
+	pi: Math.PI,
+	sqrt1_2: Math.SQRT1_2,
+	sqrt2: Math.SQRT2,
+	random: Math.random,
+}
+
+const keywords = new Set(["to", "in"])
+const lengthUnits = new Set(["km", "hm", "dam", "m", "dm", "cm", "mm"])
+const areaUnits = new Set(["km2", "hm2", "dam2", "a", "ha", "m2", "dm2", "cm2", "mm2"])
+const volumeUnits = new Set(["km3", "hm3", "dam3", "m3", "dm3", "l", "cm3", "ml", "mm3"]);
+const angularUnits = new Set(["deg", "rad"])
+
+const lengthLookup = {
+	km: 1000,
+	hm: 100,
+	dam: 10,
+	m: 1,
+	dm: 0.1,
+	cm: 0.01,
+	mm: 0.001
+};
+
+const areaLookup = {
+	km2: 1_000_000,
+	hm2: 10_000, ha: 10_000,
+	dam2: 100, a: 100,
+	m2: 1,
+	dm2: 0.01,
+	cm2: 0.0001,
+	mm2: 0.000001
+};
+
+const volumeLookup = {
+	km3: 1_000_000_000,
+	hm3: 1_000_000,
+	dam3: 1_000,
+	m3: 1,
+	dm3: 0.001, l: 0.001,
+	cm3: 0.000001, ml: 0.000001,
+	mm3: 0.000000001
+};
+
+/**
+ * @readonly
+ * @enum {number}
+ */
+const DataType = {
+	LENGTH: 0,
+	AREA: 1,
+	VOLUME: 2,
+	ANGULAR: 3
+}
+
+/**
+ * @readonly
+ * @enum {number}
+ */
+const TokenKind = {
+	NUMBER: 0,
+	WORD: 1,
+
+	OPERATOR: 50,
+	KEYWORD: 51,
+	LENGTH_UNIT_KEYWORD: 52,
+	AREA_UNIT_KEYWORD: 53,
+	ANGULAR_UNIT_KEYWORD: 54,
+	VOLUME_UNIT_KEYWORD: 55,
+
+	COMMA: 99,
+	OPEN_PARENTHESIS: 100,
+	CLOSE_PARENTHESIS: 101,
+
+	EOF: 1000,
+}
+
 /** @param {string} char */
 function isBlank(char) {
 	return /\s/.test(char)
@@ -237,87 +319,6 @@ const func = {
 	
 	random: () => Math.random(),
 };
-
-const constant = {
-	e: Math.E,
-	ln10: Math.LN10,
-	ln2: Math.LN2,
-	log10e: Math.LOG10E,
-	log2e: Math.LOG2E,
-	pi: Math.PI,
-	sqrt1_2: Math.SQRT1_2,
-	sqrt2: Math.SQRT2,
-	random: Math.random,
-}
-
-const keywords = new Set(["to", "in"])
-const lengthUnits = new Set(["km", "hm", "dam", "m", "dm", "cm", "mm"])
-const areaUnits = new Set(["km2", "hm2", "dam2", "a", "ha", "m2", "dm2", "cm2", "mm2"])
-const volumeUnits = new Set(["km3", "hm3", "dam3", "m3", "dm3", "l", "cm3", "ml", "mm3"]);
-const angularUnits = new Set(["deg", "rad"])
-
-const lengthLookup = {
-	km: 1000,
-	hm: 100,
-	dam: 10,
-	m: 1,
-	dm: 0.1,
-	cm: 0.01,
-	mm: 0.001
-};
-
-const areaLookup = {
-	km2: 1_000_000,
-	hm2: 10_000, ha: 10_000,
-	dam2: 100, a: 100,
-	m2: 1,
-	dm2: 0.01,
-	cm2: 0.0001,
-	mm2: 0.000001
-};
-
-const volumeLookup = {
-	km3: 1_000_000_000,
-	hm3: 1_000_000,
-	dam3: 1_000,
-	m3: 1,
-	dm3: 0.001, l: 0.001,
-	cm3: 0.000001, ml: 0.000001,
-	mm3: 0.000000001
-};
-
-/**
- * @readonly
- * @enum {number}
- */
-const DataType = {
-	LENGTH: 0,
-	AREA: 1,
-	VOLUME: 2,
-	ANGULAR: 3
-}
-
-/**
- * @readonly
- * @enum {number}
- */
-const TokenKind = {
-	NUMBER: 0,
-	WORD: 1,
-
-	OPERATOR: 50,
-	KEYWORD: 51,
-	LENGTH_UNIT_KEYWORD: 52,
-	AREA_UNIT_KEYWORD: 53,
-	ANGULAR_UNIT_KEYWORD: 54,
-	VOLUME_UNIT_KEYWORD: 55,
-
-	COMMA: 99,
-	OPEN_PARENTHESIS: 100,
-	CLOSE_PARENTHESIS: 101,
-
-	EOF: 1000,
-}
 
 /**
  * @typedef {Object} Token
@@ -585,9 +586,11 @@ function calc(input) {
 			case TokenKind.NUMBER: {
 				let ret = Number(eat().token)
 
-				if (at()?.tokenKind === TokenKind.WORD || at()?.tokenKind === TokenKind.OPEN_PARENTHESIS) {
-					ret *= primaryExpression()
-				}
+				if (
+					at()?.tokenKind === TokenKind.WORD ||
+					at()?.tokenKind === TokenKind.OPEN_PARENTHESIS
+				) ret *= primaryExpression()
+
 				return ret
 			}
 

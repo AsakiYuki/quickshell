@@ -47,7 +47,7 @@ DropPanel {
             width: 300
 
             OverflowScrollText {
-              text: Mpris.current.trackTitle || "Unknown Track"
+              text: topbar.musicPlayer.trackTitle || "Unknown Track"
               maxWidth: 300
 
               textComponent: StyledText {
@@ -57,7 +57,7 @@ DropPanel {
             }
 
             OverflowScrollText {
-              text: `${Mpris.current.trackArtists}${Mpris.current.trackAlbum ? ` - ${Mpris.current.trackAlbum}` : ""}`
+              text: `${topbar.musicPlayer.trackArtists}${topbar.musicPlayer.trackAlbum ? ` - ${topbar.musicPlayer.trackAlbum}` : ""}`
               maxWidth: 300
 
               textComponent: StyledText {
@@ -162,6 +162,12 @@ DropPanel {
           }
         }
       }
+
+      // Image {
+      //   width: parent.width
+      //   height: width
+      //   source: topbar.musicPlayer.bigTrackArtUrl
+      // }
     }
   }
 }

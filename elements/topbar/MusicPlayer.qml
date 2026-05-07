@@ -15,6 +15,10 @@ SimpleButton {
     readonly property string ciderToken: "rqwqpw7m99wazqxzg05z2em3"
     property list<var> lyrics: []
 
+    property string trackTitle: ""
+    property string trackArtists: ""
+    property string trackAlbum: ""
+
     property int currentLyricLine: 0
     property double realLength: 0
     property double timeOffset: 0
@@ -63,24 +67,36 @@ SimpleButton {
     onMetadataChanged: {
         root.lyrics = [];
         root.realLength = currentLyricLine = 0;
+
+        root.trackTitle = Mpris.current?.trackTitle || ""
+        root.trackArtists = Mpris.current?.trackArtists || ""
+        root.trackAlbum = Mpris.current?.trackAlbum || ""
+
         if (Mpris.current?.identity === "Cider") {
             const currentId = ++root.fetchId;
             root.timeOffset = Mpris.current?.position;
             HttpRequest.fetchJson("http://localhost:10767/api/v1/playback/now-playing", { headers: { apptoken: root.ciderToken }}).then(({ info }) =>
             {
-                if (currentId !== root.fetchId)
-                    return;
+                if (currentId !== root.fetchId) return;
+
                 root.timeOffset -= info.currentPlaybackTime;
                 root.realLength = info.durationInMillis / 1000;
-
-                if (!info.hasLyrics)
-                    return;
 
                 const id = info.playParams.catalogId || info.playParams.id;
                 const name = info.name;
                 const artist = info.artistName;
                 const album = info.albumName;
                 const duration = info.durationInMillis;
+
+                root.trackTitle = name;
+                root.trackArtists = artist;
+                root.trackAlbum = album;
+                // root.bigTrackArtUrl = info.artwork.url;
+
+                console.log(JSON.stringify(info, null, 2))
+
+                if (!info.hasLyrics)
+                    return;
 
                 console.info(`Fetching lyrics for ${name} - ${artist}`);
                 const callback = () => fetchAppleMxmLyrics({ id, name, artist, album, duration }).then(v => { if (currentId === root.fetchId) root.lyrics = v; });
@@ -250,13 +266,13 @@ SimpleButton {
                 Behavior on opacity { NumberAnimation { duration: 150 } }
 
                 OverflowScrollText {
-                    text: Mpris.current?.trackTitle || "Unknown Track"
+                    text: root.trackTitle || "Unknown Track"
                     paused: !nameText.opacity
                     textComponent: StyledText { font.pixelSize: 12 }
                 }
 
                 OverflowScrollText {
-                    text: `${Mpris.current?.trackArtists}${Mpris.current?.trackAlbum ? ` - ${Mpris.current?.trackAlbum}` : ""}`
+                    text: `${root.trackArtists}${root.trackAlbum ? ` - ${root.trackAlbum}` : ""}`
                     paused: !nameText.opacity
                     textComponent: StyledText { font.pixelSize: 12; color: Catppuccin.subtext0 }
                 }
