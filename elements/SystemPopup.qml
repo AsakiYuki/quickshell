@@ -16,26 +16,20 @@ Loader {
 
     readonly property bool touchpad: configuration.touchpad
     onTouchpadChanged: {
-        if (touchpad)
-            setPopup("touchpad_mouse.png", "Touchpad enabled");
-        else
-            setPopup("touchpad_mouse_off.png", "Touchpad disabled");
+        if (touchpad) setPopup("touchpad_mouse.png", "Touchpad enabled");
+        else setPopup("touchpad_mouse_off.png", "Touchpad disabled");
     }
 
     readonly property bool capslock: configuration.capsLock
     onCapslockChanged: {
-        if (capslock)
-            setPopup("shift_lock.png", "Caps Lock is on");
-        else
-            setPopup("shift_lock_off.png", "Caps Lock is off");
+        if (capslock) setPopup("shift_lock.png", "Caps Lock is on");
+        else setPopup("shift_lock_off.png", "Caps Lock is off");
     }
 
     readonly property bool hdr: configuration.hdr
     onHdrChanged: {
-        if (hdr)
-            setPopup("hdr_on.png", "HDR is on");
-        else
-            setPopup("hdr_off.png", "HDR is off");
+        if (hdr) setPopup("hdr_on.png", "HDR is on");
+        else setPopup("hdr_off.png", "HDR is off");
     }
 
     function setPopup(_icon, _message) {
@@ -96,7 +90,13 @@ Loader {
                 ScrollText {
                     id: _text
                     text: _loader.notifyText
-                    onTextChanged: _popup_timeout.restart()
+                    onTextChanged: {
+                        if (exitAnim.running) {
+                            exitAnim.stop();
+                            enterAnim.restart();
+                        }
+                        _popup_timeout.restart()
+                    }
                     viewHeight: parent.height
                     anchors.centerIn: parent
 
@@ -155,9 +155,7 @@ Loader {
             id: _popup_timeout
             interval: 2500
             running: true
-            onTriggered: {
-                exitAnim.start();
-            }
+            onTriggered: exitAnim.start();
         }
     }
 }
