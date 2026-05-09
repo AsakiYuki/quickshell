@@ -316,6 +316,9 @@ const func = {
 		if (typeof input === "number") return input;
 		else return input.value; 
 	},
+
+	// Exp minus Log function : eml(x, y) = e^x - ln(y)
+	eml: (x, y) => Math.pow(Math.E, x) - Math.log(y),
 	
 	random: () => Math.random(),
 };
