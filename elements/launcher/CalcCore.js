@@ -316,7 +316,11 @@ const func = {
 		else return input.value; 
 	},
 
-	eml: (x, y) => Math.exp(x) - Math.log(y),
+	eml: (x, y) => {
+		ensureNumber(x, "x");
+		ensureNumber(y, "y");
+		return Math.exp(x) - Math.log(y)
+	},
 	
 	random: () => Math.random(),
 };
