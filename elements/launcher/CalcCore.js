@@ -57,7 +57,9 @@ const DataType = {
 	LENGTH: 0,
 	AREA: 1,
 	VOLUME: 2,
-	ANGULAR: 3
+	ANGULAR: 3,
+
+	VECTOR: 100
 }
 
 /**
@@ -107,8 +109,7 @@ function execBinary(a, b, operation) {
 	if (typeof a === "number") {
 		if (typeof b === "number") return operation(a, b);
 		else {
-			if (b === undefined) 
-				throw new Error("Invalid unit object: missing unit, type, or value");
+			if (b === undefined) throw new Error("Invalid unit object: missing unit, type, or value");
 
 			const {unit, type, value} = b;
 			return { unit, type, value: operation(a, value) }
@@ -321,6 +322,18 @@ const func = {
 		ensureNumber(y, "y");
 		return Math.exp(x) - Math.log(y)
 	},
+
+	// vec: (x, y, z) => {
+	// 	ensureNumber(x);	
+	// 	ensureNumber(y);	
+	// 	if (z !== undefined) ensureNumber(z);
+		
+	// 	return  {
+	// 		unit: (z === undefined) ? 2 : 3,
+	// 		type: DataType.VECTOR,
+	// 		value: [x, y, z]
+	// 	}	
+	// },
 	
 	random: () => Math.random(),
 };
@@ -686,6 +699,11 @@ function calc(input) {
             const isSpecial = specialUnits.includes(output.unit);
             const unitDisplay = isSpecial ? output.unit : `${output.unit.substring(0, output.unit.length - 1)}\u00B3`;
             return `${output.value}${unitDisplay}`;
+		}
+
+		case DataType.VECTOR: {
+			if (output.unit === 2) return `vector(${output.value[0]}, ${output.value[1]})`;
+			else return `vector(${output.value[0]}, ${output.value[1]}, ${output.value[2]})`;
 		}
         
         default: return output.value;
