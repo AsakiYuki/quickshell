@@ -205,6 +205,11 @@ const func = {
 		return Math.cbrt(v);
 	}),
 
+	root: (input, base) => {
+		ensureNumber(input);
+		return Math.pow(input, 1 / base)
+	},
+
 	pow: (a, b) => {
 		ensureNumber(a, "base");
 		ensureNumber(b, "exponent");
@@ -277,11 +282,13 @@ const func = {
 		return Math.atan2(y, x);
 	},
 
-	log: (x, base) => {
-		if (base === undefined) return Math.log(x);
-		if (base === 2) return Math.log2(x);
-		if (base === 10) return Math.log10(x);
-		return Math.log(x) / Math.log(base);
+	log: (input, base) => {
+		ensureNumber(input, "x");
+		if (base === undefined) return Math.log(input);
+		else ensureNumber(base, "base");
+		if (base === 2) return Math.log2(input);
+		if (base === 10) return Math.log10(input);
+		return Math.log(input) / Math.log(base);
 	},
 
 	exp: v => resMathFunc(v, v => {
@@ -306,7 +313,6 @@ const func = {
 		else return input.value; 
 	},
 
-	// Exp minus Log function : eml(x, y) = e^x - ln(y)
 	eml: (x, y) => Math.exp(x) - Math.log(y),
 	
 	random: () => Math.random(),
