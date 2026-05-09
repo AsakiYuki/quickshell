@@ -277,23 +277,12 @@ const func = {
 		return Math.atan2(y, x);
 	},
 
-	log: v => resMathFunc(v, v => {
-		ensureNumber(v);
-		ensurePositive(v, "log input");
-		return Math.log(v);
-	}),
-
-	log10: v => resMathFunc(v, v => {
-		ensureNumber(v);
-		ensurePositive(v, "log10 input");
-		return Math.log10(v);
-	}),
-
-	log2: v => resMathFunc(v, v => {
-		ensureNumber(v);
-		ensurePositive(v, "log2 input");
-		return Math.log2(v);
-	}),
+	log: (x, base) => {
+		if (base === undefined) return Math.log(x);
+		if (base === 2) return Math.log2(x);
+		if (base === 10) return Math.log10(x);
+		return Math.log(x) / Math.log(base);
+	},
 
 	exp: v => resMathFunc(v, v => {
 		ensureNumber(v);
@@ -318,7 +307,7 @@ const func = {
 	},
 
 	// Exp minus Log function : eml(x, y) = e^x - ln(y)
-	eml: (x, y) => Math.pow(Math.E, x) - Math.log(y),
+	eml: (x, y) => Math.exp(x) - Math.log(y),
 	
 	random: () => Math.random(),
 };
