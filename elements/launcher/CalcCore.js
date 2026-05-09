@@ -206,8 +206,11 @@ const func = {
 	}),
 
 	root: (input, base) => {
-		ensureNumber(input);
-		return Math.pow(input, 1 / base)
+		ensureNumber(input, "input");
+		ensureNumber(base, "base");
+		if (base === 2) return Math.sqrt(input);
+		if (base === 3) return Math.cbrt(input);
+		return input ** (1/base);
 	},
 
 	pow: (a, b) => {
