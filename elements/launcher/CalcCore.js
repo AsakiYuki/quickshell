@@ -1,17 +1,28 @@
 .pragma library
 
-
 const constant = {
-	e: Math.E,
-	ln10: Math.LN10,
-	ln2: Math.LN2,
-	log10e: Math.LOG10E,
-	log2e: Math.LOG2E,
-	pi: Math.PI,
-	sqrt1_2: Math.SQRT1_2,
-	sqrt2: Math.SQRT2,
-	random: Math.random,
-}
+    e: Math.E,
+    ln10: Math.LN10,
+    ln2: Math.LN2,
+    log10e: Math.LOG10E,
+    log2e: Math.LOG2E,
+    pi: Math.PI,
+    sqrt1_2: Math.SQRT1_2,
+    sqrt2: Math.SQRT2,
+
+    tau: Math.PI * 2,
+    phi: (1 + Math.sqrt(5)) / 2,
+
+    c: 299792458,
+    g: 9.80665,
+    g_const: 6.67430e-11,
+    h: 6.62607015e-34,
+    k: 1.380649e-23,
+    avogadro: 6.02214076e23,
+
+	sw: undefined,
+	sh: undefined,
+};
 
 const keywords = new Set(["to", "in"])
 const lengthUnits = new Set(["km", "hm", "dam", "m", "dm", "cm", "mm"])
@@ -323,6 +334,144 @@ const func = {
 		return Math.exp(x) - Math.log(y)
 	},
 
+	mod: (x, y) => {
+		ensureNumber(x, "x");
+		ensureNumber(y, "y");
+		return x % y;
+	},
+
+	clamp: (x, min, max) => {
+        ensureNumber(x);
+        ensureNumber(min);
+        ensureNumber(max);
+        if (min > max) throw new Error("clamp: min cannot be greater than max");
+        return Math.min(Math.max(x, min), max);
+    },
+
+	lerp: (a, b, t) => {
+		ensureNumber(a);
+		ensureNumber(b);
+		ensureNumber(t);
+		return a + (b - a) * t;
+	},
+
+	fract: (x) => {
+		ensureNumber(x);
+		return x - Math.floor(x);
+	},
+
+	factorial: (x) => {
+		let factorial = 1;
+		for (let i = 2; i <= x; i++) factorial *= i;
+		return factorial;
+	},
+
+	ncr: (n, r) => {
+        ensureNumber(n, "n");
+        ensureNumber(r, "r");
+        if (r < 0 || r > n) return 0;
+        if (!Number.isInteger(n) || !Number.isInteger(r)) throw new Error("nCr arguments must be integers");
+        let res = 1;
+        for (let i = 1; i <= r; i++) 
+            res = res * (n - r + i) / i;
+        return Math.round(res);
+    },
+
+	npr: (n, r) => {
+        ensureNumber(n, "n");
+        ensureNumber(r, "r");
+        if (r < 0 || r > n) return 0;
+        if (!Number.isInteger(n) || !Number.isInteger(r)) throw new Error("nPr arguments must be integers");
+        let res = 1;
+        for (let i = 0; i < r; i++) {
+            res *= (n - i);
+        }
+        return res;
+    },
+
+	gcd: (...args) => {
+        if (args.length < 2) throw new Error("gcd requires at least 2 arguments");
+        args.forEach((v, i) => {
+            ensureNumber(v, `arg[${i}]`);
+            if (!Number.isInteger(v)) throw new TypeError(`gcd arguments must be integers, got ${v}`);
+        });
+
+        const _gcd2 = (a, b) => {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                a %= b;
+                [a, b] = [b, a];
+            }
+            return a;
+        };
+
+        return args.reduce((acc, curr) => _gcd2(acc, curr));
+    },
+
+	lcm: (...args) => {
+        if (args.length < 2) throw new Error("lcm requires at least 2 arguments");
+        args.forEach((v, i) => {
+            ensureNumber(v, `arg[${i}]`);
+            if (!Number.isInteger(v)) throw new TypeError(`lcm arguments must be integers, got ${v}`);
+        });
+
+        const _gcd2 = (a, b) => {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                a %= b;
+                [a, b] = [b, a];
+            }
+            return a;
+        };
+
+        const _lcm2 = (a, b) => {
+            if (a === 0 || b === 0) return 0;
+            return Math.abs(a) * (Math.abs(b) / _gcd2(a, b));
+        };
+
+        return args.reduce((acc, curr) => _lcm2(acc, curr));
+    },
+
+	mean: (...args) => {
+        if (args.length === 0) throw new Error("mean requires at least 1 argument");
+        args.forEach((v, i) => ensureNumber(v, `arg[${i}]`));
+        
+        const sum = args.reduce((acc, curr) => acc + curr, 0);
+        return sum / args.length;
+    },
+
+    median: (...args) => {
+        if (args.length === 0) throw new Error("median requires at least 1 argument");
+        args.forEach((v, i) => ensureNumber(v, `arg[${i}]`));
+
+        const sorted = [...args].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+
+        if (sorted.length % 2 === 0) {
+            return (sorted[mid - 1] + sorted[mid]) / 2;
+        }
+        return sorted[mid];
+    },
+
+    std: (...args) => {
+        if (args.length === 0) throw new Error("std requires at least 1 argument");
+        args.forEach((v, i) => ensureNumber(v, `arg[${i}]`));
+
+        const n = args.length;
+        const mean = args.reduce((acc, curr) => acc + curr, 0) / n;
+        
+        const variance = args.reduce((acc, curr) => acc + Math.pow(curr - mean, 2), 0) / n;
+        
+        return Math.sqrt(variance);
+    },
+
+    sum: (...args) => {
+        args.forEach((v, i) => ensureNumber(v, `arg[${i}]`));
+        return args.reduce((acc, curr) => acc + curr, 0);
+    },
+
 	// vec: (x, y, z) => {
 	// 	ensureNumber(x);	
 	// 	ensureNumber(y);	
@@ -368,7 +517,6 @@ function calc(input) {
 	function expression() { return bitwiseExpression() }
 
 	function bitwiseExpression() {
-		/** @type {Token} */
 		let current = at()
 		if (current && current.tokenKind === TokenKind.OPERATOR && current.token === "!") {
 			eat()
@@ -382,9 +530,9 @@ function calc(input) {
 			const right = bitshiftExpression()
 
 			switch (operator.token) {
-				case "&": return execBinary(left, right, (l, r) => l & r)
-				case "^": return execBinary(left, right, (l, r) => l ^ r)
-				case "|": return execBinary(left, right, (l, r) => l | r)
+				case "&": left = execBinary(left, right, (l, r) => l & r); break;
+				case "^": left = execBinary(left, right, (l, r) => l ^ r); break;
+				case "|": left = execBinary(left, right, (l, r) => l | r); break;
 			}
 		}
 		
@@ -393,8 +541,6 @@ function calc(input) {
 
 	function bitshiftExpression() {
 		let left = additiveExpression()
-
-		/** @type {Token} */
 		let current
 
 		while (
@@ -406,9 +552,9 @@ function calc(input) {
 			const right = additiveExpression()
 
 			switch (operator.token) {
-				case "<<": return execBinary(left, right, (l, r) => l << r);
-				case ">>": return execBinary(left, right, (l, r) => l >> r);
-				case ">>>": return execBinary(left, right, (l, r) => l  >>> r);
+				case "<<": left = execBinary(left, right, (l, r) => l << r); break;
+				case ">>": left = execBinary(left, right, (l, r) => l >> r); break;
+				case ">>>": left = execBinary(left, right, (l, r) => l >>> r); break;
 			}
 		}
 
@@ -417,17 +563,15 @@ function calc(input) {
 
 	function additiveExpression() {
 		let left = multiplicativeExpression()
-
-		/** @type {Token} */
 		let current
 
 		while ((current = at()) && current.tokenKind === TokenKind.OPERATOR && ["+", "-"].includes(current.token)) {
 			const operator = eat()
-			const right = additiveExpression()
+			const right = multiplicativeExpression()
 
 			switch (operator.token) {
-				case "+": return execBinary(left, right, (l, r) => l + r);
-				case "-": return execBinary(left, right, (l, r) => l - r);
+				case "+": left = execBinary(left, right, (l, r) => l + r); break;
+				case "-": left = execBinary(left, right, (l, r) => l - r); break;
 			}
 		}
 
@@ -436,20 +580,18 @@ function calc(input) {
 
 	function multiplicativeExpression() {
 		let left = openParenthesisMultilicationExpression()
-
-		/** @type {Token} */
 		let current
 
 		while ((current = at()) && current.tokenKind === TokenKind.OPERATOR && ["*", "/", "%"].includes(current.token)) {
 			const operator = eat()
-			const right = multiplicativeExpression()
+			const right = openParenthesisMultilicationExpression()
 
 			if ((operator.token === "/" || operator.token === "%") && right === 0) {
 				throw new Error(`Division by zero: Cannot perform '${operator.token}' when the divisor is 0.`)
 			}
 
 			switch (operator.token) {
-				case "*": return multiplicative(left, right);
+				case "*": left = multiplicative(left, right); break;
 				case "/": {
 					const output = execBinary(left, right, (l, r) => l / r)
 					if (left.type === DataType.AREA && right.type === DataType.AREA) {
@@ -457,10 +599,13 @@ function calc(input) {
 						if (output.unit === "a") output.unit = "dam";
 						else if (output.unit === "ha") output.unit = "hm";
 						else output.unit = output.unit.substring(0, output.unit.length - 1);
-					} else if (typeof left !== "number" && left.type === right.type) throw new Error(`Invalid operation: division between same types!`);
-					return output;
-				};
-				case "%": return execBinary(left, right, (l, r) => l % r);
+					} else if (typeof left !== "number" && left.type === right.type) {
+						throw new Error(`Invalid operation: division between same types!`);
+					}
+					left = output;
+					break;
+				}
+				case "%": left = execBinary(left, right, (l, r) => l % r); break;
 			}
 		}
 
@@ -469,36 +614,36 @@ function calc(input) {
 
 	function openParenthesisMultilicationExpression() {
 		let left = unitNumberMultilicationExpression()
-
-		/** @type {Token} */
 		let current
 
-		while ((current = at()) && current.tokenKind === TokenKind.OPEN_PARENTHESIS)
-			return multiplicative(left, openParenthesisMultilicationExpression());
+		while ((current = at()) && current.tokenKind === TokenKind.OPEN_PARENTHESIS) {
+			const right = unitNumberMultilicationExpression()
+			left = multiplicative(left, right)
+		}
 
 		return left
 	}
 
 	function unitNumberMultilicationExpression() {
-		let left = powerExpression();
-
-		/** @type {Token} */
+		let left = powerExpression()
 		let current
-		while ((current = at()) && current.tokenKind === TokenKind.NUMBER)
-			return multiplicative(left, unitNumberMultilicationExpression());
 
-		return left;
+		while ((current = at()) && current.tokenKind === TokenKind.NUMBER) {
+			const right = powerExpression()
+			left = multiplicative(left, right)
+		}
+
+		return left
 	}
 
 	function powerExpression() {
 		let left = factorialExpression()
-
-		/** @type {Token} */
 		let current
 
-		if ((current = at()) && current?.tokenKind === TokenKind.OPERATOR && current?.token === "**") {
+		if ((current = at()) && current.tokenKind === TokenKind.OPERATOR && current.token === "**") {
 			eat()
-			return execBinary(left, powerExpression(), (l, r) => Math.pow(l, r));
+			const right = powerExpression()
+			return execBinary(left, right, (l, r) => Math.pow(l, r));
 		}
 
 		return left
@@ -506,36 +651,25 @@ function calc(input) {
 
 	function factorialExpression() {
 		let left = unitConversion()
-
-		/** @type {Token} */
 		let current
 
 		while ((current = at()) && current.tokenKind === TokenKind.OPERATOR && current.token === "!") {
-			if (left === undefined) return left;
-			
 			eat()
 			if (left < 0 || !Number.isInteger(typeof left === "number" ? left : left.value)) {
 				throw new Error("Factorial is only defined for non-negative integers.")
 			}
-
-			return execUnary(left, (value) => {
-				let factorial = 1;
-				for (let i = 2; i <= value; i++) factorial *= i;
-				return factorial;
-			})
+			left = execUnary(left, func.factorial)
 		}
 
 		return left
 	}
 
 	function unitConversion() {
-		let left = unitExpression();
-
-		/** @type {Token} */
+		let left = unitExpression()
 		let current
 
-		while ((current = at()) && (current.tokenKind === TokenKind.KEYWORD) && (["to", "in"], current.token)) {
-			const operator = eat();
+		while ((current = at()) && current.tokenKind === TokenKind.KEYWORD && (current.token === "to" || current.token === "in")) {
+			const operator = eat()
 			if (!at()) throw new Error(`Missing target unit after '${operator.token}'`); 
 			const targetDatatype = getDataType(at().tokenKind);
 
@@ -548,21 +682,25 @@ function calc(input) {
 				case DataType.AREA: {
 					const unit = eat().token;
 					const lookup = [lengthLookup, areaLookup, volumeLookup][targetDatatype];
-					return {
+					left = {
 						unit: unit,
 						type: targetDatatype,
 						value: left.value * lookup[left.unit] / lookup[unit]
 					}
+					break;
 				}
 
 				case DataType.ANGULAR: {
 					const unit = eat().token
-					if (left.unit === unit) return { unit, type: targetDatatype, value: left.value };
-
-					return {
-						unit, type: targetDatatype,
-						value: left.value * ((unit === "rad") ? (Math.PI / 180) : (180 / Math.PI))
+					if (left.unit === unit) {
+						left = { unit, type: targetDatatype, value: left.value };
+					} else {
+						left = {
+							unit, type: targetDatatype,
+							value: left.value * ((unit === "rad") ? (Math.PI / 180) : (180 / Math.PI))
+						}
 					}
+					break;
 				}
 
 				default: throw new Error("Unsupported unit type");
@@ -573,9 +711,7 @@ function calc(input) {
 	}
 
 	function unitExpression() {
-		let left = primaryExpression();
-
-		/** @type {Token} */
+		let left = primaryExpression()
 		let current
 		
 		while ((current = at()) && [
@@ -585,7 +721,7 @@ function calc(input) {
 			TokenKind.VOLUME_UNIT_KEYWORD
 		].includes(current.tokenKind)) {
 			if (left === undefined) throw new Error("Missing value for conversion");
-			return {
+			left = {
 				unit: at().token,
 				type: getDataType(eat().tokenKind),
 				value: left
@@ -607,7 +743,7 @@ function calc(input) {
 				if (
 					at()?.tokenKind === TokenKind.WORD ||
 					at()?.tokenKind === TokenKind.OPEN_PARENTHESIS
-				) ret *= primaryExpression()
+				) ret = multiplicative(ret, primaryExpression())
 
 				return ret
 			}
@@ -635,9 +771,13 @@ function calc(input) {
 					const functionToCall = func[name]
 					if (!functionToCall) throw Error(`Unknown function: ${name}`)
 
-					const output = functionToCall(...args);
-                    if ([TokenKind.WORD, TokenKind.NUMBER].includes(at()?.tokenKind)) return output * primaryExpression();
-                    else return output;
+					let output = functionToCall(...args);
+
+                    if ([TokenKind.WORD, TokenKind.NUMBER].includes(at()?.tokenKind)) {
+						output = multiplicative(output, primaryExpression())
+					}
+
+                    return output;
 				} else {
 					const constValue = constant[name]
 					if (constValue === undefined) throw Error(`Invalid constant or function name: ${name}`)
@@ -648,7 +788,7 @@ function calc(input) {
 
 			case TokenKind.OPEN_PARENTHESIS: {
 				eat()
-				const output = expression()
+				let output = expression()
 
 				if (at()?.tokenKind !== TokenKind.CLOSE_PARENTHESIS) throw Error("Expected closing parenthesis ')'")
 				eat()
@@ -658,7 +798,7 @@ function calc(input) {
 					at()?.tokenKind === TokenKind.WORD ||
 					at()?.tokenKind === TokenKind.OPEN_PARENTHESIS
 				) {
-					return multiplicative(output, primaryExpression());
+					output = multiplicative(output, primaryExpression());
 				}
 
 				return output

@@ -31,6 +31,11 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        CalcCore.constant.sw = Screen.width;
+        CalcCore.constant.sh = Screen.height;
+    }
+
     Column {
         anchors.centerIn: parent
 
