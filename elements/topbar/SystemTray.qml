@@ -97,7 +97,7 @@ Rectangle {
                             if (_root.isTrayDragging) {
                                 _root.isTrayDragging = false;
                                 const { x, y } = this.mapToGlobal(ev.x, ev.y);
-                                if (Utils.isMouseInsideTargetElement(x, y, 0, 0, _moreTrayButton)) {
+                                if (Utils.isMouseInsideTargetElement(x, y, 0, 0, _moreTrayButton) || (overlay.systemTray !== null && Utils.isMouseInsideTargetElement(x, y, 0, 0, overlay.systemTray))) {
                                     configuration.hideTrayID.push([modelData.id, modelData.tooltipTitle, modelData.title].join("&"));
                                 }
                             } else modelData.activate();

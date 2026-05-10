@@ -13,7 +13,10 @@ DropPanel {
     active: SharedState.overlayDropPanelType === 2
 
     anchors.right: parent.right
-    onActiveChanged: anchors.rightMargin = (overlay.width - (topbar.systemTrayElement.width + topbar.systemTrayElement.mapToGlobal(0, 0).x))
+    onActiveChanged: {
+        anchors.rightMargin = (overlay.width - (topbar.systemTrayElement.width + topbar.systemTrayElement.mapToGlobal(0, 0).x));
+        overlay.systemTray = active ? this : null;
+    }
 
     viewY: 5
 

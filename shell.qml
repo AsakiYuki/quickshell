@@ -16,7 +16,11 @@ ShellRoot {
 
     Modules.FileSystem { id: fs }
     Modules.Configuration { id: configuration }
-    Modules.Overlay { id: overlay }
+    
+    Modules.Overlay {
+        id: overlay
+        property var systemTray: null;
+    }
     
     Modules.Topbar {
         id: topbar
