@@ -93,8 +93,6 @@ SimpleButton {
                 root.trackAlbum = album;
                 // root.bigTrackArtUrl = info.artwork.url;
 
-                console.log(JSON.stringify(info, null, 2))
-
                 if (!info.hasLyrics)
                     return;
 

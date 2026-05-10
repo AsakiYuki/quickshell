@@ -128,9 +128,15 @@ DropPanel {
                 return;
             }
 
-            if (ev.modifiers > Qt.NoModifier) return;
 
-            if (commandContainer.spotMode === 3) return
+            if (commandContainer.spotMode === 3) {
+                if (ev.key === Qt.Key_Return || ev.key === Qt.Key_Enter)
+                    _caculator.copyResult()
+                return
+            }
+
+            if (ev.modifiers > Qt.NoModifier) return;
+            
             switch (ev.key) {
             case Qt.Key_Down:
                 _root.goDown();
