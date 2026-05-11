@@ -62,10 +62,7 @@ Scope {
         path: Paths.settings
         onLoaded: {
             let data = {};
-            try {
-                data = JSON.parse(text());
-            } catch(err) {}
-            
+            try { data = JSON.parse(text()); } catch(err) {}
 
             _configuration.wallpaper = data.wallpaper ?? "wallpaper-0.jpg";
             _configuration.touchpad = data.touchpad ?? true;
@@ -74,14 +71,14 @@ Scope {
             _configuration.hideTrayID = data.hideTrayID || [];
             _configuration.searchScores = data.searchScores || {};
 
-            chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => _configuration.touchpad = v.trim() === "yes");
+            chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => _configuration.capsLock = v.trim() === "yes");
         }
     }
 
     Timer {
         id: _save
         running: false
-        interval: 1000
-        onTriggered: configuration.setText(JSON.stringify(_configuration))
+        interval: 200
+        onTriggered: if (configuration.loaded) configuration.setText(JSON.stringify(_configuration))
     }
 }
