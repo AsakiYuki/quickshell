@@ -72,9 +72,9 @@ Scope {
             _configuration.hdr = data.hdr || false;
             _configuration.trayIndex = data.trayIndex  || {};
             _configuration.hideTrayID = data.hideTrayID || [];
-            _configuration.searchScores = data.searchScores = {};
+            _configuration.searchScores = data.searchScores || {};
 
-            chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => capsLock = v.trim() === "yes");
+            chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => _configuration.touchpad = v.trim() === "yes");
         }
     }
 

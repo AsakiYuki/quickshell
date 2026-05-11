@@ -9,12 +9,7 @@ SearchList {
     readonly property var junkRe: /Proton|Runtime|SDK|Steamworks|Soundtrack/
     readonly property var iconRe: /^(\d+)\/([a-f0-9]+\.jpg)$/
 
-    function scoreFn(r) {
-        if (r[0].score > 0) {
-            const clickCount = configuration.getSearchScore("gamelauncher", r.obj.entry.appid);
-            return (r[0].score * 0.9 + r[1].score * 0.1) + (Math.log(1 + clickCount) * 0.1);
-        } else return 0;
-    }
+    searchScoreName: "gamelauncher"
 
     Component.onCompleted: {
         const steamCache = `${Paths.steam}/appcache/librarycache`

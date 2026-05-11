@@ -6,11 +6,19 @@ Singleton {
     readonly property list<var> commands: [
         {
             allowTyping: true,
-            name: "Steam Game Launcher",
+            name: "Steam game launcher",
             comment: "Quickly launch your favorite Steam games",
             icon: "../../assets/services/steam.png",
             textfieldPlaceHolder: "Find a game to play...",
             target: "GameLauncher"
+        },
+        {
+            allowTyping: true,
+            name: "Open recent code project",
+            comment: "Quickly open your recent VSCode projects",
+            icon: "../../assets/icons/folder_code.png",
+            textfieldPlaceHolder: "Search projects...",
+            target: "VSCodeLauncher"
         },
         {
             allowTyping: false,
