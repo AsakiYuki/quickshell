@@ -1,4 +1,6 @@
 import Quickshell
+import Quickshell.Io
+
 import QtQuick
 
 import "../core"
@@ -37,7 +39,6 @@ Scope {
         save();
     }
 
-    function save() { _save.restart() }
     onTrayIndexChanged: save()
     onWallpaperChanged: save()
     onHideTrayIDChanged: { save(); if (SystemTray.hideTrayID !== hideTrayID) SystemTray.hideTrayID = hideTrayID; }
@@ -52,31 +53,35 @@ Scope {
         ]);
     }
 
+    function save() {
+        if (configuration.loaded) _save.restart()
+    }
+    
+    FileView {
+        id: configuration
+        path: Paths.settings
+        onLoaded: {
+            let data = {};
+            try {
+                data = JSON.parse(text());
+            } catch(err) {}
+            
+
+            _configuration.wallpaper = data.wallpaper ?? "wallpaper-0.jpg";
+            _configuration.touchpad = data.touchpad ?? true;
+            _configuration.hdr = data.hdr || false;
+            _configuration.trayIndex = data.trayIndex  || {};
+            _configuration.hideTrayID = data.hideTrayID || [];
+            _configuration.searchScores = data.searchScores = {};
+
+            chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => capsLock = v.trim() === "yes");
+        }
+    }
+
     Timer {
         id: _save
         running: false
         interval: 1000
-        onTriggered: { fs.writefile(Paths.settings, JSON.stringify(_configuration)); }
-    }
-
-    Component.onCompleted: {
-        fs.readfile(Paths.settings).then(v => {
-            const data = JSON.parse(v);
-            wallpaper = data.wallpaper ?? "wallpaper-0.jpg";
-            touchpad = data.touchpad ?? true;
-            hdr = data.hdr || false;
-            trayIndex = data.trayIndex ?? {};
-            hideTrayID = data.hideTrayID ?? [];
-            searchScores = data.searchScores ?? {};
-        }).catch(err => {
-            wallpaper = "wallpaper-0.jpg";
-            touchpad = true;
-            hdr = false;
-            trayIndex = {};
-            hideTrayID = [];
-            searchScores = {};
-        });
-
-        chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => capsLock = v.trim() === "yes");
+        onTriggered: configuration.setText(JSON.stringify(_configuration))
     }
 }
