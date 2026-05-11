@@ -1,73 +1,68 @@
+import QtQuick
+
 import Quickshell
+import Quickshell.Io
 
 Scope {
     id: _root
 
+    property Component fileViewComponent: FileView {
+        watchChanges: false
+    }
+
     function readdir(path, hidden) {
         return new Promise(res => {
-            chillProcess.exec(hidden ? ["ls", "-a", path] : ["ls", path], out => res(out.trim().split("\n")));
-        });
+            const cmd = hidden
+                ? ["bash", "-c", `ls -A "${path}"`]
+                : ["bash", "-c", `ls "${path}"`]
+            chillProcess.exec(cmd, out =>
+                res(out.trim() ? out.trim().split("\n") : [])
+            )
+        })
     }
 
     function readdirrec(dir, hidden) {
         return new Promise((res, rej) => {
-            chillProcess.exec(
-                hidden ? ["ls", "-aR", dir] : ["ls", "-R", dir],
-                (out, err) => {
-                    if (err) return rej(err);
-
-                    const lines = out.split("\n");
-                    const result = [];
-
-                    let current = "";
-
-                    for (let line of lines) {
-                        line = line.trim();
-                        if (!line) continue;
-
-                        if (line.endsWith(":")) {
-                            current = line.slice(0, -1);
-
-                            if (current.startsWith(dir)) {
-                                current = current.slice(dir.length);
-                            }
-
-                            current = current.replace(/^\/+/, "");
-                            continue;
-                        }
-
-                        if (!hidden && line.startsWith(".")) continue;
-                        if (line === "." || line === "..") continue;
-
-                        const path = current
-                            ? current + "/" + line
-                            : line;
-
-                        result.push(path);
-                    }
-
-                    res(result);
-                }
-            );
-        });
+            const cmd = hidden
+                ? ["bash", "-c", `find "${dir}" -mindepth 1 -name '.*' -o -print`]
+                : ["bash", "-c", `find "${dir}" -mindepth 1 ! -name '.*' -printf '%P\n'`]
+            chillProcess.exec(cmd, (out, err) => {
+                if (err?.trim()) return rej(err)
+                res(out.trim() ? out.trim().split("\n") : [])
+            })
+        })
     }
-    
+
     function readfile(path) {
         return new Promise(res => {
-            chillProcess.exec(["cat", path], text => res(text));
-        });
+            const fv = fileViewComponent.createObject(_root)
+            fv.path = path
+            fv.onLoaded.connect(() => {
+                res(fv.text())
+                fv.destroy()
+            })
+        })
+    }
+
+    function readfiles(paths) {
+        return Promise.all(paths.map(p => readfile(p)))
     }
 
     function writefile(path, text) {
-        return new Promise(res => {
-            const safeText = text.replace(/(["$`\\])/g, '\\$1');
-            chillProcess.exec(["bash", "-c", `echo "${safeText}" > "${path}"`], () => res(true));
-        });
+        const fv = fileViewComponent.createObject(_root)
+        fv.path = path
+        fv.setText(text)
+        fv.save()
+        fv.destroy()
+        return Promise.resolve(true)
     }
 
     function exist(path) {
         return new Promise(res => {
-            chillProcess.exec(["bash", "-c", `stat "${path}" >/dev/null 2>&1 && echo 1 || echo 0`], text => res(text.trim() === "1"));
-        });
+            chillProcess.exec(
+                ["bash", "-c", `[ -e "${path}" ] && echo 1 || echo 0`],
+                text => res(text.trim() === "1")
+            )
+        })
     }
 }

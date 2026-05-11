@@ -96,6 +96,7 @@ Item {
 
     function onTextfieldTyping(text) {
         launcherListView.search = text.trim();
+        root.viewIndex = root.selectorIndex = 0;
     }
 
     function onKeyPressed(ev) {

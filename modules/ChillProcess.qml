@@ -1,14 +1,22 @@
+import QtQuick
+
 import Quickshell
+import Quickshell.Io
 
 Scope {
     id: _root
 
+    property Component procComponent: Process {
+        stdout: StdioCollector {}
+    }
+
     function exec(cmd, callback) {
-        const obj = Qt.createQmlObject(`
-            import Quickshell.Io
-            Process { property var callback: () => {}; running: true; stdout: StdioCollector { onStreamFinished: callback(this.text) } }
-        `, _root);
-        obj.callback = text => { if (callback) callback(text); obj.destroy(); };
-        obj.command = cmd;
+        const proc = procComponent.createObject(_root)
+        proc.stdout.onStreamFinished.connect(() => {
+            if (callback) callback(proc.stdout.text)
+            proc.destroy()
+        })
+        proc.command = cmd
+        proc.running = true
     }
 }
