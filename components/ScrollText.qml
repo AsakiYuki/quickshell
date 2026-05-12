@@ -26,6 +26,11 @@ Item {
     clip: true
 
     onTextChanged: {
+        if (moveAnim.running) {
+            sourceText.width = captureText.width
+            sourceText.height = captureText.height
+            sourceText?.item.scheduleUpdate()
+        }
         captureText.text = text.trim();
         moveAnim.restart();
     }
