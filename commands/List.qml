@@ -14,6 +14,14 @@ Singleton {
         },
         {
             allowTyping: true,
+            name: "Waydroid",
+            comment: "Quickly launch your android applications",
+            icon: "../../assets/icons/android.png",
+            textfieldPlaceHolder: "Search a adnroid app...",
+            target: "Waydroid"
+        },
+        {
+            allowTyping: true,
             name: "Open recent code project",
             comment: "Quickly open your recent VSCode projects",
             icon: "../../assets/icons/folder_code.png",

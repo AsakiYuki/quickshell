@@ -13,6 +13,8 @@ Item {
 
     property string searchScoreName: "application"
 
+    property bool showMostUsedOnEmpty: false
+
     property int viewIndex: 0
     property int selectorIndex: 0
 
@@ -170,10 +172,13 @@ Item {
                 return [];
 
             if (search.length === 0) {
-                return preparedEntries.map(e => ({
-                    entry: e.entry,
-                    score: root.defaultScore(e.entry)
-                })).sort((a, b) => b.score - a.score).map(v => v.entry);
+                if (root.showMostUsedOnEmpty)
+                    return preparedEntries.map(e => ({
+                        entry: e.entry,
+                        score: root.defaultScore(e.entry)
+                    })).sort((a, b) => b.score - a.score).map(v => v.entry);
+                else
+                    return root.listEntries
             }
 
             const result = SharedState.search(search, preparedEntries, false, root.scoreFn);

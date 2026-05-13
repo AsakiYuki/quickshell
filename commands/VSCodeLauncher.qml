@@ -7,6 +7,7 @@ SearchList {
     id: root
 
     searchScoreName: "codelauncher"
+    showMostUsedOnEmpty: true
 
     FileView {
         path: `${Paths.config}/Code/User/globalStorage/storage.json`

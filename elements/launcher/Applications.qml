@@ -11,7 +11,7 @@ LauncherListView {
     model: [{ text: "Nothing found!", subtext: "Try searching for something more general...", icon: "../../assets/icons/search_off.png" }]
 
     readonly property list<var> entries: DesktopEntries.applications.values
-        .filter(v => !v.noDisplay)
+        .filter(v => !v.noDisplay && v.categories[0] !== "X-WayDroid-App")
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(a => ({ name: FuzzySort.prepare(a.name), comment: FuzzySort.prepare(a.comment), entry: a }))
 
