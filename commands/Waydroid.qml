@@ -8,13 +8,13 @@ SearchList {
     listEntries: [
         {
             icon: "../../assets/icons/android.png",
-            text: "Start",
+            text: "Session start",
             subtext: "Launch waydroid session",
             execute: () => chillProcess.exec(["waydroid", "show-full-ui"])
         },
         {
             icon: "../../assets/icons/shutdown.png",
-            text: "Stop",
+            text: "Session stop",
             subtext: "Stop current waydroid session",
             execute: () => chillProcess.exec(["waydroid", "session", "stop"])
         },
