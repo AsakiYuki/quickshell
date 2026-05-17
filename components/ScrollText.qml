@@ -13,9 +13,9 @@ Item {
 
     property int viewWidth: 0
     property int viewHeight: 0
-    property int moveSpeed: 350
+    property int moveSpeed: 180
     property int resizeSpeed: 350
-    property int moveEasingType: Easing.OutQuint
+    property int moveEasingType: Easing.OutCubic
     property int resizeEasingType: Easing.OutQuint
     property bool isBottomToTop: false
 

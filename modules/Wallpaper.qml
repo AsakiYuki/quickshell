@@ -1,7 +1,10 @@
 import QtQuick
+import QtMultimedia
+import Qt5Compat.GraphicalEffects
+
 import Quickshell
 import Quickshell.Wayland
-import Qt5Compat.GraphicalEffects
+
 import "../components"
 import "../core"
 
