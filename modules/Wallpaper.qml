@@ -94,12 +94,12 @@ Variants {
                         else play();
                     }
 
+                    muted: true
                     id: sourceVideoWallpaper
                     anchors.fill: parent
                     fillMode: VideoOutput.PreserveAspectCrop
                     autoPlay: true
                     loops: MediaPlayer.Infinite
-                    // muted: true
                     visible: _root.currentShowVideo
 
                     onPlaying: {
