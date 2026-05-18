@@ -21,7 +21,11 @@ Item {
         id: soundVisualizer
         anchors.fill: parent
 
-        property string fillStyle: ColorUtils.opacity(ColorUtils.lighten(wallpaper.avgColor, wallpaper.isLightColor ? -50 : 25), 0.35);
+        property string fillStyle: ColorUtils.opacity(ColorUtils.lighten(wallpaper.avgColor, wallpaper.isLightColor ? -75 : 50), 0.35);
+
+        Behavior on fillStyle {
+            ColorAnimation { duration: 500 }
+        }
 
         onPaint: {
             const ctx = getContext("2d");

@@ -28,7 +28,7 @@ Variants {
 
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Bottom
-            
+
             anchors.top: true
             anchors.bottom: true
             anchors.left: true
@@ -39,19 +39,26 @@ Variants {
             readonly property string mediaSource: wallpaper ? `file://${Paths.wallpapers}/${wallpaper}` : ""
 
             property bool currentShowVideo: isVideo
+            property bool transitioning: false
+            property bool pendingUpdate: false
 
             onWallpaperChanged: {
-                transitionAnimation.stop();
+                if (_root.transitioning) {
+                    _root.pendingUpdate = true;
+                    return;
+                }
+                _root.transitioning = true;
                 shaderWallpaper.opacity = 1;
                 shaderWallpaper.scheduleUpdate();
             }
 
             function finalizeTransition(targetItem) {
-                transitionAnimation.restart();
+                if (!_root.transitioning) return;
                 targetItem.grabToImage(function(result) {
-                    canvas.imageData = result
-                    canvas.requestPaint()
-                }, Qt.size(16, 16))
+                    canvas.imageData = result;
+                    canvas.requestPaint();
+                }, Qt.size(1, 1));
+                transitionAnimation.restart();
             }
 
             OpacityAnimator {
@@ -59,7 +66,16 @@ Variants {
                 target: shaderWallpaper
                 from: 1
                 to: 0
-                duration: 250 
+                duration: 250
+                onStopped: {
+                    _root.transitioning = false;
+                    if (_root.pendingUpdate) {
+                        _root.pendingUpdate = false;
+                        _root.transitioning = true;
+                        shaderWallpaper.opacity = 1;
+                        shaderWallpaper.scheduleUpdate();
+                    }
+                }
             }
 
             Item {
@@ -74,15 +90,27 @@ Variants {
                     visible: !_root.currentShowVideo
 
                     onStatusChanged: {
-                        if (visible && status === Image.Ready && String(source) === String(_root.mediaSource)) {
-                            _root.finalizeTransition(sourceWallpaper)
+                        if (status === Image.Ready && String(source) === String(_root.mediaSource)) {
+                            grabToImage(function(result) {
+                                canvas.imageData = result;
+                                canvas.requestPaint();
+                            }, Qt.size(1, 1));
+                            if (visible) _root.finalizeTransition(sourceWallpaper);
                         }
                     }
                 }
 
                 Video {
+                    id: sourceVideoWallpaper
                     readonly property bool isHasFullscreen: Workspaces.current?.hasFullscreen
-                    
+
+                    anchors.fill: parent
+                    fillMode: VideoOutput.PreserveAspectCrop
+                    autoPlay: true
+                    loops: MediaPlayer.Infinite
+                    visible: _root.currentShowVideo
+                    muted: true
+
                     onSourceChanged: {
                         if (source) {
                             if (!isHasFullscreen) play();
@@ -94,66 +122,71 @@ Variants {
                         else play();
                     }
 
-                    muted: true
-                    id: sourceVideoWallpaper
-                    anchors.fill: parent
-                    fillMode: VideoOutput.PreserveAspectCrop
-                    autoPlay: true
-                    loops: MediaPlayer.Infinite
-                    visible: _root.currentShowVideo
-
                     onPlaying: {
-                        if (visible && String(source) === String(_root.mediaSource)) {
-                            _root.finalizeTransition(sourceVideoWallpaper)
+                        if (String(source) === String(_root.mediaSource)) {
+                            grabToImage(function(result) {
+                                canvas.imageData = result;
+                                canvas.requestPaint();
+                            }, Qt.size(1, 1));
+                            if (visible) _root.finalizeTransition(sourceVideoWallpaper);
+                        }
+                    }
+
+                    Timer {
+                        running: _root.currentShowVideo && !parent.isHasFullscreen && parent.playbackState === MediaPlayer.PlayingState
+                        interval: 500
+                        repeat: true
+                        onTriggered: {
+                            if (String(parent.source) === String(_root.mediaSource)) {
+                                parent.grabToImage(function(result) {
+                                    canvas.imageData = result;
+                                    canvas.requestPaint();
+                                }, Qt.size(1, 1));
+                                if (_root.transitioning && parent.visible) {
+                                    _root.finalizeTransition(parent);
+                                }
+                            }
                         }
                     }
                 }
             }
 
             ShaderEffectSource {
-                live: false
                 id: shaderWallpaper
+                live: false
                 anchors.fill: parent
                 sourceItem: mediaContainer
 
                 onScheduledUpdateCompleted: {
                     _root.currentShowVideo = _root.isVideo;
-
                     if (_root.isVideo) {
                         sourceVideoWallpaper.source = _root.mediaSource;
-                        sourceWallpaper.source = ""; 
+                        sourceWallpaper.source = "";
                     } else {
                         sourceWallpaper.source = _root.mediaSource;
-                        sourceVideoWallpaper.source = ""; 
+                        sourceVideoWallpaper.source = "";
                     }
                 }
             }
 
             Canvas {
                 id: canvas
-                width: 16
-                height: 16
+                width: 1
+                height: 1
                 visible: false
 
                 property var imageData: null
 
                 onPaint: {
-                    if (!imageData) return
-                    const ctx = getContext("2d")
-                    ctx.drawImage(imageData.url, 0, 0, 16, 16)
-                    const data = ctx.getImageData(0, 0, 16, 16).data
-                    const count = data.length / 4
-                    let r = 0, g = 0, b = 0
-                    for (let i = 0; i < data.length; i += 4) {
-                        r += data[i]
-                        g += data[i + 1]
-                        b += data[i + 2]
-                    }
-                    const ar = r / count
-                    const ag = g / count
-                    const ab = b / count
-                    root.avgColor = Qt.rgba(ar / 255, ag / 255, ab / 255, 1)
-                    root.isLightColor = Math.sqrt(0.299 * ar * ar + 0.587 * ag * ag + 0.114 * ab * ab) > 127.5
+                    if (!imageData) return;
+                    const ctx = getContext("2d");
+                    ctx.drawImage(imageData.url, 0, 0, 1, 1);
+                    const data = ctx.getImageData(0, 0, 1, 1).data;
+                    const r = data[0];
+                    const g = data[1];
+                    const b = data[2];
+                    root.avgColor = Qt.rgba(r / 255, g / 255, b / 255, 1);
+                    root.isLightColor = Math.sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b) > 127.5;
                 }
             }
         }
