@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtMultimedia
 import Qt5Compat.GraphicalEffects
@@ -33,6 +35,10 @@ Variants {
             anchors.right: true
 
             readonly property string wallpaper: configuration.wallpaper
+            readonly property bool isVideo: wallpaper.endsWith(".mp4")
+            readonly property string mediaSource: wallpaper ? `file://${Paths.wallpapers}/${wallpaper}` : ""
+
+            property bool currentShowVideo: isVideo
 
             onWallpaperChanged: {
                 transitionAnimation.stop();
@@ -40,25 +46,67 @@ Variants {
                 shaderWallpaper.scheduleUpdate();
             }
 
+            function finalizeTransition(targetItem) {
+                transitionAnimation.restart();
+                targetItem.grabToImage(function(result) {
+                    canvas.imageData = result
+                    canvas.requestPaint()
+                }, Qt.size(16, 16))
+            }
+
             OpacityAnimator {
                 id: transitionAnimation
                 target: shaderWallpaper
                 from: 1
                 to: 0
-                duration: 150
+                duration: 250 
             }
 
-            Image {
-                id: sourceWallpaper
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
+            Item {
+                id: mediaContainer
                 anchors.fill: parent
-                onStatusChanged: if (status === Image.Ready) {
-                    transitionAnimation.restart();
-                    grabToImage(function(result) {
-                        canvas.imageData = result
-                        canvas.requestPaint()
-                    }, Qt.size(16, 16))
+
+                Image {
+                    id: sourceWallpaper
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    visible: !_root.currentShowVideo
+
+                    onStatusChanged: {
+                        if (visible && status === Image.Ready && String(source) === String(_root.mediaSource)) {
+                            _root.finalizeTransition(sourceWallpaper)
+                        }
+                    }
+                }
+
+                Video {
+                    readonly property bool isHasFullscreen: Workspaces.current?.hasFullscreen
+                    
+                    onSourceChanged: {
+                        if (source) {
+                            if (!isHasFullscreen) play();
+                        } else stop();
+                    }
+
+                    onIsHasFullscreenChanged: {
+                        if (isHasFullscreen) pause();
+                        else play();
+                    }
+
+                    id: sourceVideoWallpaper
+                    anchors.fill: parent
+                    fillMode: VideoOutput.PreserveAspectCrop
+                    autoPlay: true
+                    loops: MediaPlayer.Infinite
+                    // muted: true
+                    visible: _root.currentShowVideo
+
+                    onPlaying: {
+                        if (visible && String(source) === String(_root.mediaSource)) {
+                            _root.finalizeTransition(sourceVideoWallpaper)
+                        }
+                    }
                 }
             }
 
@@ -66,9 +114,18 @@ Variants {
                 live: false
                 id: shaderWallpaper
                 anchors.fill: parent
-                sourceItem: sourceWallpaper
+                sourceItem: mediaContainer
+
                 onScheduledUpdateCompleted: {
-                    sourceWallpaper.source = `${Paths.wallpapers}/${_root.wallpaper}`;
+                    _root.currentShowVideo = _root.isVideo;
+
+                    if (_root.isVideo) {
+                        sourceVideoWallpaper.source = _root.mediaSource;
+                        sourceWallpaper.source = ""; 
+                    } else {
+                        sourceWallpaper.source = _root.mediaSource;
+                        sourceVideoWallpaper.source = ""; 
+                    }
                 }
             }
 

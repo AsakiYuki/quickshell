@@ -64,7 +64,7 @@ Item {
     
     Process {
         id: cavaProcess
-        running: !Workspaces.current.hasFullscreen
+        running: !Workspaces.current?.hasFullscreen || false
         command: ["cava", "-p", `${Paths.quickshell}/scripts/cava.ini`]
         stdout: SplitParser {
             onRead: data => root.bars = data.split(";").map(v => Number(v))

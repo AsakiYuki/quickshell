@@ -25,12 +25,7 @@ LauncherListView {
                 icon: v.entry.icon,
                 text: v.entry.name,
                 subtext: v.entry.comment,
-                entry: {
-                    target: v.entry.target,
-                    textfieldPlaceHolder: v.entry.textfieldPlaceHolder,
-                    allowTyping: v.entry.allowTyping,
-                    isSearchList: v.entry.isSearchList
-                }
+                entry: v.entry
             }))
             : SharedState.search(s.slice(1), entries, false);
 

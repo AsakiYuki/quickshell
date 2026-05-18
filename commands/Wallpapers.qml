@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtMultimedia
 import Qt5Compat.GraphicalEffects
 
 import "../components"
@@ -40,7 +41,7 @@ Item {
 
     Timer {
         id: _changeWallpaperDelay
-        interval: 150
+        interval: 250
         onTriggered: configuration.wallpaper = _root.wallpapers[_root.currentWallpaperIndex]
     }
 
@@ -51,9 +52,8 @@ Item {
             currentWallpaperIndex++;
     }
 
-    Loader {
-        id: _loader
-        active: _root.wallpapers.length > 0
+    Item {
+        id: _sliderContainer
         width: _row.width
         height: _row.height
 
@@ -76,62 +76,100 @@ Item {
             Repeater {
                 model: _root.wallpapers.length
 
-                Image {
-                    id: _img
+                Item {
+                    id: _thumbnail
                     required property int index
-                    readonly property bool shouldLoad: _loader.currentViewPos <= index && index <= _loader.endViewPos
 
-                    asynchronous: true
-                    mipmap: true
-                    cache: true
-                    fillMode: Image.PreserveAspectCrop
+                    readonly property bool shouldLoad: index >= _sliderContainer.currentViewPos && index <= _sliderContainer.endViewPos
+                    
+                    readonly property string sourcePath: `${Paths.wallpapers}/${_root.wallpapers[index]}`
+                    readonly property bool isVideo: _root.wallpapers[index].endsWith(".mp4")
 
-                    sourceSize.width: _root.imageWidth
-                    sourceSize.height: _root.imageHeight
                     width: _root.imageWidth
                     height: _root.imageHeight
 
                     scale: _root.isLoaded && _root.currentWallpaperIndex === index ? 1 : 0.8
-                    opacity: status === Image.Ready ? 1 : 0
+                    opacity: shouldLoad ? 1 : 0
 
                     Behavior on scale {
-                        NumberAnimation {
-                            duration: 350
-                            easing.type: Easing.OutQuint
-                        }
+                        NumberAnimation { duration: 350; easing.type: Easing.OutQuint }
                     }
                     Behavior on opacity {
-                        NumberAnimation {
-                            duration: 250
-                        }
+                        NumberAnimation { duration: 250 }
                     }
 
                     Timer {
                         id: _unloadTimer
                         interval: 150
-                        onTriggered: _img.source = ""
+                        onTriggered: {
+                            _imgLoader.active = false;
+                            _videoLoader.active = false;
+                        }
                     }
 
                     onShouldLoadChanged: {
                         if (shouldLoad) {
                             _unloadTimer.stop();
-                            _img.source = `${Paths.wallpapers}/${_root.wallpapers[index]}`;
+                            if (isVideo) {
+                                _videoLoader.active = true;
+                            } else {
+                                _imgLoader.active = true;
+                            }
                         } else {
                             _unloadTimer.restart();
                         }
                     }
 
                     Component.onCompleted: {
-                        if (shouldLoad)
-                            _img.source = `${Paths.wallpapers}/${_root.wallpapers[index]}`;
+                        if (shouldLoad) {
+                            if (isVideo) _videoLoader.active = true;
+                            else _imgLoader.active = true;
+                        }
                     }
 
-                    layer.enabled: true
-                    layer.effect: OpacityMask {
-                        maskSource: Rectangle {
-                            width: _root.imageWidth
-                            height: _root.imageHeight
-                            radius: 15
+                    Loader {
+                        id: _imgLoader
+                        active: false
+                        anchors.fill: parent
+                        sourceComponent: Image {
+                            asynchronous: true
+                            mipmap: true
+                            cache: true
+                            fillMode: Image.PreserveAspectCrop
+                            sourceSize.width: _root.imageWidth
+                            sourceSize.height: _root.imageHeight
+                            source: _thumbnail.sourcePath
+
+                            layer.enabled: true
+                            layer.effect: OpacityMask {
+                                maskSource: Rectangle {
+                                    width: _root.imageWidth
+                                    height: _root.imageHeight
+                                    radius: 15
+                                }
+                            }
+                        }
+                    }
+
+                    Loader {
+                        id: _videoLoader
+                        active: false
+                        anchors.fill: parent
+                        sourceComponent: Video {
+                            fillMode: VideoOutput.PreserveAspectCrop
+                            autoPlay: true
+                            loops: MediaPlayer.Infinite
+                            muted: true
+                            source: `file://${_thumbnail.sourcePath}`
+
+                            layer.enabled: true
+                            layer.effect: OpacityMask {
+                                maskSource: Rectangle {
+                                    width: _root.imageWidth
+                                    height: _root.imageHeight
+                                    radius: 15
+                                }
+                            }
                         }
                     }
                 }
@@ -140,7 +178,10 @@ Item {
     }
 
     ScaleText {
-        text: _root.wallpapers[_root.currentWallpaperIndex]?.replace(/\.\w*/, "") || ""
+        property string fileName: _root.wallpapers[_root.currentWallpaperIndex] || ""
+        property string name: fileName.replace(/\.[^/.]+$/, "") 
+        text: fileName.endsWith(".mp4") ? qsTr("Video: %1").arg(name) : qsTr("Image: %1").arg(name)
+        
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         resizeSpeed: 0

@@ -24,7 +24,7 @@ SimpleButton {
     property double timeOffset: 0
 
     property double position: 0
-    property double length: realLength || Mpris.current?.length
+    property double length: realLength || Mpris.current?.length || 0
 
     property double lyricsDelay: 0.3
     property int fetchId: 0
