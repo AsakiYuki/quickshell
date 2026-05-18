@@ -78,6 +78,13 @@ Variants {
                 }
             }
 
+            Timer {
+                id: transitionSafetyTimer
+                interval: 1000
+                running: _root.transitioning
+                onTriggered: transitionAnimation.restart()
+            }
+
             Item {
                 id: mediaContainer
                 anchors.fill: parent
@@ -90,11 +97,13 @@ Variants {
                     visible: !_root.currentShowVideo
 
                     onStatusChanged: {
-                        if (status === Image.Ready && String(source) === String(_root.mediaSource)) {
-                            grabToImage(function(result) {
-                                canvas.imageData = result;
-                                canvas.requestPaint();
-                            }, Qt.size(1, 1));
+                        if ((status === Image.Ready || status === Image.Error) && String(source) === String(_root.mediaSource)) {
+                            if (status === Image.Ready) {
+                                grabToImage(function(result) {
+                                    canvas.imageData = result;
+                                    canvas.requestPaint();
+                                }, Qt.size(1, 1));
+                            }
                             if (visible) _root.finalizeTransition(sourceWallpaper);
                         }
                     }
@@ -106,7 +115,7 @@ Variants {
 
                     anchors.fill: parent
                     fillMode: VideoOutput.PreserveAspectCrop
-                    autoPlay: true
+                    autoPlay: !isHasFullscreen
                     loops: MediaPlayer.Infinite
                     visible: _root.currentShowVideo
                     muted: true
@@ -114,7 +123,9 @@ Variants {
                     onSourceChanged: {
                         if (source) {
                             if (!isHasFullscreen) play();
-                        } else stop();
+                        } else {
+                            stop();
+                        }
                     }
 
                     onIsHasFullscreenChanged: {
@@ -122,12 +133,18 @@ Variants {
                         else play();
                     }
 
-                    onPlaying: {
-                        if (String(source) === String(_root.mediaSource)) {
+                    onPlaybackStateChanged: {
+                        if ((playbackState === MediaPlayer.PlayingState || playbackState === MediaPlayer.PausedState) && String(source) === String(_root.mediaSource)) {
                             grabToImage(function(result) {
                                 canvas.imageData = result;
                                 canvas.requestPaint();
                             }, Qt.size(1, 1));
+                            if (visible) _root.finalizeTransition(sourceVideoWallpaper);
+                        }
+                    }
+
+                    onErrorChanged: {
+                        if (error !== MediaPlayer.NoError && String(source) === String(_root.mediaSource)) {
                             if (visible) _root.finalizeTransition(sourceVideoWallpaper);
                         }
                     }

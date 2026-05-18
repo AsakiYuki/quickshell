@@ -24,7 +24,10 @@ Item {
 
     readonly property var wallpapersMap: {
         const obj = {};
-        wallpapers.forEach((v, k) => obj[v] = k);
+        const len = wallpapers.length;
+        for (let i = 0; i < len; i++) {
+            obj[wallpapers[i]] = i;
+        }
         return obj;
     }
 
@@ -82,8 +85,9 @@ Item {
 
                     readonly property bool shouldLoad: index >= _sliderContainer.currentViewPos && index <= _sliderContainer.endViewPos
                     
-                    readonly property string sourcePath: `${Paths.wallpapers}/${_root.wallpapers[index]}`
-                    readonly property bool isVideo: _root.wallpapers[index].endsWith(".mp4")
+                    readonly property string fileName: _root.wallpapers[index] || ""
+                    readonly property string sourcePath: fileName ? `${Paths.wallpapers}/${fileName}` : ""
+                    readonly property bool isVideo: fileName.endsWith(".mp4")
 
                     width: _root.imageWidth
                     height: _root.imageHeight
@@ -101,75 +105,62 @@ Item {
                     Timer {
                         id: _unloadTimer
                         interval: 150
-                        onTriggered: {
-                            _imgLoader.active = false;
-                            _videoLoader.active = false;
-                        }
+                        onTriggered: _mediaLoader.active = false
                     }
 
                     onShouldLoadChanged: {
                         if (shouldLoad) {
                             _unloadTimer.stop();
-                            if (isVideo) {
-                                _videoLoader.active = true;
-                            } else {
-                                _imgLoader.active = true;
-                            }
-                        } else {
+                            _mediaLoader.active = true;
+                        } else if (_mediaLoader.active) {
                             _unloadTimer.restart();
                         }
                     }
 
                     Component.onCompleted: {
-                        if (shouldLoad) {
-                            if (isVideo) _videoLoader.active = true;
-                            else _imgLoader.active = true;
-                        }
+                        if (shouldLoad) _mediaLoader.active = true;
                     }
 
-                    Loader {
-                        id: _imgLoader
-                        active: false
-                        anchors.fill: parent
-                        sourceComponent: Image {
+                    Rectangle {
+                        id: _maskRect
+                        width: _root.imageWidth
+                        height: _root.imageHeight
+                        radius: 15
+                        visible: false
+                    }
+
+                    Component {
+                        id: _imgComp
+                        Image {
                             asynchronous: true
-                            mipmap: true
                             cache: true
                             fillMode: Image.PreserveAspectCrop
                             sourceSize.width: _root.imageWidth
                             sourceSize.height: _root.imageHeight
                             source: _thumbnail.sourcePath
-
-                            layer.enabled: true
-                            layer.effect: OpacityMask {
-                                maskSource: Rectangle {
-                                    width: _root.imageWidth
-                                    height: _root.imageHeight
-                                    radius: 15
-                                }
-                            }
                         }
                     }
 
-                    Loader {
-                        id: _videoLoader
-                        active: false
-                        anchors.fill: parent
-                        sourceComponent: Video {
+                    Component {
+                        id: _vidComp
+                        Video {
                             fillMode: VideoOutput.PreserveAspectCrop
                             autoPlay: true
                             loops: MediaPlayer.Infinite
                             muted: true
-                            source: `file://${_thumbnail.sourcePath}`
+                            source: _thumbnail.sourcePath ? `file://${_thumbnail.sourcePath}` : ""
+                        }
+                    }
 
-                            layer.enabled: true
-                            layer.effect: OpacityMask {
-                                maskSource: Rectangle {
-                                    width: _root.imageWidth
-                                    height: _root.imageHeight
-                                    radius: 15
-                                }
-                            }
+                    Loader {
+                        id: _mediaLoader
+                        active: false
+                        anchors.fill: parent
+                        sourceComponent: _thumbnail.isVideo ? _vidComp : _imgComp
+
+                        layer.enabled: true
+                        layer.effect: OpacityMask {
+                            maskSource: _maskRect
                         }
                     }
                 }
@@ -179,7 +170,8 @@ Item {
 
     ScaleText {
         property string fileName: _root.wallpapers[_root.currentWallpaperIndex] || ""
-        property string name: fileName.replace(/\.[^/.]+$/, "") 
+        property int dotPos: fileName.lastIndexOf(".")
+        property string name: dotPos !== -1 ? fileName.substring(0, dotPos) : fileName
         text: fileName.endsWith(".mp4") ? qsTr("Video: %1").arg(name) : qsTr("Image: %1").arg(name)
         
         anchors.bottom: parent.bottom
