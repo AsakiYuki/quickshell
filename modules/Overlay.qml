@@ -10,6 +10,7 @@ import "../core"
 import "../elements" as Elements
 import "../elements/launcher" as Launcher
 import "../elements/calendar" as Calendar
+import "../elements/controlcenter" as ControlCenter
 
 Variants {
     id: _root
@@ -68,7 +69,7 @@ Variants {
 
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
-                Elements.PowerProfile {}
+                ControlCenter.ControlCenter {}
                 Calendar.Calendar {}
                 MouseArea { anchors.fill: parent; visible: SharedState.isLauncherOpened; hoverEnabled: true; onPressed: SharedState.onOverlayClicked(); z: 10; }
                 Launcher.Launcher {}

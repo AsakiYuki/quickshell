@@ -6,7 +6,7 @@ import "../../core"
 
 import "../../utils/HttpRequest.js" as HttpRequest
 import "../../utils/Lyrics.js" as Lyrics
-import "../../utils/Color.js" as ColorUtils
+import "../../utils/Utils.js" as Utils
 
 SimpleButton {
     id: root
@@ -94,35 +94,44 @@ SimpleButton {
                 // root.bigTrackArtUrl = info.artwork.url;
 
                 if (!info.hasLyrics)
-                    return;
+                    return fetchLrclibLyrics({
+                        artist_name: root.trackArtists,
+                        track_name: root.trackTitle,
+                        duration: root.length
+                    }).then(v => {
+                        if (currentId !== root.fetchId) return;
+                        console.info(`[Lrclib] Found lyrics for ${root.trackArtists} - ${root.trackTitle}`);
+                        root.lyrics = v;
+                    }).catch(() => {
+                        console.info(`Lyrics for ${name} - ${artist} not found!`);
+                    });;
 
                 console.info(`Fetching lyrics for ${name} - ${artist}`);
                 const callback = () => fetchAppleMxmLyrics({ id, name, artist, album, duration }).then(v => { if (currentId === root.fetchId) root.lyrics = v; });
                 
                 callback().then(() => {
                     if (currentId !== root.fetchId) return;
-                    console.info(`Found lyrics for ${name} - ${artist}`);
+                    console.info(`[MusixMatch] Found lyrics for ${name} - ${artist}`);
                 }).catch(() => {
                     if (currentId !== root.fetchId) return;
-                    console.info(`Fetch lyrics for ${name} - ${artist} failed, retry!`);
+                    console.info(`[MusixMatch] Fetch lyrics for ${name} - ${artist} failed, retry!`);
                     return callback().then(() => {
                         if (currentId !== root.fetchId) return;
-                        console.info(`Found lyrics for ${name} - ${artist}`);
+                        console.info(`[MusixMatch] Found lyrics for ${name} - ${artist}`);
                     }).catch(() => {
                         if (currentId !== root.fetchId) return;
-                        console.info(`Lyrics for ${name} - ${artist} not found!`);
-                        console.info(`Try to fetch the lyrics from lrclib!`);
-
+                        console.info(`[MusixMatch] Lyrics for ${name} - ${artist} not found!`);
+                        console.info(`[Lrclib] Fetch lyrics for ${name} - ${artist} failed, retry!`);
                         return fetchLrclibLyrics({
-                            artist_name: artist,
-                            track_name: name,
-                            duration: duration / 1000 >> 0
+                            artist_name: root.trackArtists,
+                            track_name: root.trackTitle,
+                            duration: root.length
                         }).then(v => {
                             if (currentId !== root.fetchId) return;
-                            console.info(`Found lyrics for ${name} - ${artist}`);
+                            console.info(`[Lrclib] Found lyrics for ${root.trackArtists} - ${root.trackTitle}`);
                             root.lyrics = v;
                         }).catch(() => {
-                            console.info(`Lyrics for ${name} - ${artist} not found!`);
+                            console.info(`[Lrclib] Lyrics for ${name} - ${artist} not found!`);
                         });
                     });
                 }).then(v => {
@@ -131,7 +140,23 @@ SimpleButton {
                     else console.info("CANCELED!");
                 });
             });
-        } else root.timeOffset = 0;
+        } else {
+            root.timeOffset = 0;
+
+            const currentId = ++root.fetchId;
+
+            return fetchLrclibLyrics({
+                artist_name: root.trackArtists,
+                track_name: root.trackTitle,
+                duration: root.length
+            }).then(v => {
+                if (currentId !== root.fetchId) return;
+                console.info(`[Lrclib] Found lyrics for ${root.trackArtists} - ${root.trackTitle}`);
+                root.lyrics = v;
+            }).catch(() => {
+                console.info(`Lyrics for ${name} - ${artist} not found!`);
+            });
+        }
 
         root.updatePositionView();
     }

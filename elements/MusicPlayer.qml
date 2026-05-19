@@ -12,7 +12,7 @@ DropPanel {
   active: SharedState.overlayDropPanelType === 3
   viewX: 5
   viewY: 5
-  direction: 2
+  direction: DropPanel.Direction.TOP
 
   openDuration: 500
 
