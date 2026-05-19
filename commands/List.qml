@@ -30,7 +30,7 @@ Singleton {
         },
         {
             allowTyping: false,
-            name: "Wallpaper",
+            name: "Wallpaper Switcher",
             comment: "Personalize your desktop background",
             icon: "../../assets/icons/images.png",
             textfieldPlaceHolder: "Choose a wallpaper...",
