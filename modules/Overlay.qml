@@ -69,7 +69,8 @@ Variants {
 
                 Elements.SystemTray {}
                 Elements.MusicPlayer {}
-                ControlCenter.ControlCenter {}
+                // ControlCenter.ControlCenter {}
+                Elements.PowerProfile {}
                 Calendar.Calendar {}
                 MouseArea { anchors.fill: parent; visible: SharedState.isLauncherOpened; hoverEnabled: true; onPressed: SharedState.onOverlayClicked(); z: 10; }
                 Launcher.Launcher {}

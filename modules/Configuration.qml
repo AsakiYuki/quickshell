@@ -45,12 +45,8 @@ Scope {
     onTouchpadChanged: { save(); chillProcess.exec(["hyprctl", "keyword", "$LAPTOP_TOUCHPAD_ENABLE", touchpad, "-r"]);}
     onHdrChanged: {
         save();
-        chillProcess.exec([ "hyprctl", "keyword", "$CURRENT_STATE_SCREEN",
-            hdr
-                ? "eDP-1, 1920x1200@60, 0x0, 1, sdrbrightness, 1.1, sdrsaturation, 1.25, bitdepth, 10, cm, hdr"
-                : "eDP-1, 1920x1200@60, 0x0, 1",
-            "-r"
-        ]);
+        chillProcess.exec([ "hyprctl", "keyword", "$SCREEN_HDR_STATE", hdr ? "hdr" : "srgb", "-r"]);
+        // chillProcess.exec([ "hyprctl", "keyword", "$SDR_ENABLE", !hdr, "-r"]);
     }
 
     function save() {
