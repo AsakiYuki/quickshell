@@ -38,7 +38,7 @@ SearchList {
             Promise.all([iconsPromise, fs.readfiles(manifestPaths)])
                 .then(([icons, contents]) => {
                     const entries = []
-                    for (const c of contents) {
+                    for (const c of contents.filter(v => v !== null)) {
                         const v = VdfParser.parse(c).AppState
                         if (!v?.name || root.junkRe.test(v.name)) continue
                         entries.push({

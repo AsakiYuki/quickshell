@@ -8,6 +8,7 @@ Scope {
 
     property Component fileViewComponent: FileView {
         watchChanges: false
+        printErrors: false
     }
 
     function readdir(path, hidden) {
@@ -40,6 +41,10 @@ Scope {
             fv.onLoaded.connect(() => {
                 res(fv.text())
                 fv.destroy()
+            })
+            fv.onLoadFailed.connect(() => {
+                res(null);
+                fv.destroy();
             })
         })
     }
