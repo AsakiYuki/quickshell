@@ -48,7 +48,7 @@ SimpleButton {
         anchors.verticalCenter: parent.verticalCenter
 
         Repeater {
-            model: Hyprland.workspaces.values
+            model: Hyprland.workspaces.values.filter(w => w.id > 0 && w.id < 11)
 
             Item {
                 id: _workspace
