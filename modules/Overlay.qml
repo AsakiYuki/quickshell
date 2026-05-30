@@ -15,7 +15,7 @@ import "../elements/controlcenter" as ControlCenter
 Variants {
     id: _root
 
-    model: Quickshell.screens
+    model: Quickshell.screens.filter(s => s.x === 0 && s.y === 0)
 
     property int width: 0
     property int height: 0

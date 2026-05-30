@@ -14,7 +14,7 @@ import "../elements/topbar"
 Variants {
     id: _root
 
-    model: Quickshell.screens
+    model: Quickshell.screens.filter(s => s.x === 0 && s.y === 0)
 
     Scope {
         id: _scope
