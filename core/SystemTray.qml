@@ -17,9 +17,7 @@ Singleton {
     property list<SystemTrayItem> hideTray: allTray.filter(v => hideTray.includes(v))
     
     function updateSystemTray() {
-        showTray = [];
-        hideTray = [];
-
+        showTray = hideTray = [];
         const isHideTrayIDSet = new Set(hideTrayID);
 
         for (const trayItem of allTray) {
