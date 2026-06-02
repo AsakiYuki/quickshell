@@ -28,7 +28,6 @@ Scope {
     function addSearchScore(searchType, id, score = 1) {
         if (!searchScores[searchType]) searchScores[searchType] = {};
         const prev = searchScores[searchType][id] || { score: 0 };
-
         const currentDecayScore = getSearchScore(searchType, id);
         
         searchScores[searchType][id] = {
@@ -42,16 +41,11 @@ Scope {
     onTrayIndexChanged: save()
     onWallpaperChanged: save()
     onHideTrayIDChanged: { save(); if (SystemTray.hideTrayID !== hideTrayID) SystemTray.hideTrayID = hideTrayID; }
-    onTouchpadChanged: { save(); chillProcess.exec(["hyprctl", "keyword", "$LAPTOP_TOUCHPAD_ENABLE", touchpad, "-r"]);}
-    onHdrChanged: {
-        save();
-        chillProcess.exec([ "hyprctl", "keyword", "$SCREEN_HDR_STATE", hdr ? "hdr" : "srgb", "-r"]);
-        // chillProcess.exec([ "hyprctl", "keyword", "$SDR_ENABLE", !hdr, "-r"]);
-    }
-
-    function save() {
-        if (configuration.loaded) _save.restart()
-    }
+    // onTouchpadChanged: { save(); chillProcess.exec(["hyprctl", "keyword", "$LAPTOP_TOUCHPAD_ENABLE", touchpad, "-r"]);}
+    onHdrChanged: save();
+    // chillProcess.exec([ "hyprctl", "keyword", "$SCREEN_HDR_STATE", hdr ? "hdr" : "srgb", "-r"]);
+    // chillProcess.exec([ "hyprctl", "keyword", "$SDR_ENABLE", !hdr, "-r"]);
+    function save() { if (configuration.loaded) _save.restart() }
     
     FileView {
         id: configuration
@@ -67,6 +61,7 @@ Scope {
             _configuration.hideTrayID = data.hideTrayID || [];
             _configuration.searchScores = data.searchScores || {};
 
+            SystemTray.updateSystemTray();
             chillProcess.exec(["sh", "-c", `hyprctl devices | grep -B 6 "main: yes" | grep capsLock | head -1 | awk '{print $2}'`], v => _configuration.capsLock = v.trim() === "yes");
         }
     }
