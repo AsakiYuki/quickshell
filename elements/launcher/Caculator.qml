@@ -47,8 +47,8 @@ Item {
     }
 
     Component.onCompleted: {
-        CalcCore.constant.sw = Screen.width;
-        CalcCore.constant.sh = Screen.height;
+        // CalcCore.constant.sw = Screen.width;
+        // CalcCore.constant.sh = Screen.height;
     }
 
     Column {

@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtMultimedia
-import Qt5Compat.GraphicalEffects
 
 import Quickshell
 import Quickshell.Wayland

@@ -18,7 +18,7 @@ Singleton {
         return null;
     }
 
-    function next() { return Hyprland.dispatch(`workspace e+1`); }
-    function prev() { return Hyprland.dispatch(`workspace e-1`); }
-    function set(id) { return Hyprland.dispatch(`workspace ${id}`); }
+    function next() { return Hyprland.dispatch(`hl.dsp.focus({ workspace = "e+1" })`); }
+    function prev() { return Hyprland.dispatch(`hl.dsp.focus({ workspace = "e-1" })`); }
+    function set(id) { return Hyprland.dispatch(`hl.dsp.focus({ workspace = "${id}" })`); }
 }
