@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 
 import "../../components"
 import "../../core"
@@ -24,7 +23,7 @@ DropPanel {
 
         readonly property int rowHeight: 55
         readonly property int topOffset: 10
-        readonly property int listHeaderArea: 0
+        readonly property int listHeaderArea: 40
 
         property int viewIndex: 0
         property int selectorIndex: 0
@@ -96,8 +95,8 @@ DropPanel {
 
             onClicked: (mouse) => {
                 if (commandContainer.spotMode === 3) return
-                if (mouse.y <= _root.listHeaderArea) return;
-                _root.mouseClick(mouse.y / _root.rowHeight >> 0);
+                if ((mouse.y < 10) || mouse.y >= (height - _root.listHeaderArea)) return;
+                _root.mouseClick((mouse.y - 10) / _root.rowHeight >> 0);
             }
 
             onWheel: (wheel) => {

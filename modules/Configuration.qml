@@ -41,7 +41,7 @@ Scope {
     onTrayIndexChanged: save()
     onWallpaperChanged: save()
     onHideTrayIDChanged: { save(); if (SystemTray.hideTrayID !== hideTrayID) SystemTray.hideTrayID = hideTrayID; }
-    // onTouchpadChanged: { save(); chillProcess.exec(["hyprctl", "keyword", "$LAPTOP_TOUCHPAD_ENABLE", touchpad, "-r"]);}
+    onTouchpadChanged: { save(); chillProcess.exec(["hyprctl", "eval", `TouchpadToggle(${touchpad})`]) }
     onHdrChanged: save();
     // chillProcess.exec([ "hyprctl", "keyword", "$SCREEN_HDR_STATE", hdr ? "hdr" : "srgb", "-r"]);
     // chillProcess.exec([ "hyprctl", "keyword", "$SDR_ENABLE", !hdr, "-r"]);
