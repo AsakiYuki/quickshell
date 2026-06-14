@@ -1,39 +1,19 @@
-//@ pragma UseQApplication
-
 import Quickshell
 import QtQuick
 
-import "./modules" as Modules
-import "./base"
-import "./core"
+import "./views"
+import "./controllers" as Controllers
 
 ShellRoot {
-    id: root
+    id: shell
 
-    Modules.ChillProcess {
-        id: chillProcess
-    } 
+    Controllers.FileSystem { id: fs }
+    Controllers.ChildProcess { id: chillProcess }
 
-    Modules.FileSystem { id: fs }
-    Modules.Configuration { id: configuration }
-    
-    Modules.Overlay {
-        id: overlay
-        property var systemTray: null;
+    Variants {
+        model: Quickshell.screens
+        delegate: Scope {
+            Views {}
+        }
     }
-    
-    Modules.Topbar {
-        id: topbar
-        property var systemTrayElement;
-        property var musicPlayer;
-    }
-
-    Modules.Wallpaper {
-        id: wallpaper
-        property string avgColor: "#000000"
-        property bool isLightColor: false
-    }
-
-    Modules.Desktop {}
-    Modules.Shortcuts {}
 }
